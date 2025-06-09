@@ -1,103 +1,171 @@
-import Image from "next/image";
+'use client'
+import { AppSidebar } from "@/components/app-sidebar"
+import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+import { DataTable } from "@/components/data-table"
+import { SectionCards } from "@/components/section-cards"
+import { SiteHeader } from "@/components/site-header"
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar"
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import data from "./incidentsForDashboard.json"
+import { useState } from "react"
+import { IncidentWithDetails, IncidentStatus, Priority, Impact, Urgency, UserRole } from "@/types/globals"
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+// Mock data for demonstration
+const mockUser = {
+  id: '1',
+  email: 'user@example.com',
+  name: 'John Doe',
+  role: UserRole.SERVICE_DESK,
+  createdAt: new Date(),
+  updatedAt: new Date()
 }
+
+const mockIncidents: IncidentWithDetails[] = [
+  {
+    id: '1',
+    number: 'INC001',
+    title: 'Email server down',
+    description: 'Email server is not responding',
+    status: IncidentStatus.NEW,
+    priority: Priority.HIGH,
+    impact: Impact.HIGH,
+    urgency: Urgency.HIGH,
+    category: 'Infrastructure',
+    subcategory: 'Email',
+    reportedById: '1',
+    reportedBy: mockUser,
+    slaBreachTime: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
+    businessService: 'Email Service',
+    location: 'Data Center 1',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    comments: [],
+    history: [],
+    _count: { comments: 0 }
+  },
+  {
+    id: '2',
+    number: 'INC002',
+    title: 'Network outage in London office',
+    description: 'Users in London office cannot access network resources',
+    status: IncidentStatus.IN_PROGRESS,
+    priority: Priority.MEDIUM,
+    impact: Impact.HIGH,
+    urgency: Urgency.MEDIUM,
+    category: 'Network',
+    subcategory: 'Connectivity',
+    reportedById: '1',
+    reportedBy: mockUser,
+    slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours from now
+    businessService: 'Office Network',
+    location: 'London Office',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    comments: [],
+    history: [],
+    _count: { comments: 0 }
+  },
+  {
+    id: '3',
+    number: 'INC003',
+    title: 'Application error in CRM',
+    description: 'Users are experiencing errors when using the CRM application',
+    status: IncidentStatus.RESOLVED,
+    priority: Priority.LOW,
+    impact: Impact.MEDIUM,
+    urgency: Urgency.LOW,
+    category: 'Application',
+    subcategory: 'CRM',
+    reportedById: '1',
+    reportedBy: mockUser,
+    slaBreachTime: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
+    businessService: 'Customer Relationship Management',
+    location: 'All Locations',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    comments: [],
+    history: [],
+    _count: { comments: 0 }
+  },
+  {
+    id: '4',
+    number: 'INC004',
+    title: 'VPN connection issues',
+    description: 'Users are unable to connect to the VPN',
+    status: IncidentStatus.CLOSED,
+    priority: Priority.HIGH,
+    impact: Impact.HIGH,
+    urgency: Urgency.HIGH,
+    category: 'Network',
+    subcategory: 'VPN',
+    reportedById: '1',
+    reportedBy: mockUser,
+    slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    businessService: 'Remote Access',
+    location: 'Various',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    comments: [],
+    history: [],
+    _count: { comments: 0 }
+  },
+  {
+    id: '5',
+    number: 'INC005',
+    title: 'Database server overload',
+    description: 'Database server is experiencing high load and slow queries',
+    status: IncidentStatus.NEW,
+    priority: Priority.HIGH,
+    impact: Impact.HIGH,
+    urgency: Urgency.HIGH,
+    category: 'Infrastructure',
+    subcategory: 'Database',
+    reportedById: '1',
+    reportedBy: mockUser,
+    slaBreachTime: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour from now
+    businessService: 'All Services',
+    location: 'Data Center 2',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    comments: [],
+    history: [],
+    _count: { comments: 0 }
+  }
+]
+
+const Page = () => {
+  const [incidents] = useState<IncidentWithDetails[]>(mockIncidents)
+
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards incidents={incidents} />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+              <DataTable data={data} />
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}
+
+export default Page
+
