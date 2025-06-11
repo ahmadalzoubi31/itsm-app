@@ -1,238 +1,1597 @@
-'use client'
+"use client";
+import { useState, useMemo } from "react";
+import {
+  IncidentWithDetails,
+  IncidentStatus,
+  Priority,
+  UserRole,
+  Urgency,
+  Impact,
+} from "@/types/globals";
+import { CardTitle, CardDescription } from "@/components/ui/card";
+import { TicketConsoleFilters } from "@/app/incidents/components/TicketConsoleFilters";
+import DataTable from "./components/data-table";   
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import IncidentList from '@/components/incidents/IncidentList'  
-import { BulkReassignDialog } from '@/components/incidents/BulkReassignDialog'
-import { Search, Filter, Plus } from 'lucide-react'
-import { IncidentWithDetails, UserRole, ReassignmentData, IncidentStatus, Priority, Impact, Urgency } from '@/types/globals'
-
-
-// Mock data for demonstration
 const mockUser = {
-  id: '1',
-  email: 'user@example.com',
-  name: 'John Doe',
+  id: "1",
+  name: "John Doe",
+  email: "john.doe@example.com",
   role: UserRole.SERVICE_DESK,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
+};
+
+function getData(): IncidentWithDetails[] {
+  // Fetch data from your API here.
+  return [
+    {
+      id: "1",
+      number: "INC-001",
+      title: "Email server not responding",
+      description: "Users cannot send or receive emails",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Email",
+      subcategory: "Outage",
+      reportedBy: { ...mockUser, id: "2", name: "Jane Smith" },
+      assignedTo: null,
+      assignmentGroup: "Email Support",
+      slaBreachTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h from now
+      businessService: "Email Service",
+      location: "Headquarters",
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "2",
+      number: "INC-002",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.NEW,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "3",
+      number: "INC-003",
+      title: "VPN connection issues",
+      description:
+        "Unable to connect to the corporate VPN from remote locations",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Network",
+      subcategory: "VPN",
+      reportedBy: { ...mockUser, id: "4", name: "Sarah Williams" },
+      assignedTo: null,
+      assignmentGroup: "",
+      slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago (overdue)
+      businessService: "Remote Access",
+      location: "All Locations",
+      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "4",
+      number: "INC-004",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.RESOLVED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "5",
+      number: "INC-005",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.ON_HOLD,
+      priority: Priority.CRITICAL,
+      impact: Impact.CRITICAL,
+      urgency: Urgency.CRITICAL,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "6",
+      number: "INC-006",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CANCELLED,
+      priority: Priority.LOW,
+      impact: Impact.LOW,
+      urgency: Urgency.LOW,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "7",
+      number: "INC-007",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "8",
+      number: "INC-008",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "9",
+      number: "INC-009",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "10",
+      number: "INC-010",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "11",
+      number: "INC-011",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "12",
+      number: "INC-012",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "13",
+      number: "INC-013",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "14",
+      number: "INC-014",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "15",
+      number: "INC-015",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "16",
+      number: "INC-016",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "17",
+      number: "INC-017",
+      title: "Email server not responding",
+      description: "Users cannot send or receive emails",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Email",
+      subcategory: "Outage",
+      reportedBy: { ...mockUser, id: "2", name: "Jane Smith" },
+      assignedTo: null,
+      assignmentGroup: "Email Support",
+      slaBreachTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h from now
+      businessService: "Email Service",
+      location: "Headquarters",
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "18",
+      number: "INC-018",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.NEW,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "19",
+      number: "INC-019",
+      title: "VPN connection issues",
+      description:
+        "Unable to connect to the corporate VPN from remote locations",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Network",
+      subcategory: "VPN",
+      reportedBy: { ...mockUser, id: "4", name: "Sarah Williams" },
+      assignedTo: null,
+      assignmentGroup: "",
+      slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago (overdue)
+      businessService: "Remote Access",
+      location: "All Locations",
+      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "20",
+      number: "INC-020",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.RESOLVED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "21",
+      number: "INC-021",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.ON_HOLD,
+      priority: Priority.CRITICAL,
+      impact: Impact.CRITICAL,
+      urgency: Urgency.CRITICAL,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "22",
+      number: "INC-022",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CANCELLED,
+      priority: Priority.LOW,
+      impact: Impact.LOW,
+      urgency: Urgency.LOW,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "23",
+      number: "INC-023",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "24",
+      number: "INC-024",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: " 25",
+      number: "INC-025",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "26",
+      number: "INC-026",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "27",
+      number: "INC-027",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "28",
+      number: "INC-028",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "29",
+      number: "INC-029",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "30",
+      number: "INC-030",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "31",
+      number: "INC-031",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "32",
+      number: "INC-032",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "33",
+      number: "INC-033",
+      title: "Email server not responding",
+      description: "Users cannot send or receive emails",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Email",
+      subcategory: "Outage",
+      reportedBy: { ...mockUser, id: "2", name: "Jane Smith" },
+      assignedTo: null,
+      assignmentGroup: "Email Support",
+      slaBreachTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h from now
+      businessService: "Email Service",
+      location: "Headquarters",
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "34",
+      number: "INC-034",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.NEW,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "35",
+      number: "INC-035",
+      title: "VPN connection issues",
+      description:
+        "Unable to connect to the corporate VPN from remote locations",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Network",
+      subcategory: "VPN",
+      reportedBy: { ...mockUser, id: "4", name: "Sarah Williams" },
+      assignedTo: null,
+      assignmentGroup: "",
+      slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago (overdue)
+      businessService: "Remote Access",
+      location: "All Locations",
+      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "36",
+      number: "INC-036",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.RESOLVED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "37",
+      number: "INC-037",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.ON_HOLD,
+      priority: Priority.CRITICAL,
+      impact: Impact.CRITICAL,
+      urgency: Urgency.CRITICAL,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "38",
+      number: "INC-038",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CANCELLED,
+      priority: Priority.LOW,
+      impact: Impact.LOW,
+      urgency: Urgency.LOW,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "39",
+      number: "INC-039",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "40",
+      number: "INC-040",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "41",
+      number: "INC-041",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "42",
+      number: "INC-042",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "43",
+      number: "INC-043",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "44",
+      number: "INC-044",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "45",
+      number: "INC-045",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "46",
+      number: "INC-046",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "47",
+      number: "INC-047",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "48",
+      number: "INC-048",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "49",
+      number: "INC-049",
+      title: "Email server not responding",
+      description: "Users cannot send or receive emails",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Email",
+      subcategory: "Outage",
+      reportedBy: { ...mockUser, id: "2", name: "Jane Smith" },
+      assignedTo: null,
+      assignmentGroup: "Email Support",
+      slaBreachTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h from now
+      businessService: "Email Service",
+      location: "Headquarters",
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "50",
+      number: "INC-050",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.NEW,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "51",
+      number: "INC-051",
+      title: "VPN connection issues",
+      description:
+        "Unable to connect to the corporate VPN from remote locations",
+      status: IncidentStatus.IN_PROGRESS,
+      priority: Priority.HIGH,
+      impact: Impact.HIGH,
+      urgency: Urgency.HIGH,
+      category: "Network",
+      subcategory: "VPN",
+      reportedBy: { ...mockUser, id: "4", name: "Sarah Williams" },
+      assignedTo: null,
+      assignmentGroup: "",
+      slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago (overdue)
+      businessService: "Remote Access",
+      location: "All Locations",
+      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "52",
+      number: "INC-052",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.RESOLVED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "53",
+      number: "INC-053",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.ON_HOLD,
+      priority: Priority.CRITICAL,
+      impact: Impact.CRITICAL,
+      urgency: Urgency.CRITICAL,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "54",
+      number: "INC-054",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CANCELLED,
+      priority: Priority.LOW,
+      impact: Impact.LOW,
+      urgency: Urgency.LOW,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "55",
+      number: "INC-055",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "56",
+      number: "INC-056",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "58",
+      number: "INC-058",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "59",
+      number: "INC-059",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: null,
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "60",
+      number: "INC-060",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "61",
+      number: "INC-061",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "62",
+      number: "INC-062",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "63",
+      number: "INC-063",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "64",
+      number: "INC-064",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+    {
+      id: "65",
+      number: "INC-065",
+      title: "Printer not working in Marketing",
+      description: "The color printer in the marketing department is jammed",
+      status: IncidentStatus.CLOSED,
+      priority: Priority.MEDIUM,
+      impact: Impact.MEDIUM,
+      urgency: Urgency.MEDIUM,
+      category: "Hardware",
+      subcategory: "Printer",
+      reportedBy: { ...mockUser, id: "3", name: "Mike Johnson" },
+      assignedTo: { ...mockUser, id: "1", name: "John Doe" },
+      assignmentGroup: "Printer Support",
+      slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12h from now
+      businessService: "Printing Services",
+      location: "Marketing Department",
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1h ago
+      updatedAt: new Date(),
+      comments: [],
+      history: [],
+      _count: { comments: 0 },
+    },
+  ];
 }
 
-const mockIncidents: IncidentWithDetails[] = [
-  {
-    id: '1',
-    number: 'INC001',
-    title: 'Email server down',
-    description: 'Email server is not responding',
-    status: IncidentStatus.NEW,
-    priority: Priority.HIGH,
-    impact: Impact.HIGH,
-    urgency: Urgency.HIGH,
-    category: 'Infrastructure',
-    subcategory: 'Email',
-    reportedById: '1',
-    reportedBy: mockUser,
-    slaBreachTime: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
-    businessService: 'Email Service',
-    location: 'Data Center 1',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-    history: [],
-    _count: { comments: 0 }
-  },
-  {
-    id: '2',
-    number: 'INC002',
-    title: 'Network outage in London office',
-    description: 'Users in London office cannot access network resources',
-    status: IncidentStatus.IN_PROGRESS,
-    priority: Priority.MEDIUM,
-    impact: Impact.HIGH,
-    urgency: Urgency.MEDIUM,
-    category: 'Network',
-    subcategory: 'Connectivity',
-    reportedById: '1',
-    reportedBy: mockUser,
-    slaBreachTime: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours from now
-    businessService: 'Office Network',
-    location: 'London Office',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-    history: [],
-    _count: { comments: 0 }
-  },
-  {
-    id: '3',
-    number: 'INC003',
-    title: 'Application error in CRM',
-    description: 'Users are experiencing errors when using the CRM application',
-    status: IncidentStatus.RESOLVED,
-    priority: Priority.LOW,
-    impact: Impact.MEDIUM,
-    urgency: Urgency.LOW,
-    category: 'Application',
-    subcategory: 'CRM',
-    reportedById: '1',
-    reportedBy: mockUser,
-    slaBreachTime: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
-    businessService: 'Customer Relationship Management',
-    location: 'All Locations',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-    history: [],
-    _count: { comments: 0 }
-  },
-  {
-    id: '4',
-    number: 'INC004',
-    title: 'VPN connection issues',
-    description: 'Users are unable to connect to the VPN',
-    status: IncidentStatus.CLOSED,
-    priority: Priority.HIGH,
-    impact: Impact.HIGH,
-    urgency: Urgency.HIGH,
-    category: 'Network',
-    subcategory: 'VPN',
-    reportedById: '1',
-    reportedBy: mockUser,
-    slaBreachTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    businessService: 'Remote Access',
-    location: 'Various',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-    history: [],
-    _count: { comments: 0 }
-  },
-  {
-    id: '5',
-    number: 'INC005',
-    title: 'Database server overload',
-    description: 'Database server is experiencing high load and slow queries',
-    status: IncidentStatus.NEW,
-    priority: Priority.HIGH,
-    impact: Impact.HIGH,
-    urgency: Urgency.HIGH,
-    category: 'Infrastructure',
-    subcategory: 'Database',
-    reportedById: '1',
-    reportedBy: mockUser,
-    slaBreachTime: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour from now
-    businessService: 'All Services',
-    location: 'Data Center 2',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-    history: [],
-    _count: { comments: 0 }
-  }
-]
+const IncidentConsolePage = () => {
+  const data = getData();
+  const [filters, setFilters] = useState<{
+    search: string;
+    statuses: IncidentStatus[];
+    priorities: Priority[];
+    assignedToMe: boolean;
+    overdueOnly: boolean;
+    dateRange: { from: Date | null; to: Date | null };
+  }>({
+    search: "",
+    statuses: [],
+    priorities: [],
+    assignedToMe: false,
+    overdueOnly: false,
+    dateRange: { from: null, to: null },
+  });
 
-const Index = () => {
-  const router = useRouter()
-  const [incidents] = useState<IncidentWithDetails[]>(mockIncidents )
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedIncidents, setSelectedIncidents] = useState<string[]>([])
-  const [showBulkReassign, setShowBulkReassign] = useState(false)
+  const filteredIncidents = useMemo(() => {
+    return data.filter((incident) => {
+      // Search filter
+      const matchesSearch =
+        incident.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        incident.number.toLowerCase().includes(filters.search.toLowerCase()) ||
+        incident.description
+          .toLowerCase()
+          .includes(filters.search.toLowerCase());
 
-  const filteredIncidents = incidents.filter(incident =>
-    incident.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    incident.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    incident.description.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+      // Status filter
+      const matchesStatus =
+        filters.statuses.length === 0 ||
+        filters.statuses.includes(incident.status);
 
-    const handleBulkReassign = (data: ReassignmentData) => {
-    console.log('Bulk reassigning incidents:', selectedIncidents, 'to:', data.assignedToId, 'group:', data.assignmentGroup, 'reason:', data.reason)
-    setSelectedIncidents([])
-    setShowBulkReassign(false)
-  }
+      // Priority filter
+      const matchesPriority =
+        filters.priorities.length === 0 ||
+        filters.priorities.includes(incident.priority);
+
+      // Assigned to me filter
+      const matchesAssignedToMe =
+        !filters.assignedToMe || incident.assignedTo?.id === "1"; // Assuming current user ID is '1'
+
+      // Overdue filter
+      const isOverdue =
+        incident.slaBreachTime && incident.slaBreachTime < new Date();
+      const matchesOverdue = !filters.overdueOnly || isOverdue;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority &&
+        matchesAssignedToMe &&
+        matchesOverdue
+      );
+    });
+  }, [filters]);
+
+  const resetFilters = () => {
+    setFilters({
+      search: "",
+      statuses: [],
+      priorities: [],
+      assignedToMe: true,
+      overdueOnly: false,
+      dateRange: { from: null, to: null },
+    });
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex justify-between items-start">
+    <div className="flex flex-1 flex-col h-full">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Incident Management Dashboard
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Monitor and manage IT incidents following ITIL v4 best practices
-            </p>
-          </div>
-          <Button onClick={() => router.push('/incidents/create')} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create New Incident
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h2 className="text-lg font-semibold text-gray-800">Open Incidents</h2>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{incidents.filter(i => i.status !== IncidentStatus.CLOSED).length}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h2 className="text-lg font-semibold text-gray-800">Incidents Due Today</h2>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{incidents.filter(i => i.slaBreachTime! < new Date(Date.now() + 24 * 60 * 60 * 1000)).length}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h2 className="text-lg font-semibold text-gray-800">Average Resolution Time</h2>
-          <p className="text-3xl font-bold text-gray-900 mt-2">3.5 hours</p>
-        </div>
-      </div>
-
-      {/* Incident List */}
-      <IncidentList
-        incidents={filteredIncidents}
-      />
-
-      {/* Bulk Actions */}
-      {selectedIncidents.length > 0 && (
-        <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              {selectedIncidents.length} incident{selectedIncidents.length > 1 ? 's' : ''} selected
-            </span>
-            <Button
-              size="sm"
-              onClick={() => setShowBulkReassign(true)}
-            >
-              Bulk Reassign
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedIncidents([])}
-            >
-              Clear Selection
-            </Button>
+            <CardTitle>Ticket Console</CardTitle>
+            <CardDescription>
+              Filter and manage your assigned tickets
+            </CardDescription>
           </div>
         </div>
-      )}
+        <TicketConsoleFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          onReset={resetFilters}
+        />
 
-      <BulkReassignDialog
-        open={showBulkReassign}
-        onOpenChange={setShowBulkReassign}
-        selectedIncidents={selectedIncidents.map(id => {
-          const incident = incidents.find(i => i.id === id)
-          return {
-            id: incident?.id || '',
-            number: incident?.number || '',
-            title: incident?.title || ''
-          }
-        })}
-        onBulkReassign={handleBulkReassign}
-      />
+        <DataTable data={filteredIncidents} />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Index
+export default IncidentConsolePage;

@@ -56,8 +56,6 @@ export enum IncidentStatus {
     urgency: Urgency
     category: string
     subcategory?: string
-    reportedById: string
-    assignedToId?: string
     assignmentGroup?: string
     resolution?: string
     closeCode?: string

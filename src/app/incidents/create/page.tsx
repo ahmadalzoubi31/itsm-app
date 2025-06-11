@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import IncidentForm from '@/components/incidents/IncidentForm'
+import IncidentForm from '@/app/incidents/components/IncidentForm'
 import { CreateIncidentDto, IncidentWithDetails, IncidentStatus, Priority, Impact, Urgency, UserRole } from '@/types/globals'
 import { toast } from 'sonner'
 import { generateIncidentNumber, calculatePriority, calculateSLABreachTime } from '@/utils/incident-utils'

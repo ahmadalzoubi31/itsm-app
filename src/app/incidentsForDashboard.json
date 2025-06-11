@@ -104,7 +104,7 @@
     "priority": "HIGH",
     "category": "Application",
     "subcategory": "Payment System",
-    "assignedToId": "1",
+    "assignedToId": "",
     "assignmentGroup": "Payment Support",
     "businessService": "E-commerce Platform",
     "reportedById": "1",

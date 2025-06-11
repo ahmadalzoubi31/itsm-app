@@ -248,7 +248,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "assignmentGroup",
     header: "Assignment Group",
     cell: ({ row }) => {
-      const isAssigned = row.original.assignmentGroup !== "Assign to group"
+      const isAssigned = row.original.assignmentGroup !== ""
 
       if (isAssigned) {
         return row.original.assignmentGroup
@@ -268,10 +268,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
               <SelectValue placeholder="Assign to group" />
             </SelectTrigger>
             <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
+              <SelectItem value="Service Desk">Service Desk</SelectItem>
+              <SelectItem value="IT Support">IT Support</SelectItem>
             </SelectContent>
           </Select>
         </>
@@ -282,7 +280,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "assignedToId",
     header: "Assigned To",
     cell: ({ row }) => {
-      const isAssigned = row.original.assignedToId !== "Assign to user"
+      const isAssigned = row.original.assignedToId !== ""
 
       if (isAssigned) {
         return row.original.assignedToId
@@ -302,10 +300,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
               <SelectValue placeholder="Assign to user" />
             </SelectTrigger>
             <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
+              <SelectItem value="Service Desk">Service Desk User</SelectItem>
+              <SelectItem value="IT Support">IT Support User</SelectItem>
             </SelectContent>
           </Select>
         </>

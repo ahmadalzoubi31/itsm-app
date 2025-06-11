@@ -50,10 +50,10 @@ export function getIncidentStatusColor(status: IncidentStatus): string {
 
 export function getPriorityColor(priority: Priority): string {
   const colors = {
-    [Priority.CRITICAL]: 'bg-red-500 text-white',
-    [Priority.HIGH]: 'bg-orange-500 text-white',
-    [Priority.MEDIUM]: 'bg-yellow-500 text-white',
-    [Priority.LOW]: 'bg-green-500 text-white'
+    [Priority.CRITICAL]: "bg-red-100 text-red-800 hover:bg-red-200",
+    [Priority.HIGH]: "bg-orange-100 text-orange-800 hover:bg-orange-200",
+    [Priority.MEDIUM]: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+    [Priority.LOW]: "bg-blue-100 text-blue-800 hover:bg-blue-200",
   }
   return colors[priority] || 'bg-gray-500 text-white'
 }
@@ -74,3 +74,4 @@ export function formatIncidentAge(createdAt: Date): string {
   }
   return `${diffHours}h`
 }
+
