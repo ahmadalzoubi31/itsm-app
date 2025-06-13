@@ -10,6 +10,7 @@ export const incidentSchema = z.object({
   description: z.string(),
   status: z.enum([
     IncidentStatus.NEW,
+    IncidentStatus.ASSIGNED,
     IncidentStatus.IN_PROGRESS,
     IncidentStatus.ON_HOLD,
     IncidentStatus.RESOLVED,

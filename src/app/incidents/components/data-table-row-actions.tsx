@@ -22,7 +22,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const incident = incidentSchema.parse(row.original);
+  // const incident = incidentSchema.parse(row.original);
 
   return (
     <DropdownMenu>

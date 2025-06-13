@@ -18,7 +18,6 @@ async function getIncidents() {
   const data = await fs.readFile(
     path.join(process.cwd(), "src/app/incidents/data/incidents.json")
   );
-
   const incidents = JSON.parse(data.toString());
 
   return z.array(incidentSchema).parse(incidents);
@@ -31,9 +30,9 @@ export default async function IncidentPage() {
     <div className="flex flex-1 flex-col h-full">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Incidents</CardTitle>
-            <CardDescription>
+          <div className="mb-4">
+            <CardTitle className="text-2xl font-bold tracking-tight">Incidents</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Filter and manage your assigned incidents
             </CardDescription>
           </div>

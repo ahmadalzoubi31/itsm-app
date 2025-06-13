@@ -1,38 +1,39 @@
 export enum IncidentStatus {
-  NEW = "NEW",
-  IN_PROGRESS = "IN_PROGRESS",
-  ON_HOLD = "ON_HOLD",
-  RESOLVED = "RESOLVED",
-  CLOSED = "CLOSED",
-  CANCELLED = "CANCELLED",
+  NEW = "new",
+  ASSIGNED = "assigned",
+  IN_PROGRESS = "in_progress",
+  ON_HOLD = "on_hold",
+  RESOLVED = "resolved",
+  CLOSED = "closed",
+  CANCELLED = "cancelled",
 }
 
 export enum Priority {
-  CRITICAL = "CRITICAL",
-  HIGH = "HIGH",
-  MEDIUM = "MEDIUM",
-  LOW = "LOW",
+  CRITICAL = "critical",
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
 }
 
 export enum Impact {
-  CRITICAL = "CRITICAL",
-  HIGH = "HIGH",
-  MEDIUM = "MEDIUM",
-  LOW = "LOW",
+  CRITICAL = "critical",
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
 }
 
 export enum Urgency {
-  CRITICAL = "CRITICAL",
-  HIGH = "HIGH",
-  MEDIUM = "MEDIUM",
-  LOW = "LOW",
+  CRITICAL = "critical",
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
 }
 
 export enum UserRole {
-  END_USER = "END_USER",
-  SERVICE_DESK = "SERVICE_DESK",
-  MANAGER = "MANAGER",
-  ADMIN = "ADMIN",
+  END_USER = "end_user",
+  SERVICE_DESK = "service_desk",
+  MANAGER = "manager",
+  ADMIN = "admin",
 }
 
 // Define the basic types that would come from Prisma

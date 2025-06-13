@@ -8,15 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { statuses } from "../constant/statuses";
 import { priorities } from "../constant/priorities";
 import { Incident } from "../validation/schema";
+
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@radix-ui/react-select";
+
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,
@@ -24,8 +19,6 @@ import {
   IconLoader,
 } from "@tabler/icons-react";
 import { Users, User } from "lucide-react";
-import { Label } from "recharts";
-import { getPriorityColor } from "@/utils/incident-utils";
 
 export const columns: ColumnDef<Incident>[] = [
   {
@@ -57,7 +50,7 @@ export const columns: ColumnDef<Incident>[] = [
   {
     accessorKey: "number",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Number" />
+      <DataTableColumnHeader column={column} title="Incident Number" />
     ),
     cell: ({ row }) => {
       return (
@@ -82,7 +75,7 @@ export const columns: ColumnDef<Incident>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
-    cell: ({ row }) => <div className="w-36">{row.original.title}</div>,
+    cell: ({ row }) => <div>{row.original.title}</div>,
   },
   {
     accessorKey: "category",
@@ -92,7 +85,7 @@ export const columns: ColumnDef<Incident>[] = [
     cell: ({ row }) => (
       <div className="flex flex-col">
         <p>{row.original.category}</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {row.original.subcategory}
         </p>
       </div>
@@ -105,7 +98,7 @@ export const columns: ColumnDef<Incident>[] = [
     ),
     cell: ({ row }) => {
       const status = statuses.find(
-        (status) => status.value === row.getValue("status")
+        (status) => status.value === row.getValue("status") as string
       );
 
       if (!status) {
@@ -118,8 +111,10 @@ export const columns: ColumnDef<Incident>[] = [
             <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
           ) : status.value === "cancelled" ? (
             <IconCircleXFilled className="fill-red-500 dark:fill-red-400" />
-          ) : status.value === "on hold" ? (
+          ) : status.value === "on_hold" ? (
             <IconAlertCircleFilled className="fill-yellow-500 dark:fill-yellow-400" />
+          ) : status.value === "assigned" ? (
+            <IconLoader />
           ) : (
             <IconLoader />
           )}
