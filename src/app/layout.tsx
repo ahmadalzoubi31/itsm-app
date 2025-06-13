@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Inter } from "next/font/google";
 import { Poppins } from "next/font/google";
 import { Roboto } from "next/font/google";
-import {Open_Sans} from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,19 +33,19 @@ const inter = Inter({
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: "400",  
+  weight: "400",
 });
 
 const roboto = Roboto({
   variable: "--font-roboto",
   subsets: ["latin"],
-  weight: "400",  
+  weight: "400",
 });
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
   subsets: ["latin"],
-  weight: "400",  
+  weight: "400",
 });
 
 export default function RootLayout({
@@ -56,9 +56,16 @@ export default function RootLayout({
   const [client] = useState(new QueryClient());
 
   return (
-    <html lang="en" style={{
-      fontSize: "16px"  
-    }} className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html
+      lang="en"
+      style={{
+        fontSize: "16px",
+        fontFamily: "var(--font-geist-sans)",
+        fontWeight: "400",
+        lineHeight: "1.5",
+      }}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -76,9 +83,9 @@ export default function RootLayout({
               >
                 <AppSidebar variant="inset" />
                 <SidebarInset>
-                  <SiteHeader />  
+                  <SiteHeader />
                   {children}
-                </SidebarInset> 
+                </SidebarInset>
               </SidebarProvider>
             </TooltipProvider>
           </QueryClientProvider>

@@ -1,58 +1,33 @@
+"use client";
+
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, User, Users } from "lucide-react";
-import { IncidentStatus, Priority } from "@/types/globals";
-import { z } from "zod";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Badge } from "@/components/ui/badge";
-import {
-  getIncidentStatusLabel,
-  getPriorityColor,
-} from "@/utils/incident-utils";
+import { Checkbox } from "@/components/ui/checkbox";
+
+import { statuses } from "../constant/statuses";
+import { priorities } from "../constant/priorities";
+import { Incident } from "../validation/schema";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from "@radix-ui/react-select";
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconAlertCircleFilled,
   IconLoader,
 } from "@tabler/icons-react";
-import { Label } from "@/components/ui/label";
-import { IncidentWithDetails } from "@/types/globals";
+import { Users, User } from "lucide-react";
+import { Label } from "recharts";
+import { getPriorityColor } from "@/utils/incident-utils";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-// export const schema = z.object({
-//   id: z.string(),
-//   number: z.string(),
-//   title: z.string(),
-//   description: z.string(),
-//   status: z.string(),
-//   priority: z.string(),
-//   category: z.string(),
-//   subcategory: z.string().optional(),
-//   assignmentGroup: z.string().optional(),
-//   assignedTo: z.string().optional(),
-//   businessService: z.string(),
-//   reportedById: z.string(),
-//   reportedBy: z.string(),
-//   createdAt: z.string()
-// })
-
-const columns: ColumnDef<IncidentWithDetails>[] = [
+export const columns: ColumnDef<Incident>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -81,7 +56,9 @@ const columns: ColumnDef<IncidentWithDetails>[] = [
   },
   {
     accessorKey: "number",
-    header: "Number",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Number" />
+    ),
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
@@ -102,12 +79,16 @@ const columns: ColumnDef<IncidentWithDetails>[] = [
   },
   {
     accessorKey: "title",
-    header: "Title",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Title" />
+    ),
     cell: ({ row }) => <div className="w-36">{row.original.title}</div>,
   },
   {
     accessorKey: "category",
-    header: "Category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
     cell: ({ row }) => (
       <div className="flex flex-col">
         <p>{row.original.category}</p>
@@ -117,54 +98,68 @@ const columns: ColumnDef<IncidentWithDetails>[] = [
       </div>
     ),
   },
-  // {
-  //   accessorKey: "businessService",
-  //   header: "Business Service",
-  //   cell: ({ row }) => (
-  //     <Badge variant="outline" className="text-muted-foreground px-1.5">
-  //       {row.original.businessService}
-  //     </Badge>
-  //   ),
-  // },
   {
     accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === IncidentStatus.RESOLVED ||
-        row.original.status === IncidentStatus.CLOSED ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : row.original.status === IncidentStatus.CANCELLED ? (
-          <IconCircleXFilled className="fill-red-500 dark:fill-red-400" />
-        ) : row.original.status === IncidentStatus.ON_HOLD ? (
-          <IconAlertCircleFilled className="fill-yellow-500 dark:fill-yellow-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {getIncidentStatusLabel(row.original.status)}
-      </Badge>
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
     ),
+    cell: ({ row }) => {
+      const status = statuses.find(
+        (status) => status.value === row.getValue("status")
+      );
+
+      if (!status) {
+        return null;
+      }
+
+      return (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {status.value === "resolved" || status.value === "closed" ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : status.value === "cancelled" ? (
+            <IconCircleXFilled className="fill-red-500 dark:fill-red-400" />
+          ) : status.value === "on hold" ? (
+            <IconAlertCircleFilled className="fill-yellow-500 dark:fill-yellow-400" />
+          ) : (
+            <IconLoader />
+          )}
+          {status.label}
+        </Badge>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "priority",
-    header: "Priority",
-    cell: ({ row }) => (
-      <Badge
-        className={`${getPriorityColor(
-          row.original.priority as Priority
-        )} px-1.5`}
-      >
-        {row.original.priority}
-      </Badge>
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Priority" />
     ),
+    cell: ({ row }) => {
+      const priority = priorities.find(
+        (priority) => priority.value === row.getValue("priority")
+      );
+
+      if (!priority) {
+        return null;
+      }
+
+      return (
+        <Badge variant="outline" className={`${priority.color} px-2`}>
+          {priority.label}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "assignmentGroup",
-    header: "Assignment Group",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Assignment Group" />
+    ),
     cell: ({ row }) => {
       const isAssigned = row.original.assignmentGroup !== "";
 
-      
       if (isAssigned) {
         return (
           <div className="flex items-center gap-2">
@@ -181,9 +176,11 @@ const columns: ColumnDef<IncidentWithDetails>[] = [
   },
   {
     accessorKey: "assignedTo",
-    header: "Assigned To",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Assigned To" />
+    ),
     cell: ({ row }) => {
-      const isAssigned = row.original.assignedTo !== null;
+      const isAssigned = row.original.assignedTo !== "";
 
       if (isAssigned) {
         return (
@@ -192,60 +189,16 @@ const columns: ColumnDef<IncidentWithDetails>[] = [
               <User className="h-4 w-4" />
             </div>
             <span className="text-muted-foreground font-medium">
-              {row.original.assignedTo?.name}
+              {row.original.assignedTo}
             </span>
           </div>
         );
       }
-
-      return (
-        <>
-          <Label
-            htmlFor={`${row.original.id}-assignedToId`}
-            className="sr-only"
-          >
-            Assigned To
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-assignedToId`}
-            >
-              <SelectValue placeholder="Assign to user" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Service Desk">Service Desk User</SelectItem>
-              <SelectItem value="IT Support">IT Support User</SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      );
     },
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(row.original.id)}
-          >
-            Copy payment ID
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>View customer</DropdownMenuItem>
-          <DropdownMenuItem>View payment details</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];
 
