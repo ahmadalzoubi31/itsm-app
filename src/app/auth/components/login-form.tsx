@@ -5,12 +5,28 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 
 const formSchema = z.object({
   username: z.string(),
@@ -41,21 +57,26 @@ export function LoginForm() {
 
   // Sign In Mutation
   const signInMutation = useMutation({
-    mutationFn: async ({ username, password }: { username: string; password: string }) => {
-
-      const res = await fetch('http://localhost:3000/api/auth/sign-in', {
-        method: 'POST',
-        credentials: 'include', // Important for cookies!
-        headers: { 'Content-Type': 'application/json' },
+    mutationFn: async ({
+      username,
+      password,
+    }: {
+      username: string;
+      password: string;
+    }) => {
+      const res = await fetch(getBackendUrl("/api/auth/sign-in"), {
+        method: "POST",
+        credentials: "include", // Important for cookies!
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      
-      console.log("🚀 ~ file: login-form.tsx:47 ~ res:", res)
+
       // THROW if there’s an error or unauthorized status
-      if (res) {
+      if (!res.ok) {
         // You can customize the message or just use a default
         // throw new Error(res.error?.message || "Unauthorized");
       }
+      return res.json();
     },
     onSuccess: (data: any) => {
       toast.success("Signed in successfully!");
@@ -71,7 +92,9 @@ export function LoginForm() {
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardDescription>
+          Enter your credentials to access your account
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -84,7 +107,13 @@ export function LoginForm() {
                   <FormItem className="grid gap-2">
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input id="username" type="text" required {...field} disabled={signInMutation.isPending} />
+                      <Input
+                        id="username"
+                        type="text"
+                        required
+                        {...field}
+                        disabled={signInMutation.isPending}
+                      />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -97,14 +126,25 @@ export function LoginForm() {
                   <FormItem className="grid gap-2">
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input id="password" type="password" required {...field} disabled={signInMutation.isPending} />
+                      <Input
+                        id="password"
+                        type="password"
+                        required
+                        {...field}
+                        disabled={signInMutation.isPending}
+                      />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
             </div>
-            <Button type="submit" size="lg" className="w-full mt-2" disabled={signInMutation.isPending}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full mt-2"
+              disabled={signInMutation.isPending}
+            >
               {signInMutation.isPending ? "Signing in..." : "Sign in"}
             </Button>
           </form>
@@ -113,7 +153,10 @@ export function LoginForm() {
       <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         <div className="text-sm text-muted-foreground">
           Create a new account?{" "}
-          <Link href="/auth/sign-up" className="text-primary underline-offset-4 transition-colors hover:underline">
+          <Link
+            href="/auth/sign-up"
+            className="text-primary underline-offset-4 transition-colors hover:underline"
+          >
             Sign up
           </Link>
         </div>

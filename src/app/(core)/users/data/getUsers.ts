@@ -1,7 +1,8 @@
 import { fetchWithAuth } from "@/utils/fetxhWithAuth";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 
 export async function getUsers() {
-  const res = await fetchWithAuth("http://localhost:3000/api/users", {
+  const res = await fetchWithAuth(getBackendUrl("/api/users"), {
     credentials: "include", // Send cookies (for auth)
     method: "GET",
   });

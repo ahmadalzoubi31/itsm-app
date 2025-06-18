@@ -1,7 +1,8 @@
 import { AddUserInput, EditUserInput, User } from "./types";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 
 export async function addUser(userData: AddUserInput): Promise<User> {
-  const res = await fetch("http://localhost:3000/users", {
+  const res = await fetch(getBackendUrl("/api/users"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -12,16 +13,19 @@ export async function addUser(userData: AddUserInput): Promise<User> {
 }
 
 export async function editUser(id: string, userData: EditUserInput) {
-  return fetch(`http://localhost:3000/users/${id}`, {
+  return fetch(getBackendUrl(`/api/users/${id}`), {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
-  }).then((res) => res.json());
+  }).then((res) => {
+    if (!res.ok) throw new Error("Failed to edit user");
+    return res.json();
+  });
 }
 
 export async function deleteUser(id: string) {
-  return fetch(`http://localhost:3000/users/${id}`, {
+  return fetch(getBackendUrl(`/api/users/${id}`), {
     method: "DELETE",
     credentials: "include",
   }).then((res) => res.json());
