@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
@@ -11,8 +11,7 @@ export function middleware(req: NextRequest) {
 
   // Optionally, verify the JWT token
   try {
-    jwt.decode(token);
-    const payload = jwt.decode(token) as JwtPayload;
+    const payload = jwtDecode(token);
     if (payload.exp && payload.exp < Date.now() / 1000) {
       return NextResponse.redirect(new URL("/auth/sign-in", req.url));
     }
