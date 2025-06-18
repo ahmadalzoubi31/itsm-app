@@ -1,3 +1,5 @@
+import { Role } from "@/app/(core)/users/data/enums";
+
 export interface BaseEntity {
   id: string;
   createdAt: Date;
@@ -42,17 +44,12 @@ export enum Urgency {
   LOW = "low",
 }
 
-export enum UserRole {
-  USER = "user",
-  ADMIN = "admin",
-}
-
 // Define the basic types that would come from Prisma
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: UserRole;
+  role: Role;
   createdAt: Date;
   updatedAt: Date;
 }

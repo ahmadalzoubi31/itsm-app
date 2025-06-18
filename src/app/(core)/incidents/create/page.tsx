@@ -4,20 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import IncidentForm from "../components/IncidentForm";
-import { CreateIncidentDto, IncidentWithDetails, IncidentStatus, Priority, Impact, Urgency, UserRole } from "@/types/globals";
+import {
+  CreateIncidentDto,
+  IncidentWithDetails,
+  IncidentStatus,
+  Priority,
+  Impact,
+  Urgency,
+} from "@/types/globals";
 import { toast } from "sonner";
-import { generateIncidentNumber, calculatePriority, calculateSLABreachTime } from "@/utils/incident-utils";
+import {
+  generateIncidentNumber,
+  calculatePriority,
+  calculateSLABreachTime,
+} from "@/utils/incident-utils";
 import { ArrowLeft } from "lucide-react";
-
-// Mock data for demonstration
-const mockUser = {
-  id: "1",
-  email: "user@example.com",
-  name: "John Doe",
-  role: UserRole.SERVICE_DESK,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+import { Role } from "../../users/data/enums";
 
 const CreateIncident = () => {
   const router = useRouter();
@@ -29,7 +31,10 @@ const CreateIncident = () => {
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const priority = calculatePriority(data.impact || Impact.MEDIUM, data.urgency || Urgency.MEDIUM);
+      const priority = calculatePriority(
+        data.impact || Impact.MEDIUM,
+        data.urgency || Urgency.MEDIUM
+      );
       const createdAt = new Date();
 
       const newIncident: IncidentWithDetails = {
@@ -43,7 +48,14 @@ const CreateIncident = () => {
         urgency: data.urgency || Urgency.MEDIUM,
         category: data.category,
         subcategory: data.subcategory,
-        reportedBy: mockUser,
+        reportedBy: {
+          id: "1",
+          email: "user@example.com",
+          name: "John Doe",
+          role: Role.AGENT,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
         slaBreachTime: calculateSLABreachTime(priority, createdAt),
         businessService: data.businessService,
         location: data.location,
@@ -71,12 +83,20 @@ const CreateIncident = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button variant="ghost" onClick={() => router.push("/")} className="mb-4 flex items-center gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="mb-4 flex items-center gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Incidents
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Incident</h1>
-          <p className="text-gray-600 mt-2">Report a new incident in the ITIL v4 aligned system</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Create New Incident
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Report a new incident in the ITIL v4 aligned system
+          </p>
         </div>
 
         {/* Form */}
