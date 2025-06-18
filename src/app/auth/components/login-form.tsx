@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { getBackendUrl } from "@/utils/getBackendUrl";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   username: z.string(),
@@ -46,48 +47,38 @@ export function LoginForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    signInMutation.mutateAsync({
-      username: values.username,
-      password: values.password,
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const promise = () =>
+      new Promise(
+        async (resolve, reject) =>
+          await fetch(getBackendUrl("/api/auth/sign-in"), {
+            method: "POST",
+            credentials: "include", // Important for cookies!
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: values.username,
+              password: values.password,
+            }),
+          }).then((res) => {
+            if (res.ok) {
+              resolve(res);
+            } else {
+              reject(res);
+            }
+          })
+      );
+
+    toast.promise(promise, {
+      loading: "Loading...",
+      success: (data) => {
+        router.push("/");
+        return `Signed in successfully!`;
+      },
+      error: (error: Response) => {
+        return `Sign in failed, ${error.statusText}`;
+      },
     });
   }
-
-  // Sign In Mutation
-  const signInMutation = useMutation({
-    mutationFn: async ({
-      username,
-      password,
-    }: {
-      username: string;
-      password: string;
-    }) => {
-      const res = await fetch(getBackendUrl("/api/auth/sign-in"), {
-        method: "POST",
-        credentials: "include", // Important for cookies!
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      // THROW if there’s an error or unauthorized status
-      if (!res.ok) {
-        // You can customize the message or just use a default
-        // throw new Error(res.error?.message || "Unauthorized");
-      }
-      return res.json();
-    },
-    onSuccess: (data: any) => {
-      toast.success("Signed in successfully!");
-      // Redirect to the dashboard or another page after successful sign-in
-      router.push("/");
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || "Sign in failed");
-    },
-  });
-
   return (
     <Card>
       <CardHeader>
@@ -107,13 +98,7 @@ export function LoginForm() {
                   <FormItem className="grid gap-2">
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        id="username"
-                        type="text"
-                        required
-                        {...field}
-                        disabled={signInMutation.isPending}
-                      />
+                      <Input id="username" type="text" required {...field} />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -131,7 +116,6 @@ export function LoginForm() {
                         type="password"
                         required
                         {...field}
-                        disabled={signInMutation.isPending}
                       />
                     </FormControl>
                     <FormMessage className="text-xs" />
@@ -139,13 +123,8 @@ export function LoginForm() {
                 )}
               />
             </div>
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full mt-2"
-              disabled={signInMutation.isPending}
-            >
-              {signInMutation.isPending ? "Signing in..." : "Sign in"}
+            <Button type="submit" size="lg" className="w-full mt-2">
+              Sign in
             </Button>
           </form>
         </Form>
