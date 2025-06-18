@@ -30,9 +30,7 @@ export enum Urgency {
 }
 
 export enum UserRole {
-  END_USER = "end_user",
-  SERVICE_DESK = "service_desk",
-  MANAGER = "manager",
+  USER = "user",
   ADMIN = "admin",
 }
 
