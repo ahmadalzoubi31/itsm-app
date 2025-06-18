@@ -24,7 +24,6 @@ import {
   IncidentWithDetails,
   IncidentStatus,
   Priority,
-  UserRole,
   User,
 } from "@/types/globals";
 import {

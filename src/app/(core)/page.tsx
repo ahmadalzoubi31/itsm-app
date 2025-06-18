@@ -3,7 +3,7 @@ import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
 
 import { useState } from "react";
-import { IncidentWithDetails, IncidentStatus, Priority, Impact, Urgency, UserRole } from "@/types/globals";
+import { IncidentWithDetails } from "@/types/globals";
 
 const Page = () => {
   const [incidents] = useState<IncidentWithDetails[]>();

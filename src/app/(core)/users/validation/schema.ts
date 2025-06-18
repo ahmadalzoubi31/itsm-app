@@ -1,4 +1,4 @@
-import { Status, UserRole } from "@/types/globals";
+import { Status } from "@/types/globals";
 import { z } from "zod";
 
 // We're keeping a simple non-relational schema here.
@@ -8,17 +8,16 @@ export const userSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   username: z.string(),
-  role: z
-    .string()
-    .refine((val) => Object.values(UserRole).includes(val as UserRole), {
-      message: "Invalid user role",
-    }),
+  role: z.string().refine((val) => Object.values(Role).includes(val as Role), {
+    message: "Invalid user role",
+  }),
   createdAt: z.date(),
 });
 
 export type User = z.infer<typeof userSchema>;
 
 import { object, string } from "zod";
+import { Role } from "../data/enums";
 
 export const createUserSchema = object({
   firstName: string({ required_error: "First name is required" })
@@ -37,11 +36,9 @@ export const createUserSchema = object({
     .min(8, "Password must be more than 8 characters")
     .max(32, "Password must be less than 32 characters")
     .optional(),
-  role: z
-    .string()
-    .refine((val) => Object.values(UserRole).includes(val as UserRole), {
-      message: "Invalid user role",
-    }),
+  role: z.string().refine((val) => Object.values(Role).includes(val as Role), {
+    message: "Invalid user role",
+  }),
   phone: z.string().optional(),
   address: z.string().optional(),
   status: z
@@ -65,11 +62,9 @@ export const editUserSchema = object({
     .min(8, "Password must be more than 8 characters")
     .max(32, "Password must be less than 32 characters")
     .optional(),
-  role: z
-    .string()
-    .refine((val) => Object.values(UserRole).includes(val as UserRole), {
-      message: "Invalid user role",
-    }),
+  role: z.string().refine((val) => Object.values(Role).includes(val as Role), {
+    message: "Invalid user role",
+  }),
   phone: z.string().optional(),
   address: z.string().optional(),
   status: z
