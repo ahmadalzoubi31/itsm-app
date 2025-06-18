@@ -1,113 +1,140 @@
-import { useState } from 'react'
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { IncidentWithDetails, IncidentStatus, Priority, UserRole, User } from '@/types/globals'
-import { getIncidentStatusColor, getPriorityColor, formatIncidentAge, isIncidentBreached } from '@/utils/incident-utils'
-import { AlertTriangle, Users, Search, Filter, Clock } from 'lucide-react'
-import { toast } from 'sonner'
-
-// Mock users for demo
-const mockUsers: User[] = [
-  { id: '1', name: 'John Doe', role: UserRole.SERVICE_DESK, email: 'john@example.com', createdAt: new Date(), updatedAt: new Date() },
-  { id: '2', name: 'Jane Smith', role: UserRole.MANAGER, email: 'jane@example.com', createdAt: new Date(), updatedAt: new Date() },
-  { id: '3', name: 'Mike Johnson', role: UserRole.SERVICE_DESK, email: 'mike@example.com', createdAt: new Date(), updatedAt: new Date() },
-  { id: '4', name: 'Sarah Wilson', role: UserRole.ADMIN, email: 'sarah@example.com', createdAt: new Date(), updatedAt: new Date() },
-]
+import { useState } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  IncidentWithDetails,
+  IncidentStatus,
+  Priority,
+  UserRole,
+  User,
+} from "@/types/globals";
+import {
+  getIncidentStatusColor,
+  getPriorityColor,
+  formatIncidentAge,
+  isIncidentBreached,
+} from "@/utils/incident-utils";
+import { AlertTriangle, Users, Search, Filter, Clock } from "lucide-react";
+import { toast } from "sonner";
 
 interface IncidentListProps {
-  incidents: IncidentWithDetails[]
-  loading?: boolean
-  onFiltersChange?: (filters: any) => void
+  incidents: IncidentWithDetails[];
+  loading?: boolean;
+  onFiltersChange?: (filters: any) => void;
 }
 
 interface BulkReassignmentData {
-  assignedToId?: string
-  assignmentGroup?: string
-  reason: string
+  assignedToId?: string;
+  assignmentGroup?: string;
+  reason: string;
 }
 
-function IncidentList({ incidents, loading = false, onFiltersChange }: IncidentListProps) {
-  const [selectedIncidents, setSelectedIncidents] = useState<string[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [stateFilter, setStateFilter] = useState<string>('ALL')
-  const [priorityFilter, setPriorityFilter] = useState<string>('ALL')
+function IncidentList({
+  incidents,
+  loading = false,
+  onFiltersChange,
+}: IncidentListProps) {
+  const [selectedIncidents, setSelectedIncidents] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [stateFilter, setStateFilter] = useState<string>("ALL");
+  const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
 
   // Filter incidents based on local status
-  const filteredIncidents = incidents.filter(incident => {
-    const matchesSearch = incident.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         incident.number.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesState = stateFilter === 'ALL' || incident.status === stateFilter
-    const matchesPriority = priorityFilter === 'ALL' || incident.priority === priorityFilter
-    
-    return matchesSearch && matchesState && matchesPriority
-  })
+  const filteredIncidents = incidents.filter((incident) => {
+    const matchesSearch =
+      incident.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      incident.number.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesState =
+      stateFilter === "ALL" || incident.status === stateFilter;
+    const matchesPriority =
+      priorityFilter === "ALL" || incident.priority === priorityFilter;
+
+    return matchesSearch && matchesState && matchesPriority;
+  });
 
   const handleSelectIncident = (incidentId: string, checked: boolean) => {
     if (checked) {
-      setSelectedIncidents([...selectedIncidents, incidentId])
+      setSelectedIncidents([...selectedIncidents, incidentId]);
     } else {
-      setSelectedIncidents(selectedIncidents.filter(id => id !== incidentId))
+      setSelectedIncidents(selectedIncidents.filter((id) => id !== incidentId));
     }
-  }
+  };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIncidents(filteredIncidents.map(incident => incident.id))
+      setSelectedIncidents(filteredIncidents.map((incident) => incident.id));
     } else {
-      setSelectedIncidents([])
+      setSelectedIncidents([]);
     }
-  }
+  };
 
   const handleBulkReassignment = (reassignmentData: BulkReassignmentData) => {
-    console.log('Bulk reassigning incidents:', selectedIncidents, reassignmentData)
-    setSelectedIncidents([])
-    
-toast.success(`${selectedIncidents.length} incidents have been reassigned`)
-  }
+    console.log(
+      "Bulk reassigning incidents:",
+      selectedIncidents,
+      reassignmentData
+    );
+    setSelectedIncidents([]);
+
+    toast.success(`${selectedIncidents.length} incidents have been reassigned`);
+  };
 
   const getAssignedToName = (incident: IncidentWithDetails) => {
     if (incident.assignedTo) {
-      return incident.assignedTo.name
+      return incident.assignedTo.name;
     }
-    const assignedUser = mockUsers.find(user => user.id === incident.assignedToId)
-    return assignedUser?.name || 'Unassigned'
-  }
+    const assignedUser = "";
+    return assignedUser || "Unassigned";
+  };
 
   const formatCreatedDate = (createdAt: Date) => {
-    return new Date(createdAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+    return new Date(createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const formatDueDate = (slaBreachTime: Date | undefined) => {
-    if (!slaBreachTime) return 'No SLA'
-    
-    const now = new Date()
-    const diffMs = slaBreachTime.getTime() - now.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffDays = Math.floor(diffHours / 24)
-    
+    if (!slaBreachTime) return "No SLA";
+
+    const now = new Date();
+    const diffMs = slaBreachTime.getTime() - now.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
     if (diffMs < 0) {
-      const overdueDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24))
-      const overdueHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60)) % 24
-      return `Overdue by ${overdueDays}d ${overdueHours}h`
+      const overdueDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+      const overdueHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60)) % 24;
+      return `Overdue by ${overdueDays}d ${overdueHours}h`;
     }
-    
+
     if (diffDays > 0) {
-      return `${diffDays}d ${diffHours % 24}h remaining`
+      return `${diffDays}d ${diffHours % 24}h remaining`;
     }
-    return `${diffHours}h remaining`
-  }
+    return `${diffHours}h remaining`;
+  };
 
   return (
     <div className="space-y-4">
@@ -139,9 +166,13 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
               <SelectContent>
                 <SelectItem value="ALL">All States</SelectItem>
                 <SelectItem value={IncidentStatus.NEW}>New</SelectItem>
-                <SelectItem value={IncidentStatus.IN_PROGRESS}>In Progress</SelectItem>
+                <SelectItem value={IncidentStatus.IN_PROGRESS}>
+                  In Progress
+                </SelectItem>
                 <SelectItem value={IncidentStatus.ON_HOLD}>On Hold</SelectItem>
-                <SelectItem value={IncidentStatus.RESOLVED}>Resolved</SelectItem>
+                <SelectItem value={IncidentStatus.RESOLVED}>
+                  Resolved
+                </SelectItem>
                 <SelectItem value={IncidentStatus.CLOSED}>Closed</SelectItem>
               </SelectContent>
             </Select>
@@ -167,7 +198,13 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
           <div className="flex items-center justify-between">
             <CardTitle>Incidents ({filteredIncidents.length})</CardTitle>
             {selectedIncidents.length > 0 && (
-              <Button variant="outline" size="sm" onClick={() => handleBulkReassignment({ reason: 'Bulk reassignment' })}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  handleBulkReassignment({ reason: "Bulk reassignment" })
+                }
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Bulk Reassign ({selectedIncidents.length})
               </Button>
@@ -181,7 +218,10 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                 <TableRow>
                   <TableHead className="w-12">
                     <Checkbox
-                      checked={selectedIncidents.length === filteredIncidents.length && filteredIncidents.length > 0}
+                      checked={
+                        selectedIncidents.length === filteredIncidents.length &&
+                        filteredIncidents.length > 0
+                      }
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
@@ -201,7 +241,12 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                       <TableCell>
                         <Checkbox
                           checked={selectedIncidents.includes(incident.id)}
-                          onCheckedChange={(checked) => handleSelectIncident(incident.id, checked as boolean)}
+                          onCheckedChange={(checked) =>
+                            handleSelectIncident(
+                              incident.id,
+                              checked as boolean
+                            )
+                          }
                         />
                       </TableCell>
                       <TableCell>
@@ -211,12 +256,16 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                               {incident.number}
                             </span>
                           </Link>
-                          {incident.slaBreachTime && isIncidentBreached(incident.slaBreachTime) && (
-                            <Badge variant="destructive" className="flex items-center gap-1">
-                              <AlertTriangle className="h-3 w-3" />
-                              SLA
-                            </Badge>
-                          )}
+                          {incident.slaBreachTime &&
+                            isIncidentBreached(incident.slaBreachTime) && (
+                              <Badge
+                                variant="destructive"
+                                className="flex items-center gap-1"
+                              >
+                                <AlertTriangle className="h-3 w-3" />
+                                SLA
+                              </Badge>
+                            )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -228,8 +277,10 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getIncidentStatusColor(incident.status)}>
-                          {incident.status.replace('_', ' ')}
+                        <Badge
+                          className={getIncidentStatusColor(incident.status)}
+                        >
+                          {incident.status.replace("_", " ")}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -238,7 +289,9 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">{getAssignedToName(incident)}</span>
+                        <span className="text-sm">
+                          {getAssignedToName(incident)}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
@@ -248,7 +301,14 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3 text-muted-foreground" />
-                          <span className={`text-sm ${incident.slaBreachTime && isIncidentBreached(incident.slaBreachTime) ? 'text-red-600 font-medium' : 'text-muted-foreground'}`}>
+                          <span
+                            className={`text-sm ${
+                              incident.slaBreachTime &&
+                              isIncidentBreached(incident.slaBreachTime)
+                                ? "text-red-600 font-medium"
+                                : "text-muted-foreground"
+                            }`}
+                          >
                             {formatDueDate(incident.slaBreachTime)}
                           </span>
                         </div>
@@ -257,7 +317,10 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No incidents found matching your criteria.
                     </TableCell>
                   </TableRow>
@@ -268,7 +331,7 @@ toast.success(`${selectedIncidents.length} incidents have been reassigned`)
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
-export default IncidentList
+export default IncidentList;
