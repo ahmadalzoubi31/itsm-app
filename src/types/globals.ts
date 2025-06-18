@@ -1,3 +1,16 @@
+export interface BaseEntity {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export enum Status {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+}
+
 export enum IncidentStatus {
   NEW = "new",
   ASSIGNED = "assigned",

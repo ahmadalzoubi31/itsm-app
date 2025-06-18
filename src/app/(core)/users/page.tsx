@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import SectionCards from "./components/section-cards";
 import { DataTable } from "./components/data-table";
@@ -11,14 +11,12 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function UsersPage() {
   const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: getUsers,
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users.</div>;
-
-  
 
   return (
     <div className="flex flex-1 flex-col h-full">
@@ -27,8 +25,12 @@ export default function UsersPage() {
           <div className="mb-4">
             <div className="flex items-center gap-4">
               <div>
-                <CardTitle className="text-2xl font-bold tracking-tight">Users</CardTitle>
-                <CardDescription className="text-muted-foreground">Filter and manage your assigned users</CardDescription>
+                <CardTitle className="text-2xl font-bold tracking-tight">
+                  Users
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Filter and manage your assigned users
+                </CardDescription>
               </div>
             </div>
           </div>
@@ -46,7 +48,7 @@ export default function UsersPage() {
             </div>
           </div>
         </div>
-        <DataTable data={data.data} columns={columns}  refetch={refetch}/>
+        <DataTable data={data.data} columns={columns} refetch={refetch} />
       </div>
     </div>
   );

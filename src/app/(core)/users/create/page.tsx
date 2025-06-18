@@ -1,10 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import * as z from "zod";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createUserSchema } from "../validation/schema";
+import { addUser } from "../data/userMutations";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,59 +14,53 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { createUserSchema } from "../validation/schema";
 import { CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { AddUserInput } from "../data/types";
+import { Role } from "../data/enums";
+import { Status } from "@/types/globals";
+import { Select } from "@/components/ui/select";
 
 type FormData = z.infer<typeof createUserSchema>;
 
-export default function CreateUserPage() {
+const CreateUserPage = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const form = useForm<FormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      firstName: "",
+      lastName: "",
       username: "",
       password: "",
+      email: "",
+      phone: "",
+      address: "",
+      role: Role.USER,
+      status: Status.ACTIVE,
     },
   });
 
-  async function onSubmit(data: FormData) {
-    const promise = () =>
-      new Promise((resolve, reject) =>
-        fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }).then((response) => {
-          if (!response.ok) {
-            reject(response.statusText);
-          }
-          resolve(response);
-        })
-      );
+  // Mutation
+  const mutation = useMutation({
+    mutationFn: addUser,
+    onSuccess: () => {
+      // queryClient.invalidateQueries(["users"]); // Refresh users list
+      queryClient.invalidateQueries();
+      toast.success("User created successfully!");
+      router.push("/users");
+    },
+    onError: (error: any) => {
+      toast.error("Failed to create user: " + error.message);
+    },
+  });
 
-    toast.promise(promise, {
-      loading: "Creating user...",
-      success: () => {
-        router.push("/users");
-        // router.refresh();
-        return "User created successfully";
-      },
-      error: (error) => {
-        return "Failed to create user: " + error;
-      },
-    });
+  function onSubmit(data: FormData) {
+    mutation.mutate(data);
   }
 
   return (
@@ -81,12 +74,25 @@ export default function CreateUserPage() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="name"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="John" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Doe" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -135,6 +141,65 @@ export default function CreateUserPage() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input placeholder="1234567890" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address</FormLabel>
+                <FormControl>
+                  <Input placeholder="123 Main St" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Role</FormLabel>
+                <FormControl>
+                  <Select {...field}>
+                    <option value={Role.USER}>User</option>
+                    <option value={Role.ADMIN}>Admin</option>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select {...field}>
+                    <option value={Status.ACTIVE}>Active</option>
+                    <option value={Status.INACTIVE}>Inactive</option>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex gap-4">
             <Button type="submit" size="sm">
               Create User
@@ -152,4 +217,6 @@ export default function CreateUserPage() {
       </Form>
     </div>
   );
-}
+};
+
+export default CreateUserPage;
