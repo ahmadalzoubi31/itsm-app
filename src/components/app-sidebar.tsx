@@ -81,7 +81,7 @@ const data = {
       url: "/users",
       icon: IconUser,
       roles: ["admin", "agent"],
-      permissions: [PermissionName.Foundation_SupportGroup],
+      permissions: [PermissionName.Foundation_People],
     },
   ],
   navSecondary: [
