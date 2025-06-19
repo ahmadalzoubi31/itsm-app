@@ -22,9 +22,17 @@ import { useForm } from "react-hook-form";
 import { AddUserInput } from "../data/types";
 import { Role } from "../data/enums";
 import { Status } from "@/types/globals";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectValue,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+} from "@/components/ui/select";
 
-type FormData = z.infer<typeof createUserSchema>;
+type FormData = z.infer<AddUserInput>;
 
 const CreateUserPage = () => {
   const router = useRouter();
@@ -175,8 +183,17 @@ const CreateUserPage = () => {
                 <FormLabel>Role</FormLabel>
                 <FormControl>
                   <Select {...field}>
-                    <option value={Role.USER}>User</option>
-                    <option value={Role.ADMIN}>Admin</option>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Roles</SelectLabel>
+                        <SelectItem value={Role.ADMIN}>Admin</SelectItem>
+                        <SelectItem value={Role.AGENT}>Agent</SelectItem>
+                        <SelectItem value={Role.USER}>User</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
                   </Select>
                 </FormControl>
                 <FormMessage />
@@ -191,8 +208,16 @@ const CreateUserPage = () => {
                 <FormLabel>Status</FormLabel>
                 <FormControl>
                   <Select {...field}>
-                    <option value={Status.ACTIVE}>Active</option>
-                    <option value={Status.INACTIVE}>Inactive</option>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                        <SelectItem value={Status.INACTIVE}>Offline</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
                   </Select>
                 </FormControl>
                 <FormMessage />

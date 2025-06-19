@@ -6,20 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { roles } from "../constant/roles";
-import { User as UserSchema } from "../validation/schema";
 
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 
-import { IconCircleCheckFilled, IconCircleXFilled, IconAlertCircleFilled, IconLoader } from "@tabler/icons-react";
+import { User } from "../data/types";
 
-export const columns: ColumnDef<UserSchema>[] = [
+export const columns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <div className="flex items-center justify-center">
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
@@ -38,12 +40,33 @@ export const columns: ColumnDef<UserSchema>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "username",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Username" />,
+    accessorKey: "fullName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Full Name" />
+    ),
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
-          <span className="text-primary hover:text-primary/80 font-medium">{row.original.username}</span>
+          <span className="text-primary hover:text-primary/80 font-medium">
+            {row.original.fullName}
+          </span>
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "username",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Username" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <span className="text-primary hover:text-primary/80 font-medium">
+            {row.original.username}
+          </span>
         </div>
       );
     },
@@ -52,31 +75,41 @@ export const columns: ColumnDef<UserSchema>[] = [
   },
   {
     accessorKey: "email",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
     cell: ({ row }) => <div>{row.original.email}</div>,
     enableSorting: true,
     enableHiding: true,
   },
-  {
-    accessorKey: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Full Name" />,
-    cell: ({ row }) => <div>{row.original.name}</div>,
-    enableSorting: true,
-    enableHiding: true,
-  },
+
   {
     accessorKey: "role",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
     cell: ({ row }) => {
       console.log("Row data:", row.original.role);
-      const role = roles.find((role) => role.value === (row.getValue("role") as string));
+      const role = roles.find(
+        (role) => role.value === (row.getValue("role") as string)
+      );
 
       if (!role) {
         return null;
       }
 
       return role.value === "admin" ? (
-        <Badge variant="outline" className="text-muted-foreground px-1.5 bg-red-200">
+        <Badge
+          variant="outline"
+          className="text-muted-foreground px-1.5 bg-red-200"
+        >
+          {role.label}
+        </Badge>
+      ) : role.value === "agent" ? (
+        <Badge
+          variant="outline"
+          className="text-muted-foreground px-1.5 bg-blue-200"
+        >
           {role.label}
         </Badge>
       ) : (
@@ -92,15 +125,38 @@ export const columns: ColumnDef<UserSchema>[] = [
     },
   },
   {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phone" />
+    ),
+    cell: ({ row }) => <div>{row.original.phone}</div>,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "address",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Address" />
+    ),
+    cell: ({ row }) => <div>{row.original.address}</div>,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "createdAt",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created At" />
+    ),
     cell: ({ row }) => {
       return (
         <div className="text-muted-foreground">
-          {new Date(row.original.createdAt).toLocaleDateString("en-US", {
+          {new Date(row.original.createdAt).toLocaleString("en-US", {
             year: "numeric",
-            month: "2-digit",
+            month: "short",
             day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
           })}
         </div>
       );

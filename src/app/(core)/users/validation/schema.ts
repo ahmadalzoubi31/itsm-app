@@ -1,23 +1,8 @@
+import { object, z, string } from "zod";
 import { Status } from "@/types/globals";
-import { z } from "zod";
-
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
-export const userSchema = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  name: z.string(),
-  username: z.string(),
-  role: z.string().refine((val) => Object.values(Role).includes(val as Role), {
-    message: "Invalid user role",
-  }),
-  createdAt: z.date(),
-});
-
-export type User = z.infer<typeof userSchema>;
-
-import { object, string } from "zod";
 import { Role } from "../data/enums";
+
+
 
 export const createUserSchema = object({
   firstName: string({ required_error: "First name is required" })
@@ -32,10 +17,7 @@ export const createUserSchema = object({
   username: string({ required_error: "Username is required" })
     .min(1, "Username is required")
     .max(50, "Username must be less than 50 characters"),
-  password: string({ required_error: "Password is required" })
-    .min(8, "Password must be more than 8 characters")
-    .max(32, "Password must be less than 32 characters")
-    .optional(),
+  password: string().optional(),
   role: z.string().refine((val) => Object.values(Role).includes(val as Role), {
     message: "Invalid user role",
   }),

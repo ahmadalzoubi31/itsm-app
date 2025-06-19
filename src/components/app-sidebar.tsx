@@ -2,14 +2,10 @@
 
 import * as React from "react";
 import {
-  IconCamera,
   IconChartBar,
   IconDashboard,
   IconDatabase,
-  IconFileAi,
-  IconFileDescription,
   IconFileWord,
-  IconFolder,
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
@@ -22,7 +18,7 @@ import {
 
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavUser } from "./nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +28,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { PermissionName } from "@/app/(core)/permissions/data/enums";
+import { useUser } from "@/app/(core)/users/hooks/useUser";
 
 const data = {
   user: {
@@ -44,26 +42,46 @@ const data = {
       title: "Dashboard",
       url: "/",
       icon: IconDashboard,
+      roles: ["admin", "agent"],
+      permissions: [
+        PermissionName.INCIDENT_MASTER,
+        PermissionName.INCIDENT_USER,
+        PermissionName.INCIDENT_SUBMITTER,
+        PermissionName.INCIDENT_VIEWER,
+      ],
     },
     {
       title: "Incidents",
       url: "/incidents",
       icon: IconListDetails,
+      roles: ["admin", "agent"],
+      permissions: [
+        PermissionName.INCIDENT_MASTER,
+        PermissionName.INCIDENT_USER,
+        PermissionName.INCIDENT_SUBMITTER,
+        PermissionName.INCIDENT_VIEWER,
+      ],
     },
     {
       title: "Analytics",
       url: "#",
       icon: IconChartBar,
+      roles: ["admin"],
+      permissions: [],
     },
     {
       title: "Groups",
       url: "#",
       icon: IconUsers,
+      roles: ["admin", "agent"],
+      permissions: [PermissionName.Foundation_SupportGroup],
     },
     {
       title: "Users",
       url: "/users",
       icon: IconUser,
+      roles: ["admin", "agent"],
+      permissions: [PermissionName.Foundation_SupportGroup],
     },
   ],
   navSecondary: [
@@ -103,6 +121,11 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, isLoading } = useUser();
+  console.log(user);
+
+  if (isLoading) return null; // or spinner
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -121,16 +144,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} user={user.data} />
         {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        {/* <NavUser
-          user={
-            data.user
-          }
-        /> */}
+        <NavUser user={user.data} />
       </SidebarFooter>
     </Sidebar>
   );

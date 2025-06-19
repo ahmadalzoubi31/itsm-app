@@ -36,7 +36,7 @@ interface DataTableProps<TData, TValue, TFunc> {
 export function DataTable<TData, TValue, TFunc>({
   columns,
   data,
-  refetch
+  refetch,
 }: DataTableProps<TData, TValue, TFunc>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue, TFunc>({
     <div className="space-y-3">
       <DataTableToolbar table={table} refetch={refetch} />
       <div className="rounded-md overflow-hidden border">
-        <Table className="w-full">
+        <Table className="w-full text-sm leading-8">
           <TableHeader className="bg-muted sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

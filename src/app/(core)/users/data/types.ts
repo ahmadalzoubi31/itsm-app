@@ -1,3 +1,4 @@
+import { ZodSchema } from "zod";
 import { Permission } from "../../permissions/data/types";
 import { Role } from "./enums";
 import { BaseEntity, Status } from "@/types/globals";
@@ -17,7 +18,7 @@ export interface User extends BaseEntity {
   status: string;
 }
 
-export interface AddUserInput {
+export interface AddUserInput extends ZodSchema {
   firstName: string;
   lastName: string;
   username: string;
@@ -29,7 +30,7 @@ export interface AddUserInput {
   status: string;
 }
 
-export interface EditUserInput {
+export interface EditUserInput extends ZodSchema {
   firstName?: string;
   lastName?: string;
   password?: string;
