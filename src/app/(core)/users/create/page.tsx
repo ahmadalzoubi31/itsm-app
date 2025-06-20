@@ -48,20 +48,10 @@ import {
   Plus,
   Check,
   ChevronDown,
-  Search,
 } from "lucide-react";
 import { addUser } from "../data/userMutations";
-// Mock enums and types
-const Role = {
-  ADMIN: "admin",
-  AGENT: "agent",
-  USER: "user",
-};
-
-const Status = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-};
+import { Status } from "../enums/status.enum";
+import { Role } from "../enums/role.enum";
 
 // Mock permissions data
 const availablePermissions = [
@@ -203,7 +193,7 @@ const CreateUserForm = () => {
     const userData = {
       ...formData,
       // fullName: `${formData.firstName} ${formData.lastName}`,
-      // permissions: selectedPermissions,
+      permissions: selectedPermissions,
     };
     console.log("Creating user:", userData);
 
