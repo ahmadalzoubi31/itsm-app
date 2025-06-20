@@ -1,9 +1,9 @@
-import { ZodSchema } from "zod";
 import { Permission } from "../../permissions/data/types";
-import { Role } from "./enums";
-import { BaseEntity, Status } from "@/types/globals";
+import { Role } from "../enums/role.enum";
+import { Status } from "../enums/status.enum";
+import { BaseEntity } from "@/types/globals";
 
-export interface User extends BaseEntity {
+export type User = BaseEntity & {
   id: string;
   firstName: string;
   lastName: string;
@@ -11,14 +11,14 @@ export interface User extends BaseEntity {
   username: string;
   email: string;
   password?: string;
-  role: Role;
+  role: string;
   phone?: string;
   address?: string;
   permissions: Permission[];
   status: string;
-}
+};
 
-export interface AddUserInput extends ZodSchema {
+export type AddUserInput = {
   firstName: string;
   lastName: string;
   username: string;
@@ -28,15 +28,8 @@ export interface AddUserInput extends ZodSchema {
   address?: string;
   role: string;
   status: string;
-}
+};
 
-export interface EditUserInput extends ZodSchema {
-  firstName?: string;
-  lastName?: string;
-  password?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  role?: string;
-  status?: string;
-}
+export type EditUserInput = Partial<AddUserInput> & {
+  id: string;
+};

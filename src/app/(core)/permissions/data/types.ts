@@ -1,4 +1,4 @@
-import { User } from "../../users/data/types";
+import { User } from "../../users/types/types";
 import { PermissionName } from "./enums";
 
 export interface Permission {

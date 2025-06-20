@@ -10,6 +10,32 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import {
+  IconChartBar,
+  IconDashboard,
+  IconDatabase,
+  IconFileWord,
+  IconHelp,
+  IconListDetails,
+  IconReport,
+  IconSearch,
+  IconSettings,
+  IconUser,
+  IconUsers,
+} from "@tabler/icons-react";
+
+// Map icon names to components
+const icons: { [key: string]: React.ComponentType<any> } = {
+  dashboard: IconDashboard,
+  incidents: IconListDetails,
+  analytics: IconChartBar,
+  groups: IconUsers,
+  users: IconUser,
+  settings: IconSettings,
+  help: IconHelp,
+  search: IconSearch,
+  // add other mappings as needed
+};
 
 export function NavMain({
   items,
@@ -18,7 +44,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon?: Icon;
+    icon: string;
     roles: string[];
     permissions: string[];
   }[];
@@ -57,27 +83,30 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              {item.roles.includes(user.role) &&
-                (!item.permissions ||
-                  item.permissions.length === 0 ||
-                  item.permissions.some((perm) =>
-                    user.permissionNames.includes(perm)
-                  )) && (
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    className="cursor-pointer"
-                    asChild
-                  >
-                    <Link href={item.url}>
-                      {item.icon && <item.icon />}
-                      <span className="leading-8">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                )}
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const IconComponent = icons[item.icon]; // lookup the icon
+            return (
+              <SidebarMenuItem key={item.title}>
+                {item.roles.includes(user.role) &&
+                  (!item.permissions ||
+                    item.permissions.length === 0 ||
+                    item.permissions.some((perm) =>
+                      user.permissionNames.includes(perm)
+                    )) && (
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="cursor-pointer"
+                      asChild
+                    >
+                      <a href={item.url}>
+                        {IconComponent && <IconComponent />}
+                        <span className="leading-8">{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  )}
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

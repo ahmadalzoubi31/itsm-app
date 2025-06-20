@@ -1,21 +1,3 @@
-"use client";
-
-import * as React from "react";
-import {
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileWord,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUser,
-  IconUsers,
-} from "@tabler/icons-react";
-
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "./nav-user";
@@ -29,19 +11,15 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { PermissionName } from "@/app/(core)/permissions/data/enums";
-import { useUser } from "@/app/(core)/users/hooks/useUser";
+import { IconInnerShadowTop } from "@tabler/icons-react";
+import { getLoggedUser } from "@/app/(core)/users/data/getLoggedUser";
 
 const data = {
-  user: {
-    name: "",
-    email: "",
-    avatar: "https://avatars.githubusercontent.com/u/1?v=4", // Placeholder avatar
-  },
   navMain: [
     {
       title: "Dashboard",
       url: "/",
-      icon: IconDashboard,
+      icon: "dasboard",
       roles: ["admin", "agent"],
       permissions: [
         PermissionName.INCIDENT_MASTER,
@@ -53,7 +31,7 @@ const data = {
     {
       title: "Incidents",
       url: "/incidents",
-      icon: IconListDetails,
+      icon: "incidents",
       roles: ["admin", "agent"],
       permissions: [
         PermissionName.INCIDENT_MASTER,
@@ -65,21 +43,21 @@ const data = {
     {
       title: "Analytics",
       url: "#",
-      icon: IconChartBar,
+      icon: "analytics",
       roles: ["admin"],
       permissions: [],
     },
     {
       title: "Groups",
       url: "#",
-      icon: IconUsers,
+      icon: "groups",
       roles: ["admin", "agent"],
       permissions: [PermissionName.Foundation_SupportGroup],
     },
     {
       title: "Users",
       url: "/users",
-      icon: IconUser,
+      icon: "users",
       roles: ["admin", "agent"],
       permissions: [PermissionName.Foundation_People],
     },
@@ -88,43 +66,23 @@ const data = {
     {
       title: "Settings",
       url: "#",
-      icon: IconSettings,
+      icon: "settings",
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp,
+      icon: "help",
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
+      icon: "search",
     },
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, isLoading } = useUser();
-  console.log(user);
-
-  if (isLoading) return null; // or spinner
+async function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const user = await getLoggedUser();
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -145,7 +103,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} user={user.data} />
-        {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
@@ -154,3 +111,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+
+export default AppSidebar;

@@ -1,8 +1,9 @@
-import { AddUserInput, EditUserInput, User } from "./types";
+import { fetchWithAuth } from "@/utils/fetxhWithAuth";
+import { AddUserInput, EditUserInput, User } from "../types/types";
 import { getBackendUrl } from "@/utils/getBackendUrl";
 
 export async function addUser(userData: AddUserInput): Promise<User> {
-  const res = await fetch(getBackendUrl("/api/users"), {
+  const res = await fetchWithAuth(getBackendUrl("/api/users"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -13,7 +14,7 @@ export async function addUser(userData: AddUserInput): Promise<User> {
 }
 
 export async function editUser(id: string, userData: EditUserInput) {
-  return fetch(getBackendUrl(`/api/users/${id}`), {
+  return fetchWithAuth(getBackendUrl(`/api/users/${id}`), {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -25,7 +26,7 @@ export async function editUser(id: string, userData: EditUserInput) {
 }
 
 export async function deleteUser(id: string) {
-  return fetch(getBackendUrl(`/api/users/${id}`), {
+  return fetchWithAuth(getBackendUrl(`/api/users/${id}`), {
     method: "DELETE",
     credentials: "include",
   }).then((res) => res.json());

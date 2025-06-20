@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.className} text-sm`}
+      className={`${geistSans.className} text-[15px]`}
       suppressHydrationWarning
     >
       <body

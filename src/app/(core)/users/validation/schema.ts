@@ -1,8 +1,6 @@
 import { object, z, string } from "zod";
 import { Status } from "@/types/globals";
-import { Role } from "../data/enums";
-
-
+import { Role } from "../enums/role.enum";
 
 export const createUserSchema = object({
   firstName: string({ required_error: "First name is required" })

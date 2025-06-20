@@ -5,18 +5,27 @@ import { DataTable } from "./components/data-table";
 import { columns } from "./components/columns";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getUsers } from "./data/getUsers";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useUser } from "./hooks/useUser";
 
 export default function UsersPage() {
-  const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
+  const {
+    users,
+    refetch,
+    isLoading,
+    error,
+    totalUsers,
+    newUsers,
+    pendingUsers,
+    rejectedUsers,
+    activeUsers,
+  } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading users.</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  if (!users) return <div>Loading...</div>;
 
   return (
     <div className="flex flex-1 flex-col h-full">
@@ -44,11 +53,16 @@ export default function UsersPage() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2  mb-4">
             <div className="flex flex-col gap-4">
-              <SectionCards />
+              <SectionCards
+                totalUsers={totalUsers}
+                totalNewUsers={newUsers.length}
+                totalPendingUsers={pendingUsers.length}
+                totalRejectedUsers={rejectedUsers.length}
+              />
             </div>
           </div>
         </div>
-        <DataTable data={data.data} columns={columns} refetch={refetch} />
+        <DataTable data={users} columns={columns} refetch={refetch} />
       </div>
     </div>
   );

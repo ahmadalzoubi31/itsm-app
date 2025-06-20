@@ -1,4 +1,4 @@
-import { Role } from "@/app/(core)/users/data/enums";
+import { User } from "@/app/(core)/users/types/types";
 
 export interface BaseEntity {
   id: string;
@@ -6,11 +6,6 @@ export interface BaseEntity {
   updatedAt: Date;
   createdBy: string;
   updatedBy: string;
-}
-
-export enum Status {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
 }
 
 export enum IncidentStatus {
@@ -44,15 +39,11 @@ export enum Urgency {
   LOW = "low",
 }
 
-// Define the basic types that would come from Prisma
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: Role;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export type ApiResponse<T> = {
+  data: T;
+  status: string;
+  message: string;
+};
 
 export interface Incident {
   id: string;
