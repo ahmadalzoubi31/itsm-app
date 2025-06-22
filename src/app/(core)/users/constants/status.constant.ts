@@ -1,9 +1,15 @@
-import { Status } from "../enums/status.enum";
+export enum StatusEnum {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
 
-export const statuses = [
-  { value: Status.ACTIVE, label: "Active" },
-  { value: Status.INACTIVE, label: "Inactive" },
-  { value: Status.PENDING, label: "Pending" },
-  { value: Status.APPROVED, label: "Approved" },
-  { value: Status.REJECTED, label: "Rejected" },
+export const STATUSES = [
+  { value: StatusEnum.ACTIVE, label: "Active" },
+  { value: StatusEnum.INACTIVE, label: "Inactive" },
+  { value: StatusEnum.PENDING, label: "Pending" },
+  { value: StatusEnum.APPROVED, label: "Approved" },
+  { value: StatusEnum.REJECTED, label: "Rejected" },
 ] as const;

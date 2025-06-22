@@ -1,7 +1,11 @@
-import { Role } from "../enums/role.enum";
+export enum RoleEnum {
+  ADMIN = "ADMIN",
+  USER = "USER",
+  AGENT = "AGENT",
+}
 
-export const roles = [
-  { value: Role.ADMIN, label: "Admin" },
-  { value: Role.AGENT, label: "Agent" },
-  { value: Role.USER, label: "User" },
+export const ROLES = [
+  { value: RoleEnum.ADMIN, label: "Admin" },
+  { value: RoleEnum.AGENT, label: "Agent" },
+  { value: RoleEnum.USER, label: "User" },
 ] as const;

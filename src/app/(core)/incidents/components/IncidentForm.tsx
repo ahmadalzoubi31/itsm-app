@@ -203,7 +203,12 @@ export default function IncidentForm({
           </div>
 
           <div className="flex justify-end gap-4">
-            <Button type="submit" disabled={loading} className="min-w-32">
+            <Button
+              size="sm"
+              type="submit"
+              disabled={loading}
+              className="min-w-32"
+            >
               {loading ? "Creating..." : "Create Incident"}
             </Button>
           </div>

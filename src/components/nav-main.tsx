@@ -50,11 +50,10 @@ export function NavMain({
   }[];
   user: {
     id: string;
-    name: string;
+    fullName: string;
     email: string;
-    image?: string | null | undefined | undefined;
     role: string;
-    permissionNames: string[];
+    permissions: Array<string>;
   };
 }) {
   return (
@@ -91,7 +90,7 @@ export function NavMain({
                   (!item.permissions ||
                     item.permissions.length === 0 ||
                     item.permissions.some((perm) =>
-                      user.permissionNames.includes(perm)
+                      user.permissions.includes(perm)
                     )) && (
                     <SidebarMenuButton
                       tooltip={item.title}

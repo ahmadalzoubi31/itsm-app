@@ -6,11 +6,12 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { roles } from "../constants/role.constant";
+import { ROLES } from "../constants/role.constant";
+import { STATUSES } from "../constants/status.constant";
 
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { statuses } from "../constants/status.constant";
+import { statuses } from "../../incidents/constant/statuses";
 
 interface DataTableToolbarProps<TData, TFunc> {
   table: Table<TData>;
@@ -41,7 +42,7 @@ export function DataTableToolbar<TData, TFunc>({
           <DataTableFacetedFilter
             column={table.getColumn("role")}
             title="Role"
-            options={roles.map((role) => ({
+            options={ROLES.map((role) => ({
               label: role.label,
               value: role.value,
             }))}
@@ -51,7 +52,7 @@ export function DataTableToolbar<TData, TFunc>({
           <DataTableFacetedFilter
             column={table.getColumn("status")}
             title="Status"
-            options={statuses.map((status) => ({
+            options={STATUSES.map((status) => ({
               label: status.label,
               value: status.value,
             }))}

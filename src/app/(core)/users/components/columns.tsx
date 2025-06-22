@@ -5,13 +5,13 @@ import { ColumnDef, RowSelection } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { roles } from "../constants/role.constant";
-import { statuses } from "../constants/status.constant";
+import { ROLES } from "../constants/role.constant";
+import { StatusEnum, STATUSES } from "../constants/status.constant";
 
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 
-import { User } from "../types/types";
+import { User } from "../types";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -107,7 +107,7 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => {
-      const role = roles.find(
+      const role = ROLES.find(
         (role) => role.value === (row.getValue("role") as string)
       );
 
@@ -133,7 +133,7 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
+      const status = STATUSES.find(
         (status: { value: string }) =>
           status.value === (row.getValue("status") as string)
       );
@@ -142,7 +142,7 @@ export const columns: ColumnDef<User>[] = [
         return null;
       }
 
-      return status.value === "inactive" ? (
+      return status.value === StatusEnum.INACTIVE ? (
         <Badge
           variant="outline"
           className="text-muted-foreground px-1.5 bg-red-200"

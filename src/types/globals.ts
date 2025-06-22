@@ -1,4 +1,4 @@
-import { User } from "@/app/(core)/users/types/types";
+import { User } from "@/app/(core)/users/types";
 
 export interface BaseEntity {
   id: string;

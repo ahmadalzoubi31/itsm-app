@@ -19,7 +19,7 @@ import {
   calculateSLABreachTime,
 } from "@/utils/incident-utils";
 import { ArrowLeft } from "lucide-react";
-import { Role } from "../../users/data/enums";
+import { Role } from "../../users/services/enums";
 
 // Mock data for demonstration
 const mockUser = {

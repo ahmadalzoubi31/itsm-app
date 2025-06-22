@@ -10,22 +10,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { PermissionName } from "@/app/(core)/permissions/data/enums";
+import { PermissionNameEnum } from "@/app/(core)/permissions/constants/permission-name.constant";
 import { IconInnerShadowTop } from "@tabler/icons-react";
-import { getLoggedUser } from "@/app/(core)/users/data/getLoggedUser";
+import { getLoggedUser } from "@/app/(core)/users/services/user.server";
 
 const data = {
   navMain: [
     {
       title: "Dashboard",
       url: "/",
-      icon: "dasboard",
+      icon: "dashboard",
       roles: ["admin", "agent"],
       permissions: [
-        PermissionName.INCIDENT_MASTER,
-        PermissionName.INCIDENT_USER,
-        PermissionName.INCIDENT_SUBMITTER,
-        PermissionName.INCIDENT_VIEWER,
+        PermissionNameEnum.INCIDENT_MASTER,
+        PermissionNameEnum.INCIDENT_USER,
+        PermissionNameEnum.INCIDENT_SUBMITTER,
+        PermissionNameEnum.INCIDENT_VIEWER,
       ],
     },
     {
@@ -34,10 +34,10 @@ const data = {
       icon: "incidents",
       roles: ["admin", "agent"],
       permissions: [
-        PermissionName.INCIDENT_MASTER,
-        PermissionName.INCIDENT_USER,
-        PermissionName.INCIDENT_SUBMITTER,
-        PermissionName.INCIDENT_VIEWER,
+        PermissionNameEnum.INCIDENT_MASTER,
+        PermissionNameEnum.INCIDENT_USER,
+        PermissionNameEnum.INCIDENT_SUBMITTER,
+        PermissionNameEnum.INCIDENT_VIEWER,
       ],
     },
     {
@@ -52,14 +52,14 @@ const data = {
       url: "#",
       icon: "groups",
       roles: ["admin", "agent"],
-      permissions: [PermissionName.Foundation_SupportGroup],
+      permissions: [PermissionNameEnum.Foundation_SupportGroup],
     },
     {
       title: "Users",
       url: "/users",
       icon: "users",
       roles: ["admin", "agent"],
-      permissions: [PermissionName.Foundation_People],
+      permissions: [PermissionNameEnum.Foundation_People],
     },
   ],
   navSecondary: [
@@ -84,6 +84,10 @@ const data = {
 async function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const user = await getLoggedUser();
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -102,11 +106,11 @@ async function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} user={user.data} />
+        <NavMain items={data.navMain} user={user!} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user.data} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );
