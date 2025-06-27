@@ -1,11 +1,11 @@
 "use client";
 
-import { ColumnDef, RowSelection } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { ROLES } from "../constants/role.constant";
+import { RoleEnum, ROLES } from "../constants/role.constant";
 import { StatusEnum, STATUSES } from "../constants/status.constant";
 
 import { DataTableColumnHeader } from "./data-table-column-header";
@@ -28,8 +28,17 @@ export const columns: ColumnDef<User>[] = [
         />
       </div>
     ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center mx-3">
+    cell: ({ row, getValue }) => (
+      <div
+        style={{
+          // Since rows are flattened by default,
+          // we can use the row.depth property
+          // and paddingLeft to visually indicate the depth
+          // of the row
+          paddingLeft: `${row.depth * 2}rem`,
+        }}
+        className="flex items-center justify-center mx-3"
+      >
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -38,7 +47,25 @@ export const columns: ColumnDef<User>[] = [
       </div>
     ),
     enableSorting: true,
-    enableHiding: false,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "firstName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="First Name" />
+    ),
+    cell: ({ row }) => <div>{row.original.firstName}</div>,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "lastName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Name" />
+    ),
+    cell: ({ row }) => <div>{row.original.lastName}</div>,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "fullName",
@@ -72,7 +99,7 @@ export const columns: ColumnDef<User>[] = [
       );
     },
     enableSorting: true,
-    enableHiding: false,
+    enableHiding: true,
   },
   {
     accessorKey: "email",
@@ -115,14 +142,21 @@ export const columns: ColumnDef<User>[] = [
         return null;
       }
 
-      return (
+      return role.value === RoleEnum.AGENT ? (
+        <Badge
+          variant="outline"
+          className="text-muted-foreground px-1.5 bg-blue-200"
+        >
+          {role.label}
+        </Badge>
+      ) : (
         <Badge variant="outline" className="text-muted-foreground px-1.5">
           {role.label}
         </Badge>
       );
     },
     enableSorting: true,
-    enableHiding: false,
+    enableHiding: true,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -143,18 +177,31 @@ export const columns: ColumnDef<User>[] = [
       }
 
       return status.value === StatusEnum.INACTIVE ? (
-        <Badge
-          variant="outline"
-          className="text-muted-foreground px-1.5 bg-red-200"
-        >
+        <Badge variant="outline" className="text-red-600 px-1.5 bg-red-200">
           {status.label}
         </Badge>
       ) : (
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
+        <Badge
+          variant="outline"
+          className="text-green-600 px-1.5  bg-green-200"
+        >
           {status.label}
         </Badge>
       );
     },
+  },
+  {
+    accessorKey: "createdBy",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created By" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">{row.original.createdBy}</div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "createdAt",
@@ -176,7 +223,42 @@ export const columns: ColumnDef<User>[] = [
       );
     },
     enableSorting: true,
-    enableHiding: false,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "updatedBy",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated By" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">{row.original.updatedBy}</div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated At" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">
+          {new Date(row.original.updatedAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     id: "actions",

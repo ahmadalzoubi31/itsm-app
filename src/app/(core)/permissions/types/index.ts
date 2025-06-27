@@ -12,10 +12,10 @@ export type Permission = {
 
 export type AssignPermissionDto = {
   userId: string;
-  permissionId: string;
+  permissionNames: PermissionNameEnum[];
 };
 
 export type RemovePermissionDto = {
   userId: string;
-  permissionId: string;
+  permissionNames: PermissionNameEnum[];
 };

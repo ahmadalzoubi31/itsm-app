@@ -25,6 +25,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 
 export function NavUser({
   user,
@@ -41,27 +43,43 @@ export function NavUser({
   const router = useRouter();
 
   const handleLogout = async () => {
-    // try {
-    //   await authClient.signOut({
-    //     fetchOptions: {
-    //       onSuccess: () => {
-    //         router.push("/auth/sign-in");
-    //       },
-    //     },
-    //   });
-    // } catch (error) {
-    //   console.error("Logout failed:", error);
-    // }
+    const promise = () =>
+      new Promise(
+        async (resolve, reject) =>
+          await fetch(getBackendUrl("/api/auth/sign-out"), {
+            method: "POST",
+            credentials: "include", // Important for cookies!
+            headers: { "Content-Type": "application/json" },
+          }).then((res) => {
+            if (res.ok) {
+              resolve(res);
+            } else {
+              reject(res);
+            }
+          })
+      );
+
+    toast.promise(promise, {
+      loading: "Loading...",
+      success: (data) => {
+        router.push("/auth/sign-in");
+        return `Signed out successfully!`;
+      },
+      error: (error: Response) => {
+        return `Sign out failed, ${error.statusText}`;
+      },
+    });
   };
 
   // Get initials for avatar fallback
-  const getInitials = (name: string) =>
-    name
+  const getInitials = (name: string) => {
+    return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
       .toUpperCase();
+  };
 
   if (!user) {
     return null;

@@ -6,8 +6,11 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { statuses } from "../constant/statuses";
-import { priorities } from "../constant/priorities";
+import {
+  IncidentStatusEnum,
+  INCIDENT_STATUSES,
+} from "../constants/incident-status.constant";
+import { PRIORITIES } from "../constants/priority.constant";
 
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
@@ -37,14 +40,14 @@ export function DataTableToolbar<TData>({
           <DataTableFacetedFilter
             column={table.getColumn("status")}
             title="Status"
-            options={statuses}
+            options={INCIDENT_STATUSES}
           />
         )}
         {table.getColumn("priority") && (
           <DataTableFacetedFilter
             column={table.getColumn("priority")}
             title="Priority"
-            options={priorities}
+            options={PRIORITIES}
           />
         )}
         {isFiltered && (

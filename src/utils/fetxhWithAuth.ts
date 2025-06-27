@@ -10,6 +10,7 @@ export async function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
     if (typeof window !== "undefined") {
       window.location.href = "/auth/sign-in";
     }
+
     // Optionally throw or handle error
     throw new Error("Unauthorized");
   }

@@ -4,6 +4,7 @@ import { User } from "../types";
 import { StatusEnum } from "../constants/status.constant";
 import { ApiResponse } from "@/types/globals";
 import { useMemo } from "react";
+import { RoleEnum } from "../constants/role.constant";
 
 export function useUsers() {
   const { data, error, isLoading, refetch } = useQuery<ApiResponse<User[]>>({
@@ -14,7 +15,7 @@ export function useUsers() {
   const users = data?.data ?? [];
 
   // Memoized derived data
-  const { totalUsers, newUsers, pendingUsers, rejectedUsers, activeUsers } =
+  const { totalUsers, newUsers, pendingUsers, rejectedUsers, agentUsers } =
     useMemo(() => {
       const totalUsers = users.length;
 
@@ -35,16 +36,14 @@ export function useUsers() {
         (user) => user.status === StatusEnum.REJECTED
       );
 
-      const activeUsers = users.filter(
-        (user) => user.status === StatusEnum.ACTIVE
-      );
+      const agentUsers = users.filter((user) => user.role === RoleEnum.AGENT);
 
       return {
         totalUsers,
         newUsers,
         pendingUsers,
         rejectedUsers,
-        activeUsers,
+        agentUsers,
       };
     }, [users]);
 
@@ -54,7 +53,7 @@ export function useUsers() {
     newUsers,
     pendingUsers,
     rejectedUsers,
-    activeUsers,
+    agentUsers,
     error,
     isLoading,
     refetch,

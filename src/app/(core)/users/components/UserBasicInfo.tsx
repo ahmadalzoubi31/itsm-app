@@ -6,27 +6,23 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { User, Mail, Phone, MapPin, Lock } from "lucide-react";
-import { RoleEnum } from "../constants/role.constant";
-import { StatusEnum } from "../constants/status.constant";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
+import { Separator } from "@/components/ui/separator";
 
+// Accept the whole form instance as prop
 type Props = {
-  formData: {
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
-    password: string;
-    phone: string;
-    address: string;
-    role: RoleEnum;
-    status: StatusEnum;
-  };
-  onChange: (field: string, value: string) => void;
+  form: UseFormReturn<any>;
 };
 
-export default function UserBasicInfo({ formData, onChange }: Props) {
+export default function UserBasicInfo({ form }: Props) {
   return (
     <Card>
       <CardHeader>
@@ -39,91 +35,126 @@ export default function UserBasicInfo({ formData, onChange }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <Separator />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              placeholder="John"
-              value={formData.firstName}
-              onChange={(e) => onChange("firstName", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              placeholder="Doe"
-              value={formData.lastName}
-              onChange={(e) => onChange("lastName", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Email Address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john.doe@company.com"
-              value={formData.email}
-              onChange={(e) => onChange("email", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              placeholder="john_doe"
-              value={formData.username}
-              onChange={(e) => onChange("username", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password" className="flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Password
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Enter secure password"
-            value={formData.password}
-            onChange={(e) => onChange("password", e.target.value)}
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              placeholder="+1 (555) 123-4567"
-              value={formData.phone}
-              onChange={(e) => onChange("phone", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Address
-            </Label>
-            <Input
-              id="address"
-              placeholder="123 Main Street, City, State"
-              value={formData.address}
-              onChange={(e) => onChange("address", e.target.value)}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Mail className="h-4 w-4 inline" /> Email Address
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="john.doe@company.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="john_doe"
+                    autoComplete="username"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Lock className="h-4 w-4 inline" /> Password
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Enter secure password"
+                  autoComplete="new-password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Phone className="h-4 w-4 inline" /> Phone Number
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="+1 (555) 123-4567" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <MapPin className="h-4 w-4 inline" /> Address
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="123 Main Street, City, State"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </CardContent>
     </Card>

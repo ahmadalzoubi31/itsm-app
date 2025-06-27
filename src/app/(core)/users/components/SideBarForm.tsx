@@ -7,44 +7,47 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Shield, UserPlus } from "lucide-react";
+import { User, Mail, Shield } from "lucide-react";
 import { RoleEnum } from "../constants/role.constant";
 import { StatusEnum } from "../constants/status.constant";
-import { Permission } from "../../permissions/types";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import { UseFormReturn } from "react-hook-form";
 
 type Props = {
-  formData: {
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
-    password: string;
-    phone: string;
-    address: string;
-    role: RoleEnum;
-    status: StatusEnum;
-  };
-  selectedPermissions: Permission[];
+  form: UseFormReturn<any>;
+  errors?: Record<string, any>;
 };
 
-const SideBarForm = ({ formData, selectedPermissions }: Props) => {
-  const getRoleVariant = (role: RoleEnum) => {
-    switch (role) {
-      case RoleEnum.ADMIN:
-        return "destructive";
-      case RoleEnum.AGENT:
-        return "default";
-      case RoleEnum.USER:
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
+const getRoleVariant = (role: RoleEnum) => {
+  switch (role) {
+    case RoleEnum.ADMIN:
+      return "destructive";
+    case RoleEnum.AGENT:
+      return "default";
+    case RoleEnum.USER:
+      return "secondary";
+    default:
+      return "outline";
+  }
+};
 
-  const getStatusVariant = (status: StatusEnum) => {
-    return status === StatusEnum.ACTIVE ? "default" : "secondary";
-  };
+const getStatusVariant = (status: StatusEnum) => {
+  return status === StatusEnum.ACTIVE ? "default" : "secondary";
+};
+
+const SideBarForm = ({ form, errors = {} }: Props) => {
+  const router = useRouter();
+  const formData = form.watch(); // 👈 this is the live snapshot of form fields!
+
+  // Extract field errors
+  const errorMessages = Object.entries(errors)
+    .map(([key, value]) => {
+      if (value?.message) return `${key}: ${value.message}`;
+      return null;
+    })
+    .filter(Boolean);
+
   return (
     <div className="space-y-6">
       {/* Preview Card */}
@@ -82,19 +85,38 @@ const SideBarForm = ({ formData, selectedPermissions }: Props) => {
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                {selectedPermissions.length} permissions
+                {formData.permissions.length} permissions
               </span>
             </div>
           </div>
 
+          {/* Error messages under preview */}
+          {errorMessages.length > 0 && (
+            <div className="mb-4">
+              {errorMessages.map((msg, i) => (
+                <div key={i} className="text-destructive text-xs font-medium">
+                  {msg}
+                </div>
+              ))}
+            </div>
+          )}
+
           <Separator />
 
-          <div className="space-y-3">
-            <Button type="submit" className="w-full" size="lg">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Create User
+          <div className="flex flex-row gap-2">
+            <Button type="submit" className="w-1/2" size="sm">
+              {/* <UserPlus className="h-4 w-4 mr-2" /> */}
+              Save
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-1/2"
+              onClick={() => {
+                router.push("/users");
+              }}
+            >
               Cancel
             </Button>
           </div>

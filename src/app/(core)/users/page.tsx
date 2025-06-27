@@ -16,13 +16,14 @@ export default function UsersPage() {
     newUsers,
     pendingUsers,
     rejectedUsers,
+    agentUsers,
     refetch,
   } = useUsers();
 
-  if (isLoading) return <div className="px-4 lg:px-6">Loading...</div>;
+  // if (isLoading) return <div className="px-4 lg:px-6">Loading...</div>;
   if (error) return <div className="px-4 lg:px-6">Error: {error.message}</div>;
 
-  if (!users) return <div className="px-4 lg:px-6">Loading...</div>;
+  // if (!users) return <div className="px-4 lg:px-6">Loading...</div>;
 
   return (
     <>
@@ -46,6 +47,7 @@ export default function UsersPage() {
           totalNewUsers={newUsers.length}
           totalPendingUsers={pendingUsers.length}
           totalRejectedUsers={rejectedUsers.length}
+          totalAgentUsers={agentUsers.length}
         />
       </div>
       <div className="px-4 lg:px-6">

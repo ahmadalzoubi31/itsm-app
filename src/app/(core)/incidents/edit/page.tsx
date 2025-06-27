@@ -19,14 +19,13 @@ import {
   calculateSLABreachTime,
 } from "@/utils/incident-utils";
 import { ArrowLeft } from "lucide-react";
-import { Role } from "../../users/services/enums";
+import { RoleEnum } from "../../users/constants/role.constant";
 
 // Mock data for demonstration
 const mockUser = {
   id: "1",
   email: "user@example.com",
-  name: "John Doe",
-  role: Role.AGENT,
+  role: RoleEnum.AGENT,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

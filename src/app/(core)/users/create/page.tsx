@@ -1,6 +1,6 @@
 import React from "react";
 import { UserPlus } from "lucide-react";
-import CreateUserForm from "../components/CreateUserForm";
+import UserForm from "../components/UserForm";
 
 const CreateUserPage = () => {
   return (
@@ -12,7 +12,7 @@ const CreateUserPage = () => {
             <UserPlus className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-3xl font-semibold tracking-tight">
+            <h1 className="text-xl font-semibold tracking-tight">
               Create New User
             </h1>
             <p className="text-muted-foreground">
@@ -23,7 +23,7 @@ const CreateUserPage = () => {
         </div>
       </div>
       <div className="px-4 lg:px-6">
-        <CreateUserForm />
+        <UserForm />
       </div>
     </>
   );

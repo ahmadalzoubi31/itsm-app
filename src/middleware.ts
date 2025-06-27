@@ -9,23 +9,31 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
 
-  // Optionally, verify the JWT token
   try {
-    const payload = jwtDecode(token);
+    const payload = jwtDecode<{ exp: number }>(token);
+
     if (payload.exp && payload.exp < Date.now() / 1000) {
-      return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+      // If expired, redirect to session-expired with redirect param
+      const refreshToken = req.cookies.get("refreshToken")?.value || "";
+      const sessionExpiredUrl = new URL("/auth/session-expired", req.url);
+      sessionExpiredUrl.searchParams.set("redirect", req.nextUrl.pathname);
+      sessionExpiredUrl.searchParams.set("refreshToken", refreshToken);
+      console.log(
+        "🚀 ~ file: middleware.ts:21 ~ sessionExpiredUrl:",
+        sessionExpiredUrl
+      );
+
+      return NextResponse.redirect(sessionExpiredUrl);
     }
-  } catch (error) {
-    console.log(error);
+  } catch {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
 
   return NextResponse.next();
 }
 
-// Place the matcher config here!
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|auth/sign-in|auth/sign-up|assets).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth/sign-in|auth/sign-up|auth/session-expired|auth/refresh|assets).*)",
   ],
 };

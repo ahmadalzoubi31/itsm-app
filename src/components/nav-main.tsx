@@ -34,6 +34,7 @@ const icons: { [key: string]: React.ComponentType<any> } = {
   settings: IconSettings,
   help: IconHelp,
   search: IconSearch,
+  "service-requests": IconFileWord,
   // add other mappings as needed
 };
 
@@ -97,10 +98,10 @@ export function NavMain({
                       className="cursor-pointer"
                       asChild
                     >
-                      <a href={item.url}>
+                      <Link href={item.url}>
                         {IconComponent && <IconComponent />}
                         <span className="leading-8">{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   )}
               </SidebarMenuItem>

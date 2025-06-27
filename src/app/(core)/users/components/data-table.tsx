@@ -12,6 +12,8 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -40,7 +42,22 @@ export function DataTable<TData, TValue, TFunc>({
 }: DataTableProps<TData, TValue, TFunc>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({
+      firstName: false,
+      lastName: false,
+      fullName: true,
+      username: true,
+      email: true,
+      phone: false,
+      address: false,
+      role: true,
+      permissions: false,
+      status: true,
+      createdAt: true,
+      createdBy: false,
+      updatedAt: false,
+      updatedBy: false,
+    });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -58,6 +75,7 @@ export function DataTable<TData, TValue, TFunc>({
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(), // <-- REQUIRED!
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
@@ -65,6 +83,7 @@ export function DataTable<TData, TValue, TFunc>({
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getExpandedRowModel: getExpandedRowModel(),
   });
 
   return (

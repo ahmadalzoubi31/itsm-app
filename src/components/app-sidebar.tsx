@@ -13,6 +13,7 @@ import {
 import { PermissionNameEnum } from "@/app/(core)/permissions/constants/permission-name.constant";
 import { IconInnerShadowTop } from "@tabler/icons-react";
 import { getLoggedUser } from "@/app/(core)/users/services/user.server";
+import { RoleEnum } from "@/app/(core)/users/constants/role.constant";
 
 const data = {
   navMain: [
@@ -20,7 +21,7 @@ const data = {
       title: "Dashboard",
       url: "/",
       icon: "dashboard",
-      roles: ["admin", "agent"],
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
       permissions: [
         PermissionNameEnum.INCIDENT_MASTER,
         PermissionNameEnum.INCIDENT_USER,
@@ -32,7 +33,7 @@ const data = {
       title: "Incidents",
       url: "/incidents",
       icon: "incidents",
-      roles: ["admin", "agent"],
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
       permissions: [
         PermissionNameEnum.INCIDENT_MASTER,
         PermissionNameEnum.INCIDENT_USER,
@@ -41,31 +42,43 @@ const data = {
       ],
     },
     {
+      title: "Service Requests",
+      url: "/service-requests",
+      icon: "service-requests",
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
+      permissions: [
+        // PermissionNameEnum.SERVICE_REQUEST_MASTER,
+        // PermissionNameEnum.SERVICE_REQUEST_USER,
+        // PermissionNameEnum.SERVICE_REQUEST_SUBMITTER,
+        // PermissionNameEnum.SERVICE_REQUEST_VIEWER,
+      ],
+    },
+    {
       title: "Analytics",
       url: "#",
       icon: "analytics",
-      roles: ["admin"],
+      roles: [RoleEnum.ADMIN],
       permissions: [],
     },
     {
       title: "Groups",
       url: "#",
       icon: "groups",
-      roles: ["admin", "agent"],
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
       permissions: [PermissionNameEnum.Foundation_SupportGroup],
     },
     {
       title: "Users",
       url: "/users",
       icon: "users",
-      roles: ["admin", "agent"],
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
       permissions: [PermissionNameEnum.Foundation_People],
     },
   ],
   navSecondary: [
     {
       title: "Settings",
-      url: "#",
+      url: "/settings/ldap",
       icon: "settings",
     },
     {

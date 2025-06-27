@@ -27,7 +27,7 @@ export function DataTableViewOptions<TData, TFunc>({
       <Button
         variant="outline"
         size="sm"
-        className="ml-auto hidden h-8 lg:flex"
+        className="ml-auto mr-2 hidden h-8 lg:flex"
         onClick={() => refetch()}
       >
         Refresh
@@ -40,7 +40,7 @@ export function DataTableViewOptions<TData, TFunc>({
             className="ml-auto hidden h-8 lg:flex"
           >
             <Settings2 />
-            View
+            Columns
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[170px]">

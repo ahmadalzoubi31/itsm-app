@@ -11,7 +11,6 @@ import { STATUSES } from "../constants/status.constant";
 
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { statuses } from "../../incidents/constant/statuses";
 
 interface DataTableToolbarProps<TData, TFunc> {
   table: Table<TData>;
