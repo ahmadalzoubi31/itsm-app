@@ -3,18 +3,19 @@ import {
   fetchLdapSettings,
   saveLdapSettings,
 } from "../../services/settings.service";
-import { LdapSettings } from "../types";
+import { testLdapConnection } from "../services/ldap.service";
 
-// Fetch LDAP settings
-export function useLdapSettings() {
+// Get LDAP settings
+export function useGetLdapSettings() {
   return useQuery({
     queryKey: ["ldapSettings"],
     queryFn: fetchLdapSettings,
-    select: (res) => res.data?.jsonValue as LdapSettings | undefined, // You may have { id, type, jsonValue }
+    select: (data) => data.data,
+    refetchOnWindowFocus: false,
   });
 }
 
-// Update/save LDAP settings
+// Save LDAP settings
 export function useSaveLdapSettings() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -23,4 +24,9 @@ export function useSaveLdapSettings() {
       queryClient.invalidateQueries({ queryKey: ["ldapSettings"] });
     },
   });
+}
+
+// Test LDAP settings
+export function useTestLdapSettings() {
+  return useMutation({ mutationFn: testLdapConnection });
 }

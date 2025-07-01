@@ -39,7 +39,7 @@ export default function RootLayout({
       <body lang="en" suppressHydrationWarning>
         <QueryClientProvider client={client}>
           <TooltipProvider>
-            <Toaster richColors />
+            <Toaster richColors position="top-center" />
             {children}
           </TooltipProvider>
         </QueryClientProvider>

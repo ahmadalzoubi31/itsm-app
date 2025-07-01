@@ -3,8 +3,8 @@ export interface LdapSettings {
   port: number;
   protocol: "ldap" | "ldaps";
   baseDn: string;
-  bindDn?: string;
-  bindPassword?: string;
+  bindDn: string;
+  bindPassword: string;
   searchFilter: string;
   attributes: string;
   useSSL: boolean;
@@ -16,6 +16,8 @@ export const DEFAULT_LDAP_SETTINGS: LdapSettings = {
   port: 389,
   protocol: "ldap",
   baseDn: "",
+  bindDn: "",
+  bindPassword: "",
   searchFilter: "(objectClass=user)",
   attributes:
     "cn,mail,displayName,givenName,sn,userPrincipalName,department,title,telephoneNumber",
@@ -23,7 +25,7 @@ export const DEFAULT_LDAP_SETTINGS: LdapSettings = {
   validateCert: true,
 };
 
-export type ConnectionStatus = "connected" | "disconnected" | "testing";
+// export type ConnectionStatus = "connected" | "disconnected" | "testing";
 
 export interface LdapSettingsFormProps {
   settings: LdapSettings;

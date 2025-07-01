@@ -24,7 +24,6 @@ import UserBasicInfo from "./UserBasicInfo";
 import UserPermissions from "./UserPermissions";
 import UserSettings from "./UserSettings";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUser } from "../hooks/useUser";
 
 const UserForm = () => {
   const { id } = useParams() as { id: string };

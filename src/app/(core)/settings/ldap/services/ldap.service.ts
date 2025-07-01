@@ -16,8 +16,7 @@ export async function testLdapConnection(
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
-    const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to test ldap connection");
+    throw new Error("Connection Failed");
   }
   return res.json();
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -270,11 +270,11 @@ export function LdapJsonModal({
   const [viewMode, setViewMode] = useState("pretty");
 
   const filteredUsers = useMemo(() => {
-    if (!searchTerm) return sampleUsers;
-    return sampleUsers.filter((user) =>
+    if (!searchTerm) return users;
+    return users.filter((user) =>
       JSON.stringify(user).toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [sampleUsers, searchTerm]);
+  }, [users, searchTerm]);
 
   const selectedUser = filteredUsers[selectedUserIndex] || filteredUsers[0];
 
@@ -301,7 +301,7 @@ export function LdapJsonModal({
     URL.revokeObjectURL(url);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedUserIndex(0);
   }, [users]);
 
