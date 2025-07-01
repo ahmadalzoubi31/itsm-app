@@ -248,7 +248,7 @@ export const UserStaging = () => {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
             User Staging Area
@@ -271,10 +271,10 @@ export const UserStaging = () => {
               </div>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="md:w-48">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="w-full">
+              <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="new">New</SelectItem>
                 <SelectItem value="updated">Updated</SelectItem>

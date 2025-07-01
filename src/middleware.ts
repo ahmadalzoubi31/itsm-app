@@ -18,10 +18,6 @@ export function middleware(req: NextRequest) {
       const sessionExpiredUrl = new URL("/auth/session-expired", req.url);
       sessionExpiredUrl.searchParams.set("redirect", req.nextUrl.pathname);
       sessionExpiredUrl.searchParams.set("refreshToken", refreshToken);
-      console.log(
-        "🚀 ~ file: middleware.ts:21 ~ sessionExpiredUrl:",
-        sessionExpiredUrl
-      );
 
       return NextResponse.redirect(sessionExpiredUrl);
     }

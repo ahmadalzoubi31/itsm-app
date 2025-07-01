@@ -42,6 +42,7 @@ export const NewServiceRequestDialog = ({
     if (!selectedServiceData) return;
 
     const newRequest: ServiceRequest = {
+      id: `REQ-${Date.now()}`,
       serviceId: selectedService,
       serviceName: selectedServiceData.name,
       title: requestTitle,

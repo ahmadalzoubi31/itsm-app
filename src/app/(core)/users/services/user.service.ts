@@ -51,7 +51,6 @@ export async function createUserWithPermissions(
   });
   if (!res.ok) throw new Error("Failed to create user");
   const userResponse: ApiResponse<User> = await res.json();
-  console.log("🚀 ~ userResponse:", userResponse);
 
   // 2. Assign permissions if any
   if (permissionNames.length && userResponse.data?.id) {

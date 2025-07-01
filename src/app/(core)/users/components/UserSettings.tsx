@@ -54,10 +54,10 @@ export default function UserSettings({ form }: Props) {
                 <FormLabel>User Role</FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="w-full">
+                    <SelectContent>
                       {ROLES.map((role) => (
                         <SelectItem key={role.value} value={role.value}>
                           {role.label}
@@ -78,10 +78,10 @@ export default function UserSettings({ form }: Props) {
                 <FormLabel>Account Status</FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="w-full">
+                    <SelectContent>
                       {STATUSES.map((status) => (
                         <SelectItem key={status.value} value={status.value}>
                           {status.label}

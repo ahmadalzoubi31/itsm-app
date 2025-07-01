@@ -77,7 +77,7 @@ export default function ServiceRequests() {
   });
 
   return (
-    <div className="space-y-6">
+    <>
       <div className="flex flex-row items-center justify-between px-4 lg:px-6">
         <div className="text-2xl font-bold tracking-tight">
           Service Requests
@@ -85,7 +85,7 @@ export default function ServiceRequests() {
             Browse and request business services
           </div>
         </div>
-        <Button size="sm" onClick={() => setShowNewRequestDialog(true)}>
+        <Button onClick={() => setShowNewRequestDialog(true)}>
           Create Request
         </Button>
       </div>
@@ -126,6 +126,6 @@ export default function ServiceRequests() {
           services={activeServices}
         />
       </div>
-    </div>
+    </>
   );
 }

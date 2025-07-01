@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
@@ -20,6 +21,8 @@ const geistMono = Geist_Mono({
   variable: "--geist-font-mono",
 });
 
+const inter = Inter({ subsets: ["latin"] });
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,14 +33,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.className} text-[15px]`}
+      className={inter.className + " text-[14.5px] leading-6"}
       suppressHydrationWarning
     >
-      <body
-        lang="en"
-        className={`${geistSans.className}`}
-        suppressHydrationWarning
-      >
+      <body lang="en" suppressHydrationWarning>
         <QueryClientProvider client={client}>
           <TooltipProvider>
             <Toaster richColors />

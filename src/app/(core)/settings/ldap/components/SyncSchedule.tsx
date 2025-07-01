@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, Clock, Play, Pause, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 export const SyncSchedule = () => {
   const [syncEnabled, setSyncEnabled] = useState(false);
@@ -100,7 +101,7 @@ export const SyncSchedule = () => {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center gap-2">
             <Clock className="w-5 h-5" />
             Synchronization Status
@@ -165,7 +166,7 @@ export const SyncSchedule = () => {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center gap-2">
             <RotateCcw className="w-5 h-5" />
             Schedule Configuration
@@ -195,10 +196,10 @@ export const SyncSchedule = () => {
                 }
                 disabled={!syncEnabled}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="w-full">
+                <SelectContent>
                   <SelectItem value="hourly">Hourly</SelectItem>
                   <SelectItem value="daily">Daily</SelectItem>
                   <SelectItem value="weekly">Weekly</SelectItem>
@@ -227,10 +228,10 @@ export const SyncSchedule = () => {
                 }
                 disabled={!syncEnabled}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="w-full">
+                <SelectContent>
                   <SelectItem value="UTC">UTC</SelectItem>
                   <SelectItem value="EST">EST</SelectItem>
                   <SelectItem value="PST">PST</SelectItem>
@@ -286,11 +287,12 @@ export const SyncSchedule = () => {
               />
             </div>
           </div>
-
-          <Button onClick={saveSchedule} className="w-full">
-            Save Schedule Settings
-          </Button>
         </CardContent>
+
+        <Separator />
+        <div className="flex justify-end px-4 lg:px-6">
+          <Button onClick={saveSchedule}>Save Settings</Button>
+        </div>
       </Card>
     </div>
   );

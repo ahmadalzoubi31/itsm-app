@@ -1,11 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Server } from "lucide-react";
 import { Clock, Users } from "lucide-react";
-import { LdapSettings } from "./components/LdapSettings";
+import { LdapSettingsPage } from "./components/LdapSettings";
 import { SyncSchedule } from "./components/SyncSchedule";
 import { UserStaging } from "./components/UserStaging";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function LdapPage() {
   return (
@@ -36,7 +34,7 @@ export default function LdapPage() {
           </TabsList>
 
           <TabsContent value="ldap">
-            <LdapSettings />
+            <LdapSettingsPage />
           </TabsContent>
 
           <TabsContent value="schedule">

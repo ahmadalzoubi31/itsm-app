@@ -1,6 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import {
+  CheckCircle,
+  XCircle,
+  TestTube,
+  PlayCircle,
+  Badge,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ldapSchema } from "../validations/ldap.schema";
+import { useLdapSettings, useSaveLdapSettings } from "../hooks/useLdapSettings";
+import {
+  useLdapConnectionTest,
+  useLdapSampleUsers,
+} from "../hooks/useLdapLdapActions";
+import { LdapSettings } from "../types";
+import { LdapJsonModal } from "./SamplePreview";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,305 +27,387 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, TestTube } from "lucide-react";
-import { toast } from "sonner";
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
+import { Separator } from "@radix-ui/react-separator";
+import { Switch } from "@radix-ui/react-switch";
+import { showSample } from "../services/ldap.service";
 
-export const LdapSettings = () => {
+export function LdapSettingsPage() {
+  // Hooks for data
+  const { data: ldapSettings, isLoading } = useLdapSettings();
+  const saveLdapMutation = useSaveLdapSettings();
+  const testConnectionMutation = useLdapConnectionTest();
+
+  // Local UI state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sampleUsers, setSampleUsers] = useState<any[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<
     "connected" | "disconnected" | "testing"
   >("disconnected");
-  const [loading, setLoading] = useState(false);
-  const [settingsId, setSettingsId] = useState<string | null>(null);
-  const [settings, setSettings] = useState({
-    server: "",
-    port: "389",
-    protocol: "ldap",
-    baseDn: "",
-    bindDn: "",
-    bindPassword: "",
-    searchFilter: "(objectClass=user)",
-    attributes: "cn,mail,sAMAccountName,displayName,department",
-    useSSL: false,
-    validateCert: true,
+
+  // Form setup
+  const form = useForm<LdapSettings>({
+    resolver: zodResolver(ldapSchema),
+    defaultValues: DEFAULT_LDAP_SETTINGS,
   });
 
+  // When LDAP settings loaded, reset form
   useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      //   const { data, error } = await supabase
-      //     .from("ldap_settings")
-      //     .select("*")
-      //     .maybeSingle();
-      //   if (error && error.code !== "PGRST116") {
-      //     throw error;
-      //   }
-      //   if (data) {
-      //     setSettingsId(data.id);
-      //     setSettings({
-      //       server: data.server || "",
-      //       port: data.port?.toString() || "389",
-      //       protocol: data.protocol || "ldap",
-      //       baseDn: data.base_dn || "",
-      //       bindDn: data.bind_dn || "",
-      //       bindPassword: data.bind_password || "",
-      //       searchFilter: data.search_filter || "(objectClass=user)",
-      //       attributes:
-      //         data.attributes || "cn,mail,sAMAccountName,displayName,department",
-      //       useSSL: data.use_ssl || false,
-      //       validateCert: data.validate_cert !== false,
-      //     });
-      //   }
-    } catch (error: any) {
-      console.error("Error loading settings:", error);
-      toast.error("Error loading settings");
+    if (ldapSettings) {
+      form.reset(ldapSettings);
     }
+  }, [ldapSettings]);
+
+  // Connection status based on test result
+  useEffect(() => {
+    const status = localStorage.getItem("ldapTestingResult") as
+      | "connected"
+      | "disconnected"
+      | null;
+    if (status) setConnectionStatus(status);
+  }, [ldapSettings]);
+
+  // Save settings
+  const onSave = (values: LdapSettings) => {
+    saveLdapMutation.mutate(values, {
+      onSuccess: () => {
+        toast.success("Settings saved successfully");
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || "Failed to save");
+      },
+    });
   };
 
-  const testConnection = async () => {
+  // Test connection
+  const onTest = (values: LdapSettings) => {
     setConnectionStatus("testing");
-    // Simulate connection test
-    setTimeout(() => {
-      if (settings.server && settings.baseDn) {
+    testConnectionMutation.mutate(values, {
+      onSuccess: (res) => {
         setConnectionStatus("connected");
         toast.success("Connection successful");
-      } else {
+        localStorage.setItem("ldapTestingResult", "connected");
+      },
+      onError: (error: any) => {
         setConnectionStatus("disconnected");
-        toast.error("Connection failed");
-      }
-    }, 2000);
+        toast.error(error?.message || "Connection failed");
+        localStorage.setItem("ldapTestingResult", "disconnected");
+      },
+    });
   };
 
-  const saveSettings = async () => {
-    setLoading(true);
+  // Preview sample users
+  const handlePreviewSample = async () => {
     try {
-      const settingsData = {
-        server: settings.server,
-        port: parseInt(settings.port),
-        protocol: settings.protocol,
-        base_dn: settings.baseDn,
-        bind_dn: settings.bindDn,
-        bind_password: settings.bindPassword,
-        search_filter: settings.searchFilter,
-        attributes: settings.attributes,
-        use_ssl: settings.useSSL,
-        validate_cert: settings.validateCert,
-        updated_at: new Date().toISOString(),
-      };
-
-      if (settingsId) {
-        // const { error } = await supabase
-        //   .from("ldap_settings")
-        //   .update(settingsData)
-        //   .eq("id", settingsId);
-        // if (error) throw error;
-      } else {
-        // const { data, error } = await supabase
-        //   .from("ldap_settings")
-        //   .insert([settingsData])
-        //   .select()
-        //   .single();
-        // if (error) throw error;
-        // setSettingsId(data.id);
-      }
-
-      toast.success("Settings saved successfully");
-    } catch (error: any) {
-      console.error("Error saving settings:", error);
-      toast.error("Error saving settings");
-    } finally {
-      setLoading(false);
+      const { data } = await showSample();
+      if (!data) throw new Error("Failed to show sample");
+      setSampleUsers(data);
+      setIsModalOpen(true);
+    } catch (e: any) {
+      toast.error(e.message);
     }
   };
+
+  // Watch form values for "Test Connection"
+  const currentValues = form.watch();
 
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                LDAP Server Configuration
-                {connectionStatus === "connected" && (
-                  <Badge variant="default" className="bg-green-500">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Connected
-                  </Badge>
-                )}
-                {connectionStatus === "disconnected" && (
-                  <Badge variant="destructive">
-                    <XCircle className="w-3 h-3 mr-1" />
-                    Disconnected
-                  </Badge>
-                )}
-                {connectionStatus === "testing" && (
-                  <Badge variant="secondary">
-                    <TestTube className="w-3 h-3 mr-1" />
-                    Testing...
-                  </Badge>
-                )}
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              LDAP Server Configuration
+              {connectionStatus === "connected" && (
+                <Badge className="bg-green-500">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Connected
+                </Badge>
+              )}
+              {connectionStatus === "disconnected" && (
+                <Badge variant="destructive">
+                  <XCircle className="w-3 h-3 mr-1" />
+                  Disconnected
+                </Badge>
+              )}
+              {connectionStatus === "testing" && (
+                <Badge variant="secondary">
+                  <TestTube className="w-3 h-3 mr-1" />
+                  Testing...
+                </Badge>
+              )}
+            </CardTitle>
+            <div className="flex items-center gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={handlePreviewSample}
+                disabled={testConnectionMutation.isPending}
+              >
+                <PlayCircle className="w-3 h-3 mr-1" />
+                Preview Sample
+              </Button>
+              <Button
+                onClick={() => onTest(currentValues)}
+                disabled={testConnectionMutation.isPending}
+              >
+                Test Connection
+              </Button>
             </div>
-            <Button
-              onClick={testConnection}
-              disabled={connectionStatus === "testing"}
-            >
-              Test Connection
-            </Button>
           </div>
           <CardDescription>
-            Configure your Active Directory LDAP server connection settings
+            Configure your Active Directory LDAP server
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="server">LDAP Server</Label>
-              <Input
-                id="server"
-                placeholder="ldap.company.com"
-                value={settings.server}
-                onChange={(e) =>
-                  setSettings({ ...settings, server: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="port">Port</Label>
-              <Input
-                id="port"
-                type="number"
-                value={settings.port}
-                onChange={(e) =>
-                  setSettings({ ...settings, port: e.target.value })
-                }
-              />
-            </div>
-          </div>
+          <LdapJsonModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            users={sampleUsers}
+          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="server"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>LDAP Server</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ldap.example.com" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        The hostname or IP address of your LDAP server
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="protocol">Protocol</Label>
-              <Select
-                value={settings.protocol}
-                onValueChange={(value) =>
-                  setSettings({ ...settings, protocol: value })
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select protocol" />
-                </SelectTrigger>
-                <SelectContent className="w-full">
-                  <SelectItem value="ldap">LDAP</SelectItem>
-                  <SelectItem value="ldaps">LDAPS (SSL)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="baseDn">Base DN</Label>
-              <Input
-                id="baseDn"
-                placeholder="DC=company,DC=com"
-                value={settings.baseDn}
-                onChange={(e) =>
-                  setSettings({ ...settings, baseDn: e.target.value })
-                }
-              />
-            </div>
-          </div>
+                <FormField
+                  control={form.control}
+                  name="port"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Port</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="389" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Default LDAP port is 389 (636 for LDAPS)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="bindDn">Bind DN</Label>
-              <Input
-                id="bindDn"
-                placeholder="CN=service,OU=users,DC=company,DC=com"
-                value={settings.bindDn}
-                onChange={(e) =>
-                  setSettings({ ...settings, bindDn: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bindPassword">Bind Password</Label>
-              <Input
-                id="bindPassword"
-                type="password"
-                value={settings.bindPassword}
-                onChange={(e) =>
-                  setSettings({ ...settings, bindPassword: e.target.value })
-                }
-              />
-            </div>
-          </div>
+                <FormField
+                  control={form.control}
+                  name="protocol"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Protocol</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a protocol" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ldap">LDAP</SelectItem>
+                          <SelectItem value="ldaps">LDAPS (SSL/TLS)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Choose LDAP or LDAPS (secure)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="space-y-2">
-            <Label htmlFor="searchFilter">Search Filter</Label>
-            <Input
-              id="searchFilter"
-              placeholder="(objectClass=user)"
-              value={settings.searchFilter}
-              onChange={(e) =>
-                setSettings({ ...settings, searchFilter: e.target.value })
-              }
-            />
-          </div>
+                <FormField
+                  control={form.control}
+                  name="baseDn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Base DN</FormLabel>
+                      <FormControl>
+                        <Input placeholder="dc=example,dc=com" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Base distinguished name for LDAP searches
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="space-y-2">
-            <Label htmlFor="attributes">Attributes to Retrieve</Label>
-            <Textarea
-              id="attributes"
-              placeholder="cn,mail,sAMAccountName,displayName,department"
-              value={settings.attributes}
-              onChange={(e) =>
-                setSettings({ ...settings, attributes: e.target.value })
-              }
-              rows={3}
-            />
-          </div>
+                <FormField
+                  control={form.control}
+                  name="bindDn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bind DN</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="cn=admin,dc=example,dc=com"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Leave empty for anonymous bind
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="useSSL"
-                checked={settings.useSSL}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, useSSL: checked })
-                }
+                <FormField
+                  control={form.control}
+                  name="bindPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bind Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Password for the bind DN
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="searchFilter"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Search Filter</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="(objectClass=*)"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      LDAP search filter to find users (e.g.,
+                      (objectClass=person))
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="useSSL">Use SSL/TLS</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="validateCert"
-                checked={settings.validateCert}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, validateCert: checked })
-                }
-              />
-              <Label htmlFor="validateCert">Validate Certificate</Label>
-            </div>
-          </div>
 
-          <Button onClick={saveSettings} className="w-full" disabled={loading}>
-            {loading ? "Saving..." : "Save LDAP Settings"}
-          </Button>
+              <FormField
+                control={form.control}
+                name="attributes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attributes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="cn,mail,displayName,givenName,sn,userPrincipalName"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Comma-separated list of attributes to fetch
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="useSSL"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg p-4 border">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Use SSL/TLS</FormLabel>
+                      <FormDescription>
+                        Enable secure connection to LDAP server (recommended for
+                        production)
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="validateCert"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg p-4 border">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Validate Certificate
+                      </FormLabel>
+                      <FormDescription>
+                        Verify the LDAP server's SSL certificate (recommended
+                        for production)
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!form.watch("useSSL")}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <Separator />
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saveLdapMutation.isPending}>
+                  {saveLdapMutation.isPending ? "Saving..." : "Save Settings"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
   );
-};
+}

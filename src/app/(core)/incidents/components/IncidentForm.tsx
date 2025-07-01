@@ -112,7 +112,7 @@ export default function IncidentForm({
                 value={formData.category}
                 onValueChange={(value) => updateField("category", value)}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,7 +145,7 @@ export default function IncidentForm({
                 value={formData.impact}
                 onValueChange={(value: Impact) => updateField("impact", value)}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,7 +166,7 @@ export default function IncidentForm({
                   updateField("urgency", value)
                 }
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

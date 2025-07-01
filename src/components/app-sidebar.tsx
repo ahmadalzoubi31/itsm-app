@@ -45,13 +45,15 @@ const data = {
       title: "Service Requests",
       url: "/service-requests",
       icon: "service-requests",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [
-        // PermissionNameEnum.SERVICE_REQUEST_MASTER,
-        // PermissionNameEnum.SERVICE_REQUEST_USER,
-        // PermissionNameEnum.SERVICE_REQUEST_SUBMITTER,
-        // PermissionNameEnum.SERVICE_REQUEST_VIEWER,
-      ],
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      permissions: [],
+    },
+    {
+      title: "Service Templates",
+      url: "/service-templates",
+      icon: "service-templates",
+      roles: [RoleEnum.ADMIN],
+      permissions: [],
     },
     {
       title: "Analytics",
@@ -78,7 +80,7 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "/settings/ldap",
+      url: "/settings",
       icon: "settings",
     },
     {

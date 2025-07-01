@@ -104,7 +104,7 @@ const SideBarForm = ({ form, errors = {} }: Props) => {
           <Separator />
 
           <div className="flex flex-row gap-2">
-            <Button type="submit" className="w-1/2" size="sm">
+            <Button type="submit" className="w-1/2">
               {/* <UserPlus className="h-4 w-4 mr-2" /> */}
               Save
             </Button>

@@ -34,7 +34,7 @@ export default function UsersPage() {
             Filter and manage your assigned users
           </div>
         </div>
-        <Button asChild size="sm">
+        <Button asChild>
           <Link href="/users/create" className="dark:text-foreground">
             Create User
           </Link>

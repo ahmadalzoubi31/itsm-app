@@ -244,7 +244,7 @@ const KnowledgeBaseSection = ({
         ))}
 
         <div className="pt-2">
-          <Button size="sm" variant="outline" className="w-full">
+          <Button variant="outline" className="w-full">
             <Search className="h-4 w-4 mr-2" />
             Search All Knowledge Base Articles
           </Button>

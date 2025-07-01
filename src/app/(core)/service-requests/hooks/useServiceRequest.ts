@@ -13,7 +13,7 @@ export function useServiceRequest(id: string) {
   });
 
   return {
-    serviceRequest: data ?? null,
+    serviceRequest: data?.data ?? null,
     error,
     isLoading,
     refetch,

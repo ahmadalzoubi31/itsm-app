@@ -143,14 +143,11 @@ export const columns: ColumnDef<User>[] = [
       }
 
       return role.value === RoleEnum.AGENT ? (
-        <Badge
-          variant="outline"
-          className="text-muted-foreground px-1.5 bg-blue-200"
-        >
+        <Badge variant="secondary" className="text-blue-600 px-1.5 bg-blue-200">
           {role.label}
         </Badge>
       ) : (
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
+        <Badge variant="secondary" className="text-muted-foreground px-1.5">
           {role.label}
         </Badge>
       );
@@ -177,12 +174,12 @@ export const columns: ColumnDef<User>[] = [
       }
 
       return status.value === StatusEnum.INACTIVE ? (
-        <Badge variant="outline" className="text-red-600 px-1.5 bg-red-200">
+        <Badge variant="secondary" className="text-red-600 px-1.5 bg-red-200">
           {status.label}
         </Badge>
       ) : (
         <Badge
-          variant="outline"
+          variant="secondary"
           className="text-green-600 px-1.5  bg-green-200"
         >
           {status.label}
