@@ -19,10 +19,10 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { LdapSettings } from "../types";
+import { LdapSettings } from "../../types";
 import { UseFormReturn } from "react-hook-form";
+import { PROTOCOLS } from "../../constants/protocol.constant";
+import { SEARCH_SCOPES } from "../../constants/search-scope.constant";
 
 type Props = {
   form: UseFormReturn<LdapSettings>;
@@ -30,11 +30,11 @@ type Props = {
   isSaving: boolean;
 };
 
-export function LdapSettingsForm({ form, onSave, isSaving }: Props) {
+export const LdapSettingsForm = ({ form, onSave, isSaving }: Props) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Server */}
           <FormField
             control={form.control}
@@ -83,8 +83,12 @@ export function LdapSettingsForm({ form, onSave, isSaving }: Props) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="ldap">LDAP</SelectItem>
-                    <SelectItem value="ldaps">LDAPS (SSL/TLS)</SelectItem>
+                    <SelectItem value={PROTOCOLS[0].value}>
+                      {PROTOCOLS[0].label}
+                    </SelectItem>
+                    <SelectItem value={PROTOCOLS[1].value}>
+                      {PROTOCOLS[1].label}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>Choose LDAP or LDAPS (secure)</FormDescription>
@@ -92,23 +96,7 @@ export function LdapSettingsForm({ form, onSave, isSaving }: Props) {
               </FormItem>
             )}
           />
-          {/* Base DN */}
-          <FormField
-            control={form.control}
-            name="baseDn"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Base DN</FormLabel>
-                <FormControl>
-                  <Input placeholder="dc=example,dc=com" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Base distinguished name for LDAP searches
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           {/* Bind DN */}
           <FormField
             control={form.control}
@@ -150,29 +138,80 @@ export function LdapSettingsForm({ form, onSave, isSaving }: Props) {
               </FormItem>
             )}
           />
+          {/* Search Base */}
+          <FormField
+            control={form.control}
+            name="searchBase"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Search Base</FormLabel>
+                <FormControl>
+                  <Input placeholder="dc=example,dc=com" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Base distinguished name for LDAP searches
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Search Scope */}
+          <FormField
+            control={form.control}
+            name="searchScope"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Search Scope</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a scope" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={SEARCH_SCOPES[0].value}>
+                        {SEARCH_SCOPES[0].label}
+                      </SelectItem>
+                      <SelectItem value={SEARCH_SCOPES[1].value}>
+                        {SEARCH_SCOPES[1].label}
+                      </SelectItem>
+                      <SelectItem value={SEARCH_SCOPES[2].value}>
+                        {SEARCH_SCOPES[2].label}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription>
+                  Default scope is sub (searches all levels)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Search Filter */}
+          <FormField
+            control={form.control}
+            name="searchFilter"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Search Filter</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="(objectClass=*)"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormDescription>
+                  LDAP search filter to find users (e.g., (objectClass=person))
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        {/* Search Filter */}
-        <FormField
-          control={form.control}
-          name="searchFilter"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Search Filter</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="(objectClass=*)"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription>
-                LDAP search filter to find users (e.g., (objectClass=person))
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         {/* Attributes */}
         <FormField
           control={form.control}
@@ -240,15 +279,9 @@ export function LdapSettingsForm({ form, onSave, isSaving }: Props) {
             </FormItem>
           )}
         />
-
-        <Separator />
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Settings"}
-          </Button>
-        </div>
       </form>
     </Form>
   );
-}
+};
+
+export default LdapSettingsForm;

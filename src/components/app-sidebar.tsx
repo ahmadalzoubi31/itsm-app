@@ -82,16 +82,22 @@ const data = {
       title: "Settings",
       url: "/settings",
       icon: "settings",
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
+      permissions: [PermissionNameEnum.Foundation_People],
     },
     {
       title: "Get Help",
       url: "#",
       icon: "help",
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      permissions: [],
     },
     {
       title: "Search",
       url: "#",
       icon: "search",
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      permissions: [],
     },
   ],
 };

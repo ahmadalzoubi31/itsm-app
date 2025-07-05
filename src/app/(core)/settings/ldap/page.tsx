@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Server } from "lucide-react";
 import { Clock, Users } from "lucide-react";
-import { LdapSettingsPage } from "./components/LdapSettings";
-import { SyncSchedule } from "./components/SyncSchedule";
-import { UserStaging } from "./components/UserStaging";
+import { LdapSettingsPage } from "./components/tab1/LdapSettings";
+import { SyncSchedule } from "./components/tab2/SyncSchedule";
+import { UserStaging } from "./components/tab3/UserStaging";
 
 export default function LdapPage() {
   return (
@@ -17,7 +17,7 @@ export default function LdapPage() {
         </div>
       </div>
       <div className="px-4 lg:px-6">
-        <Tabs defaultValue="ldap" className="w-full">
+        <Tabs defaultValue="ldap" className="w-full space-y-6 gap-0">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ldap" className="flex items-center gap-2">
               <Server className="w-4 h-4" />

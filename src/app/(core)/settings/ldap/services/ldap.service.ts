@@ -9,6 +9,8 @@ import { LdapSettings } from "../types";
 export async function testLdapConnection(
   payload: Partial<LdapSettings>
 ): Promise<ApiResponse<boolean>> {
+  const body = { type: "LDAP", jsonValue: payload };
+
   const res = await fetchWithAuth(getBackendUrl("/api/ldap/test"), {
     method: "POST",
     credentials: "include",
@@ -23,7 +25,7 @@ export async function testLdapConnection(
 
 // Fetch sample LDAP users
 export async function showSample(): Promise<ApiResponse<any>> {
-  const res = await fetchWithAuth(getBackendUrl("/api/ldap/users"), {
+  const res = await fetchWithAuth(getBackendUrl("/api/ldap/preview"), {
     method: "GET",
     credentials: "include",
   });
@@ -34,13 +36,11 @@ export async function showSample(): Promise<ApiResponse<any>> {
   return res.json();
 }
 
-// Sync LDAP users
-export async function syncLdapUsers(payload: any): Promise<ApiResponse<any>> {
+// Sync LDAP users (expects response: AD-Entry[])
+export async function syncLdapUsers(): Promise<ApiResponse<any>> {
   const res = await fetchWithAuth(getBackendUrl("/api/ldap/sync"), {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const error = await res.json().catch(() => null);

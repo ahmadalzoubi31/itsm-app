@@ -25,7 +25,7 @@ const sampleUsers = [
     userPrincipalName: "john.doe@example.com",
     department: "Engineering",
     title: "Senior Developer",
-    telephoneNumber: "+1-555-0123",
+    mobile: "+1-555-0123",
     objectClass: ["person", "organizationalPerson", "user"],
   },
   {
@@ -38,7 +38,7 @@ const sampleUsers = [
     userPrincipalName: "jane.smith@example.com",
     department: "Marketing",
     title: "Marketing Manager",
-    telephoneNumber: "+1-555-0124",
+    mobile: "+1-555-0124",
     objectClass: ["person", "organizationalPerson", "user"],
   },
   {
@@ -51,7 +51,7 @@ const sampleUsers = [
     userPrincipalName: "mike.johnson@example.com",
     department: "Sales",
     title: "Sales Representative",
-    telephoneNumber: "+1-555-0125",
+    mobile: "+1-555-0125",
     objectClass: ["person", "organizationalPerson", "user"],
   },
 ];
