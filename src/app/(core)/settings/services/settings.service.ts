@@ -9,7 +9,7 @@ import { Settings } from "../types";
 // Fetch LDAP settings
 export async function fetchLdapSettings(): Promise<ApiResponse<LdapSettings>> {
   const res = await fetchWithAuth(getBackendUrl("/api/settings/LDAP"), {
-    credentials: "include",
+    credentials: "include",    
   });
 
   if (!res.ok) {
@@ -31,6 +31,7 @@ export async function saveLdapSettings(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) {
     const error = await res.json().catch(() => null);
     throw new Error(error?.message || "Failed to create ldap settings");

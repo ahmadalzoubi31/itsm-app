@@ -145,6 +145,10 @@ export const columns: ColumnDef<StagedUser>[] = [
         <Badge variant="secondary" className="text-blue-600 px-1.5 bg-blue-200">
           {status.label}
         </Badge>
+      ) : status.value === StagedUserStatusEnum.REJECTED ? (
+        <Badge variant="secondary" className="text-red-600 px-1.5 bg-red-200">
+          {status.label}
+        </Badge>
       ) : (
         <Badge variant="secondary" className="text-muted-foreground px-1.5">
           {status.label}
@@ -156,6 +160,80 @@ export const columns: ColumnDef<StagedUser>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
+  },
+  {
+    accessorKey: "createdBy",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created By" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">
+          {row.original.createdBy.username}
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created At" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">
+          {new Date(row.original.createdAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "updatedBy",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated By" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">
+          {row.original.updatedBy.username}
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated At" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-muted-foreground">
+          {new Date(row.original.updatedAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </div>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     id: "actions",

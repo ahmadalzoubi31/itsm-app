@@ -79,17 +79,34 @@ export async function createUserWithPermissions(
 }
 
 // Update user
-export async function updateUser(
-  id: string,
-  payload: Partial<User>
-): Promise<ApiResponse<User>> {
-  const res = await fetchWithAuth(getBackendUrl(`/api/users/${id}`), {
-    method: "PUT",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error("Failed to update user");
+// export async function updateUser(
+//   id: string,
+//   payload: Partial<User>
+// ): Promise<ApiResponse<User>> {
+//   console.log("🚀 ~ payload:", payload);
+//   const res = await fetchWithAuth(getBackendUrl(`/api/users/${id}`), {
+//     method: "PUT",
+//     credentials: "include",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(payload),
+//   });
+//   if (!res.ok) throw new Error("Failed to update user");
+//   return res.json();
+// }
+
+// Clear all permissions for a user
+export async function clearAllUserPermissions(
+  userId: string
+): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetchWithAuth(
+    getBackendUrl(`/api/permissions/clear-all/${userId}`),
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  if (!res.ok) throw new Error("Failed to clear user permissions");
   return res.json();
 }
 
@@ -112,7 +129,7 @@ export async function updateUserWithPermissions(
   }
   const userResponse: ApiResponse<User> = await res.json();
 
-  // 2. Assign permissions if any
+  // 2. Assign permissions if any else clear all permissions
   let permissionAssignResult: any = undefined;
   if (permissionNames.length) {
     const assignRes = await fetchWithAuth(
@@ -134,6 +151,10 @@ export async function updateUserWithPermissions(
           "Failed to assign permission(s) to user"
       );
     }
+  } else {
+    // Clear all permissions instead of sending empty array
+    const clearResult = await clearAllUserPermissions(userId);
+    permissionAssignResult = clearResult;
   }
 
   // 3. Return both results

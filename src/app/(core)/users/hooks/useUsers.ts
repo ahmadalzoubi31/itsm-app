@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchUsers } from "../services/user.service";
 import { User } from "../types";
-import { StatusEnum } from "../constants/status.constant";
 import { ApiResponse } from "@/types/globals";
 import { useMemo } from "react";
 import { RoleEnum } from "../constants/role.constant";
@@ -15,7 +14,7 @@ export function useUsers() {
   const users = data?.data ?? [];
 
   // Memoized derived data
-  const { totalUsers, newUsers, pendingUsers, rejectedUsers, agentUsers } =
+  const { totalUsers, newUsers, manualUsers, importedUsers, agentUsers } =
     useMemo(() => {
       const totalUsers = users.length;
 
@@ -28,21 +27,17 @@ export function useUsers() {
         return diffDays <= 30;
       });
 
-      const pendingUsers = users.filter(
-        (user) => user.status === StatusEnum.PENDING
-      );
+      const manualUsers = users.filter((user) => user.objectGUID === null);
 
-      const rejectedUsers = users.filter(
-        (user) => user.status === StatusEnum.REJECTED
-      );
+      const importedUsers = users.filter((user) => user.objectGUID !== null);
 
       const agentUsers = users.filter((user) => user.role === RoleEnum.AGENT);
 
       return {
         totalUsers,
         newUsers,
-        pendingUsers,
-        rejectedUsers,
+        manualUsers,
+        importedUsers,
         agentUsers,
       };
     }, [users]);
@@ -51,8 +46,8 @@ export function useUsers() {
     users,
     totalUsers,
     newUsers,
-    pendingUsers,
-    rejectedUsers,
+    manualUsers,
+    importedUsers,
     agentUsers,
     error,
     isLoading,

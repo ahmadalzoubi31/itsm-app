@@ -17,7 +17,7 @@ import { Clock, Calendar, Play, Pause } from "lucide-react";
 import { useState } from "react";
 
 import { SyncSettings } from "../../types";
-import { useSyncLdapUsers } from "../../hooks/useSync";
+import { useCancelLdapSync, useSyncLdapUsers } from "../../hooks/useSync";
 import { SyncHistory } from "../../types";
 import { format } from "date-fns";
 
@@ -29,6 +29,7 @@ interface SyncScheduleFormProps {
 const SyncStatusCard = ({ form, syncHistoryList }: SyncScheduleFormProps) => {
   // Data hooks
   const syncLdapMutation = useSyncLdapUsers();
+  const cancelLdapSyncMutation = useCancelLdapSync();
 
   // UI state
   const [lastSync, setLastSync] = useState(
@@ -47,36 +48,31 @@ const SyncStatusCard = ({ form, syncHistoryList }: SyncScheduleFormProps) => {
 
     syncLdapMutation.mutate(undefined, {
       onSuccess: (data) => {
-        console.log("🚀 ~ onSync ~ data:", data);
         const usersFetched = data?.data?.users.length || 0;
 
-        setTimeout(() => {
-          setSyncProgress(20);
-        }, 1000);
-
-        setTimeout(() => {
-          setSyncProgress(40);
-        }, 2000);
-
-        setTimeout(() => {
-          setSyncProgress(60);
-        }, 3000);
-
-        setTimeout(() => {
-          setSyncProgress(80);
-        }, 4000);
-
-        setTimeout(() => {
-          setSyncProgress(100);
-          setIsRunning(false);
-          toast.success(`LDAP search completed found: (${usersFetched} users)`);
-        }, 5000);
+        setSyncProgress(100);
+        setIsRunning(false);
+        toast.success(`LDAP search completed found: (${usersFetched} users)`);
       },
       onError: () => {
         setSyncProgress(0);
         setIsRunning(false);
 
         toast.error("Failed to synchronize users from LDAP");
+      },
+    });
+  };
+
+  // Generate pause sync function
+  const handlePauseSync = () => {
+    cancelLdapSyncMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsRunning(false);
+        setSyncProgress(0);
+        toast.success("Sync operation cancelled successfully");
+      },
+      onError: () => {
+        toast.error("Failed to cancel sync operation");
       },
     });
   };
@@ -131,6 +127,7 @@ const SyncStatusCard = ({ form, syncHistoryList }: SyncScheduleFormProps) => {
         <div className="flex gap-2">
           <Button
             onClick={onSync}
+            size="sm"
             disabled={isRunning || syncLdapMutation.isPending}
             className="flex items-center gap-2"
           >
@@ -139,6 +136,8 @@ const SyncStatusCard = ({ form, syncHistoryList }: SyncScheduleFormProps) => {
           </Button>
           <Button
             variant="outline"
+            onClick={handlePauseSync}
+            size="sm"
             disabled={!isRunning}
             className="flex items-center gap-2"
           >

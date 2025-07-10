@@ -31,11 +31,7 @@ export default function RootLayout({
   const [client] = useState(new QueryClient());
 
   return (
-    <html
-      lang="en"
-      className={inter.className + " text-[14.5px] leading-6"}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={inter.className} suppressHydrationWarning>
       <body lang="en" suppressHydrationWarning>
         <QueryClientProvider client={client}>
           <TooltipProvider>

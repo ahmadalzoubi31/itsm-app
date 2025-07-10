@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { FREQUENCIES } from "../../constants/frequency.constant";
+import { TIMEZONES } from "../../constants/timezone.constant";
 
 interface SyncScheduleFormProps {
   form: UseFormReturn<SyncSettings>;
@@ -50,9 +52,9 @@ export function SyncScheduleForm({
         autoComplete="off"
       >
         <Card>
-          <CardHeader className="border-b border-gray-200">
-            <CardTitle className="flex items-center gap-2">
-              <RotateCcw className="w-5 h-5" />
+          <CardHeader className="border-b border-gray-200 ">
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <RotateCcw className="w-5 h-5 text-primary" />
               Schedule Configuration
             </CardTitle>
             <CardDescription>
@@ -60,14 +62,15 @@ export function SyncScheduleForm({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Enabled Switch */}
             <FormField
               control={form.control}
               name="enabled"
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <FormLabel>Enable Automatic Sync</FormLabel>
+                    <FormLabel className="text-gray-900 font-medium">
+                      Enable Automatic Sync
+                    </FormLabel>
                     <FormDescription>
                       Automatically synchronize users based on the schedule
                       below
@@ -83,8 +86,6 @@ export function SyncScheduleForm({
                 </FormItem>
               )}
             />
-
-            {/* Schedule fields */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -99,13 +100,17 @@ export function SyncScheduleForm({
                         disabled={!form.watch("enabled") || isSaving}
                       >
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue placeholder="Select Frequency" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="hourly">Hourly</SelectItem>
-                          <SelectItem value="daily">Daily</SelectItem>
-                          <SelectItem value="weekly">Weekly</SelectItem>
-                          <SelectItem value="monthly">Monthly</SelectItem>
+                          {FREQUENCIES.map((frequency) => (
+                            <SelectItem
+                              key={frequency.value}
+                              value={frequency.value}
+                            >
+                              {frequency.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -113,7 +118,6 @@ export function SyncScheduleForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="syncTime"
@@ -131,7 +135,6 @@ export function SyncScheduleForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="timezone"
@@ -145,13 +148,17 @@ export function SyncScheduleForm({
                         disabled={!form.watch("enabled") || isSaving}
                       >
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue placeholder="Select Timezone" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="UTC">UTC</SelectItem>
-                          <SelectItem value="EST">EST</SelectItem>
-                          <SelectItem value="PST">PST</SelectItem>
-                          <SelectItem value="GMT">GMT</SelectItem>
+                          {TIMEZONES.map((timezone) => (
+                            <SelectItem
+                              key={timezone.value}
+                              value={timezone.value}
+                            >
+                              {timezone.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -160,8 +167,6 @@ export function SyncScheduleForm({
                 )}
               />
             </div>
-
-            {/* Numeric fields */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -236,7 +241,12 @@ export function SyncScheduleForm({
           </CardContent>
           <Separator />
           <div className="flex justify-end px-4 lg:px-6">
-            <Button type="submit" disabled={isSaving}>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isSaving}
+              className="bg-primary hover:bg-primary/90 text-white"
+            >
               {isSaving ? "Saving..." : "Save Settings"}
             </Button>
           </div>

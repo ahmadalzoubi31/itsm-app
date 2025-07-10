@@ -1,12 +1,12 @@
 import { User } from "@/app/(core)/users/types";
 
-export interface BaseEntity {
+export type BaseEntity = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  createdBy: string;
-  updatedBy: string;
-}
+  createdBy: User;
+  updatedBy: User;
+};
 
 export enum IncidentStatus {
   NEW = "new",

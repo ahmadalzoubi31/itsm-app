@@ -41,10 +41,26 @@ export async function syncLdapUsers(): Promise<ApiResponse<any>> {
   const res = await fetchWithAuth(getBackendUrl("/api/ldap/sync"), {
     method: "POST",
     credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isManualSync: true }),
   });
   if (!res.ok) {
     const error = await res.json().catch(() => null);
     throw new Error(error?.message || "Failed to sync users");
+  }
+  return res.json();
+}
+
+// Cancel ongoing LDAP sync operation
+export async function cancelLdapSync(): Promise<ApiResponse<any>> {
+  const res = await fetchWithAuth(getBackendUrl("/api/ldap/sync/cancel"), {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || "Failed to cancel sync operation");
   }
   return res.json();
 }

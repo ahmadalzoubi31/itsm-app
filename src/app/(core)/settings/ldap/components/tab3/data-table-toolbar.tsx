@@ -25,16 +25,20 @@ export function DataTableToolbar<TData, TFunc>({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
+        {/* Filter by full name(cn) and username(sAMAccountName) */}
         <Input
-          placeholder="Filter users..."
+          placeholder="Filter staged users..."
           value={
-            (table.getColumn("sAMAccountName")?.getFilterValue() as string) ??
+            (table.getColumn("cn")?.getFilterValue() as string) ??
+            // (table.getColumn("sAMAccountName")?.getFilterValue() as string) ??
             ""
           }
-          onChange={(event) =>
-            table
-              .getColumn("sAMAccountName")
-              ?.setFilterValue(event.target.value)
+          onChange={
+            (event) => table.getColumn("cn")?.setFilterValue(event.target.value)
+            //  ||
+            // table
+            //   .getColumn("sAMAccountName")
+            //   ?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />

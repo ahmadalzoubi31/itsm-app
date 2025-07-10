@@ -25,10 +25,11 @@ import { ldapSchema } from "../../validations/ldap.schema";
 import { LdapSettings } from "../../types";
 import { DEFAULT_LDAP_SETTINGS } from "../../constants/default.constant";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function LdapSettingsPage() {
   // Data hooks
-  const { data: ldapSettings } = useGetLdapSettings();
+  const { data: ldapSettings, isLoading } = useGetLdapSettings();
   const saveLdapMutation = useSaveLdapSettings();
   const testConnectionMutation = useTestLdapSettings();
 
@@ -50,7 +51,7 @@ export function LdapSettingsPage() {
   }, [ldapSettings]);
 
   // Save settings
-  const onSave = (values: LdapSettings) => {
+  const onSave = (values: LdapSettings) => {    
     saveLdapMutation.mutate(values, {
       onSuccess: () => {
         toast.success("Settings saved successfully");
@@ -98,6 +99,61 @@ export function LdapSettingsPage() {
     }
   };
 
+  
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader className="border-b">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-64" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-32" />
+                <Skeleton className="h-9 w-32" />
+              </div>
+            </div>
+            <Skeleton className="h-4 w-96 mt-2" />
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 9 }).map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+
+            <div className="space-y-4">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <div key={index} className="flex flex-row items-center justify-between rounded-lg p-4 border">
+                  <div className="space-y-0.5">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-3 w-64" />
+                  </div>
+                  <Skeleton className="h-6 w-11" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <Separator />
+          <div className="flex justify-end px-4 lg:px-6 py-4">
+            <Skeleton className="h-9 w-32" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -109,6 +165,7 @@ export function LdapSettingsPage() {
             <div className="flex items-center gap-2 justify-end">
               <Button
                 variant="outline"
+                size="sm"
                 onClick={onPreviewSample}
                 disabled={testConnectionMutation.isPending}
               >
@@ -117,6 +174,7 @@ export function LdapSettingsPage() {
               </Button>
               <Button
                 onClick={onTest}
+                size="sm"
                 disabled={testConnectionMutation.isPending}
               >
                 Test Connection
@@ -145,6 +203,7 @@ export function LdapSettingsPage() {
         <div className="flex justify-end px-4 lg:px-6">
           <Button
             disabled={saveLdapMutation.isPending}
+            size="sm"
             onClick={() => onSave(form.getValues())}
           >
             {saveLdapMutation.isPending ? "Saving..." : "Save Settings"}

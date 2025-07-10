@@ -14,8 +14,8 @@ export default function UsersPage() {
     isLoading,
     totalUsers,
     newUsers,
-    pendingUsers,
-    rejectedUsers,
+    manualUsers,
+    importedUsers,
     agentUsers,
     refetch,
   } = useUsers();
@@ -34,7 +34,7 @@ export default function UsersPage() {
             Filter and manage your assigned users
           </div>
         </div>
-        <Button asChild>
+        <Button size="sm" asChild>
           <Link href="/users/create" className="dark:text-foreground">
             Create User
           </Link>
@@ -45,8 +45,8 @@ export default function UsersPage() {
         <SectionCards
           totalUsers={totalUsers}
           totalNewUsers={newUsers.length}
-          totalPendingUsers={pendingUsers.length}
-          totalRejectedUsers={rejectedUsers.length}
+          totalManualUsers={manualUsers.length}
+          totalImportedUsers={importedUsers.length}
           totalAgentUsers={agentUsers.length}
         />
       </div>

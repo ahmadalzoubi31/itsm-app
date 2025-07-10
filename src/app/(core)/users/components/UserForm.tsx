@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
   fetchUserById,
-  updateUser,
   createUserWithPermissions,
   updateUserWithPermissions,
 } from "../services/user.service";
@@ -58,12 +57,10 @@ const UserForm = () => {
 
       let result;
       if (id && id !== "") {
-        const user = await fetchUserById(id);
-        if (!user) {
-          throw new Error("User not found");
+        if (userData.password === "*********") {
+          // @ts-ignore
+          delete userData.password;
         }
-
-        userData.password = user.data.password!;
 
         console.log(userData);
 

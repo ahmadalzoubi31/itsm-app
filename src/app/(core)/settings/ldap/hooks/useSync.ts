@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { syncLdapUsers } from "../services/ldap.service";
+import { syncLdapUsers, cancelLdapSync } from "../services/ldap.service";
 
 import {
   fetchSyncSettings,
@@ -31,6 +31,11 @@ export function useSaveSyncSettings() {
 // Sync LDAP users
 export function useSyncLdapUsers() {
   return useMutation({ mutationFn: syncLdapUsers });
+}
+
+// Cancel LDAP sync operation
+export function useCancelLdapSync() {
+  return useMutation({ mutationFn: cancelLdapSync });
 }
 
 // Get Sync history

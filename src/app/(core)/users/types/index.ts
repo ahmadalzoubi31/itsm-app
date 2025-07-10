@@ -4,7 +4,6 @@ import { RoleEnum } from "../constants/role.constant";
 import { StatusEnum } from "../constants/status.constant";
 
 export type User = BaseEntity & {
-  id: string;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -15,6 +14,7 @@ export type User = BaseEntity & {
   phone?: string;
   address?: string;
   permissions: Permission[];
+  objectGUID?: string;
   status: StatusEnum;
 };
 

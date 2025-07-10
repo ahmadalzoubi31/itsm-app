@@ -28,10 +28,10 @@ interface SyncHistoryProps {
 
 const SyncHistoryCard = ({ syncHistoryList }: SyncHistoryProps) => {
   const getStatusIcon = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "success":
         return <CheckCircle2 className="w-4 h-4 text-green-600" />;
-      case "error":
+      case "error": 
         return <XCircle className="w-4 h-4 text-red-600" />;
       case "in-progress":
         return <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />;
@@ -41,7 +41,7 @@ const SyncHistoryCard = ({ syncHistoryList }: SyncHistoryProps) => {
   };
 
   const getStatusVariant = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "success":
         return "default";
       case "error":

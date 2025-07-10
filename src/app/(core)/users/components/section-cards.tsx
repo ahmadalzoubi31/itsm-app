@@ -8,14 +8,14 @@ import {
 const SectionCards = ({
   totalUsers,
   totalNewUsers,
-  totalPendingUsers,
-  totalRejectedUsers,
+  totalManualUsers,
+  totalImportedUsers,
   totalAgentUsers,
 }: {
   totalUsers: number;
   totalNewUsers: number;
-  totalPendingUsers: number;
-  totalRejectedUsers: number;
+  totalManualUsers: number;
+  totalImportedUsers: number;
   totalAgentUsers: number;
 }) => {
   return (
@@ -46,17 +46,17 @@ const SectionCards = ({
       </Card>
       <Card className="@container/card py-3 ">
         <CardHeader>
-          <CardDescription>Pending Users</CardDescription>
+          <CardDescription>Manual Users</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {totalPendingUsers}
+            {totalManualUsers}
           </CardTitle>
         </CardHeader>
       </Card>
       <Card className="@container/card py-3 ">
         <CardHeader>
-          <CardDescription>Rejected Users</CardDescription>
+          <CardDescription>Imported Users</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {totalRejectedUsers}
+            {totalImportedUsers}
           </CardTitle>
         </CardHeader>
       </Card>

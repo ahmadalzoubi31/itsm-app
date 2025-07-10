@@ -188,13 +188,22 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "objectGUID",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Object Guid" />
+    ),
+    cell: ({ row }) => <div>{row.original.objectGUID}</div>,
+  },
+  {
     accessorKey: "createdBy",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created By" />
     ),
     cell: ({ row }) => {
       return (
-        <div className="text-muted-foreground">{row.original.createdBy}</div>
+        <div className="text-muted-foreground">
+          {row.original.createdBy.username}
+        </div>
       );
     },
     enableSorting: true,
@@ -229,7 +238,9 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="text-muted-foreground">{row.original.updatedBy}</div>
+        <div className="text-muted-foreground">
+          {row.original.updatedBy.username}
+        </div>
       );
     },
     enableSorting: true,

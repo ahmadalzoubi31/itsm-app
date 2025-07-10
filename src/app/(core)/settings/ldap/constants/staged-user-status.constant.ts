@@ -1,7 +1,7 @@
 export enum StagedUserStatusEnum {
   NEW = "NEW",
   UPDATED = "UPDATED",
-  EXISTING = "EXISTING",
+  IMPORTED = "IMPORTED",
   DISABLED = "DISABLED",
   REJECTED = "REJECTED",
 }
@@ -18,9 +18,9 @@ export const STAGED_USER_STATUSES = [
     description: "Use UPDATED if found and changed.",
   },
   {
-    value: StagedUserStatusEnum.EXISTING,
-    label: "Existing",
-    description: "Use EXISTING if found and not changed.",
+    value: StagedUserStatusEnum.IMPORTED,
+    label: "Imported",
+    description: "Use IMPORTED if found and not changed.",
   },
   {
     value: StagedUserStatusEnum.DISABLED,

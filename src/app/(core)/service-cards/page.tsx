@@ -163,7 +163,7 @@ export default function ServiceCards() {
       {/* Services Grid */}
       <div className="px-4 lg:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {serviceCards.map((serviceCard) => (
+          {serviceCards.map((serviceCard: ServiceCard) => (
             <Card
               key={serviceCard.id}
               className={`relative ${
@@ -369,9 +369,7 @@ export default function ServiceCards() {
               </Button>
               <Button
                 onClick={
-                  editingServiceCard
-                    ? handleUpdateService
-                    : handleCreateService
+                  editingServiceCard ? handleUpdateService : handleCreateService
                 }
                 disabled={
                   !formData.name || !formData.category || !formData.description

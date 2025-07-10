@@ -51,11 +51,12 @@ export function DataTable<TData, TValue, TFunc>({
       phone: false,
       address: false,
       role: true,
-      permissions: false,
       status: true,
+      objectGUID: false,
+      permissions: false,
       createdAt: true,
       createdBy: false,
-      updatedAt: false,
+      updatedAt: true,
       updatedBy: false,
     });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

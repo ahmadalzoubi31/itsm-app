@@ -27,6 +27,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getBackendUrl } from "@/utils/getBackendUrl";
+import { fetchWithAuth } from "@/utils/fetxhWithAuth";
 
 export function NavUser({
   user,
@@ -46,10 +47,9 @@ export function NavUser({
     const promise = () =>
       new Promise(
         async (resolve, reject) =>
-          await fetch(getBackendUrl("/api/auth/sign-out"), {
-            method: "POST",
-            credentials: "include", // Important for cookies!
-            headers: { "Content-Type": "application/json" },
+          await fetchWithAuth(getBackendUrl("/api/auth/sign-out"), {
+            method: "DELETE",
+            credentials: "include",
           }).then((res) => {
             if (res.ok) {
               resolve(res);
@@ -62,6 +62,7 @@ export function NavUser({
     toast.promise(promise, {
       loading: "Loading...",
       success: (data) => {
+        // TODO: Clear cookies
         router.push("/auth/sign-in");
         return `Signed out successfully!`;
       },

@@ -2,6 +2,8 @@ import { ProtocolEnum } from "../constants/protocol.constant";
 import { SearchScopeEnum } from "../constants/search-scope.constant";
 import { SyncStatusEnum } from "../constants/sync-status.constant";
 import { FrequencyEnum } from "../constants/frequency.constant";
+import { BaseEntity } from "@/types/globals";
+import { StagedUserStatusEnum } from "../constants/staged-user-status.constant";
 
 export type LdapSettings = {
   server: string;
@@ -36,8 +38,7 @@ export type SyncHistory = {
   duration?: number;
 };
 
-export interface StagedUser {
-  id: string;
+export type StagedUser = BaseEntity & {
   cn?: string;
   mail?: string;
   sAMAccountName?: string;
@@ -51,6 +52,6 @@ export interface StagedUser {
   objectGUID: string;
   manager?: string;
   additionalAttributes?: Record<string, any>;
-  status: "new" | "updated" | "existing" | "disabled";
+  status: StagedUserStatusEnum;
   selected: boolean;
-}
+};

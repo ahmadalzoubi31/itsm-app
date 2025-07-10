@@ -23,17 +23,33 @@ export const UserStaging = () => {
     isLoading,
     refetch,
     importMutation,
+    rejectMutation,
   } = useStagedUsers();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+
+  // Helper to get selected IDs from rowSelection
+  const selectedIds = Object.keys(rowSelection).filter(
+    (id) => rowSelection[id]
+  );
 
   const importSelectedUsers = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const response = await importMutation.mutateAsync(selectedIds);
-      console.log("🚀 ~ importSelectedUsers ~ response:", response);
-      toast.success("Users imported");
-      await refetch();
-      setSelectedIds([]); // Clear selection
+      const promise = async () => {
+        const response = await importMutation.mutateAsync(selectedIds);
+        return response;
+      };
+      toast.promise(promise, {
+        loading: "Importing users...",
+        success: async () => {
+          await refetch();
+          setRowSelection({}); // Clear selection
+          return "Users imported";
+        },
+        error: (error) => {
+          return `${error}`;
+        },
+      });
     } catch (error: any) {
       console.error("Error importing users:", error);
       toast.error("Error importing users");
@@ -43,10 +59,21 @@ export const UserStaging = () => {
   const rejectSelectedUsers = async () => {
     if (selectedIds.length === 0) return;
     try {
-      // TODO: Replace with actual reject logic
-      toast.error("Users rejected");
-      await refetch();
-      setSelectedIds([]); // Clear selection
+      const promise = async () => {
+        const response = await rejectMutation.mutateAsync(selectedIds);
+        return response;
+      };
+      toast.promise(promise, {
+        loading: "Rejecting users...",
+        success: async () => {
+          await refetch();
+          setRowSelection({}); // Clear selection
+          return "Users rejected";
+        },
+        error: (error) => {
+          return `${error}`;
+        },
+      });
     } catch (error: any) {
       console.error("Error rejecting users:", error);
       toast.error("Error rejecting users");
@@ -54,12 +81,21 @@ export const UserStaging = () => {
   };
 
   const exportUserList = () => {
+    //export only the selected users
+    if (selectedIds.length === 0) {
+      toast.error("No users selected");
+      return;
+    }
+
+    console.log("🚀 ~ exportUserList ~ selectedIds:", selectedIds);
     const csvContent = [
       "Display Name,Email,Username,Department,Status",
-      ...stagedUsers?.map(
-        (user) =>
-          `"${user.displayName}","${user.mail}","${user.sAMAccountName}","${user.department}","${user.status}"`
-      ),
+      ...stagedUsers
+        .filter((user) => selectedIds.includes(user.id))
+        .map(
+          (user) =>
+            `"${user.displayName}","${user.mail}","${user.sAMAccountName}","${user.department}","${user.status}"`
+        ),
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -89,6 +125,7 @@ export const UserStaging = () => {
           <div className="flex flex-col md:flex-row gap-2 mb-4">
             <Button
               onClick={importSelectedUsers}
+              size="sm"
               disabled={selectedIds.length === 0}
               className="flex items-center gap-2"
             >
@@ -98,6 +135,7 @@ export const UserStaging = () => {
             <Button
               variant="destructive"
               onClick={rejectSelectedUsers}
+              size="sm"
               disabled={selectedIds.length === 0}
               className="flex items-center gap-2"
             >
@@ -106,6 +144,7 @@ export const UserStaging = () => {
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={exportUserList}
               className="flex items-center gap-2"
             >
@@ -118,8 +157,8 @@ export const UserStaging = () => {
             columns={columns}
             data={stagedUsers}
             refetch={refetch}
-            selectedIds={selectedIds}
-            onSelectedIdsChange={setSelectedIds}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
           />
 
           {stagedUsers.length === 0 && (

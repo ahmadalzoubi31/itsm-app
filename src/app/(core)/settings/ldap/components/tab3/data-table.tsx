@@ -33,49 +33,17 @@ interface DataTableProps<TData, TValue, TFunc> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   refetch: () => Promise<TFunc>;
-  selectedIds: string[];
-  onSelectedIdsChange: (ids: string[]) => void;
+  rowSelection: Record<string, boolean>;
+  onRowSelectionChange: (rowSelection: Record<string, boolean>) => void;
 }
 
-export function DataTable<TData extends { id: string }, TValue, TFunc>({
+export function DataTable<TData extends { objectGUID: string }, TValue, TFunc>({
   columns,
   data,
   refetch,
-  selectedIds,
-  onSelectedIdsChange,
+  rowSelection,
+  onRowSelectionChange,
 }: DataTableProps<TData, TValue, TFunc>) {
-  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>(
-    selectedIds.reduce((acc, id) => ({
-      ...acc,
-      [id]: true,
-    }), {})
-  );
-
-  // Update parent's selectedIds when rowSelection changes
-  React.useEffect(() => {
-    const selectedRowIds = Object.entries(rowSelection)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([id]) => id);
-    
-    onSelectedIdsChange(selectedRowIds);
-  }, [rowSelection, onSelectedIdsChange]);
-  // const [columnVisibility, setColumnVisibility] =
-  //   React.useState<VisibilityState>({
-  //     firstName: false,
-  //     lastName: false,
-  //     fullName: true,
-  //     username: true,
-  //     email: true,
-  //     phone: false,
-  //     address: false,
-  //     role: true,
-  //     permissions: false,
-  //     status: true,
-  //     createdAt: true,
-  //     createdBy: false,
-  //     updatedAt: false,
-  //     updatedBy: false,
-  //   });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -84,6 +52,7 @@ export function DataTable<TData extends { id: string }, TValue, TFunc>({
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => row.objectGUID, // Use objectGUID as row identifier
     state: {
       sorting,
       // columnVisibility,
@@ -91,7 +60,14 @@ export function DataTable<TData extends { id: string }, TValue, TFunc>({
       columnFilters,
     },
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: (updaterOrValue) => {
+      // updaterOrValue can be a value or a function
+      const value =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(rowSelection)
+          : updaterOrValue;
+      onRowSelectionChange(value);
+    },
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -109,7 +85,7 @@ export function DataTable<TData extends { id: string }, TValue, TFunc>({
       <DataTableToolbar table={table} refetch={refetch} />
       <div className="rounded-md overflow-hidden border">
         <Table className="w-full text-sm leading-8">
-          <TableHeader className="bg-muted sticky top-0 z-10">
+          <TableHeader className="bg-table-header text-table-header-foreground sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
