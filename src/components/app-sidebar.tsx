@@ -64,10 +64,10 @@ const data = {
     },
     {
       title: "Groups",
-      url: "#",
+      url: "/groups",
       icon: "groups",
       roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [PermissionNameEnum.Foundation_SupportGroup],
+      permissions: [PermissionNameEnum.Foundation_SupportGroups],
     },
     {
       title: "Users",
@@ -75,6 +75,13 @@ const data = {
       icon: "users",
       roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
       permissions: [PermissionNameEnum.Foundation_People],
+    },
+    {
+      title: "Design Demo",
+      url: "/design-demo",
+      icon: "design",
+      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      permissions: [],
     },
   ],
   navSecondary: [

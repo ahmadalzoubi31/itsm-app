@@ -22,6 +22,7 @@ import {
   IconSettings,
   IconUser,
   IconUsers,
+  IconPalette,
 } from "@tabler/icons-react";
 
 // Map icon names to components
@@ -36,6 +37,7 @@ const icons: { [key: string]: React.ComponentType<any> } = {
   search: IconSearch,
   "service-requests": IconFileWord,
   "service-templates": IconDatabase,
+  design: IconPalette,
   // add other mappings as needed
 };
 

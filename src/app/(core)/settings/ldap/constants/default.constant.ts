@@ -26,4 +26,8 @@ export const DEFAULT_SYNC_SETTINGS: SyncSettings = {
   retryAttempts: 3,
   retryInterval: 30,
   fullSyncInterval: 7,
+  // Default values for frequency-specific fields
+  syncMinute: 0,
+  daysOfWeek: [0], // Sunday by default
+  daysOfMonth: [1], // 1st day of month by default
 };

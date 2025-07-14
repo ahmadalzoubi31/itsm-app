@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { FREQUENCIES } from "../../constants/frequency.constant";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FREQUENCIES, DAYS_OF_WEEK, DAYS_OF_MONTH, MINUTES, FrequencyEnum } from "../../constants/frequency.constant";
 import { TIMEZONES } from "../../constants/timezone.constant";
 
 interface SyncScheduleFormProps {
@@ -86,7 +87,7 @@ export function SyncScheduleForm({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="frequency"
@@ -118,54 +119,313 @@ export function SyncScheduleForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="syncTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sync Time</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="time"
-                        {...field}
-                        disabled={!form.watch("enabled") || isSaving}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="timezone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Timezone</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!form.watch("enabled") || isSaving}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Timezone" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TIMEZONES.map((timezone) => (
-                            <SelectItem
-                              key={timezone.value}
-                              value={timezone.value}
-                            >
-                              {timezone.label}
-                            </SelectItem>
+
+              {/* Conditional fields based on frequency */}
+              {form.watch("frequency") === FrequencyEnum.HOURLY && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="syncMinute"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sync at Minute</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value?.toString()}
+                            onValueChange={(value) => field.onChange(Number(value))}
+                            disabled={!form.watch("enabled") || isSaving}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Minute" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MINUTES.map((minute) => (
+                                <SelectItem
+                                  key={minute.value}
+                                  value={minute.value.toString()}
+                                >
+                                  {minute.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="timezone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Timezone</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!form.watch("enabled") || isSaving}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Timezone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIMEZONES.map((timezone) => (
+                                <SelectItem
+                                  key={timezone.value}
+                                  value={timezone.value}
+                                >
+                                  {timezone.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {form.watch("frequency") === FrequencyEnum.DAILY && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="syncTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sync Time</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="time"
+                            {...field}
+                            disabled={!form.watch("enabled") || isSaving}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="timezone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Timezone</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!form.watch("enabled") || isSaving}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Timezone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIMEZONES.map((timezone) => (
+                                <SelectItem
+                                  key={timezone.value}
+                                  value={timezone.value}
+                                >
+                                  {timezone.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {form.watch("frequency") === FrequencyEnum.WEEKLY && (
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="daysOfWeek"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Days of Week</FormLabel>
+                        <FormDescription>
+                          Select one or more days when sync should run
+                        </FormDescription>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {DAYS_OF_WEEK.map((day) => (
+                            <div key={day.value} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`day-${day.value}`}
+                                checked={field.value?.includes(day.value) || false}
+                                onCheckedChange={(checked) => {
+                                  const currentValues = field.value || [];
+                                  if (checked) {
+                                    field.onChange([...currentValues, day.value]);
+                                  } else {
+                                    field.onChange(currentValues.filter(v => v !== day.value));
+                                  }
+                                }}
+                                disabled={!form.watch("enabled") || isSaving}
+                              />
+                              <label
+                                htmlFor={`day-${day.value}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {day.label}
+                              </label>
+                            </div>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="syncTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sync Time</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="time"
+                              {...field}
+                              disabled={!form.watch("enabled") || isSaving}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="timezone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Timezone</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              disabled={!form.watch("enabled") || isSaving}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Timezone" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIMEZONES.map((timezone) => (
+                                  <SelectItem
+                                    key={timezone.value}
+                                    value={timezone.value}
+                                  >
+                                    {timezone.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {form.watch("frequency") === FrequencyEnum.MONTHLY && (
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="daysOfMonth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Days of Month</FormLabel>
+                        <FormDescription>
+                          Select one or more days of the month when sync should run
+                        </FormDescription>
+                        <div className="grid grid-cols-4 md:grid-cols-8 gap-2 max-h-32 overflow-y-auto">
+                          {DAYS_OF_MONTH.map((day) => (
+                            <div key={day.value} className="flex items-center space-x-1">
+                              <Checkbox
+                                id={`month-day-${day.value}`}
+                                checked={field.value?.includes(day.value) || false}
+                                onCheckedChange={(checked) => {
+                                  const currentValues = field.value || [];
+                                  if (checked) {
+                                    field.onChange([...currentValues, day.value]);
+                                  } else {
+                                    field.onChange(currentValues.filter(v => v !== day.value));
+                                  }
+                                }}
+                                disabled={!form.watch("enabled") || isSaving}
+                              />
+                              <label
+                                htmlFor={`month-day-${day.value}`}
+                                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {day.value}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="syncTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sync Time</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="time"
+                              {...field}
+                              disabled={!form.watch("enabled") || isSaving}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="timezone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Timezone</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              disabled={!form.watch("enabled") || isSaving}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Timezone" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIMEZONES.map((timezone) => (
+                                  <SelectItem
+                                    key={timezone.value}
+                                    value={timezone.value}
+                                  >
+                                    {timezone.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField

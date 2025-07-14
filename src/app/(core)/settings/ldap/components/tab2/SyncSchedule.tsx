@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FrequencyEnum } from "../../constants/frequency.constant";
 import { toast } from "sonner";
 import { SyncSettings } from "../../types";
 import { SyncScheduleForm } from "./SyncScheduleForm";
@@ -34,6 +35,30 @@ export function SyncSchedule() {
   useEffect(() => {
     if (syncSettings) form.reset(syncSettings);
   }, [syncSettings]);
+
+  // Handle frequency change to set appropriate defaults
+  useEffect(() => {
+    const frequency = form.watch("frequency");
+    const currentValues = form.getValues();
+
+    switch (frequency) {
+      case FrequencyEnum.HOURLY:
+        if (currentValues.syncMinute === undefined) {
+          form.setValue("syncMinute", 0);
+        }
+        break;
+      case FrequencyEnum.WEEKLY:
+        if (!currentValues.daysOfWeek || currentValues.daysOfWeek.length === 0) {
+          form.setValue("daysOfWeek", [0]); // Sunday by default
+        }
+        break;
+      case FrequencyEnum.MONTHLY:
+        if (!currentValues.daysOfMonth || currentValues.daysOfMonth.length === 0) {
+          form.setValue("daysOfMonth", [1]); // 1st day of month by default
+        }
+        break;
+    }
+  }, [form.watch("frequency")]);
 
   const onSave = async (values: SyncSettings) => {
     setIsSaving(true);

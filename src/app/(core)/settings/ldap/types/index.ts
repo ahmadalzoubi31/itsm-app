@@ -27,6 +27,10 @@ export type SyncSettings = {
   retryAttempts: number;
   retryInterval: number;
   fullSyncInterval: number;
+  // Frequency-specific fields
+  syncMinute?: number; // For HOURLY (0-59)
+  daysOfWeek?: number[]; // For WEEKLY (0-6, Sunday = 0) - multiple days allowed
+  daysOfMonth?: number[]; // For MONTHLY (1-31) - multiple days allowed
 };
 
 export type SyncHistory = {
