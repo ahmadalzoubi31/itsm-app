@@ -4,14 +4,20 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 import { GROUP_TYPES, GroupTypeEnum } from "../constants/group-type.constant";
-import { GROUP_STATUSES, GroupStatusEnum } from "../constants/group-status.constant";
+import {
+  GROUP_STATUSES,
+  GroupStatusEnum,
+} from "../constants/group-status.constant";
 
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { GroupMembersDialog } from "./GroupMembersDialog";
 
 import { Group } from "../types";
+import { Users } from "lucide-react";
 
 export const columns: ColumnDef<Group>[] = [
   {
@@ -110,7 +116,10 @@ export const columns: ColumnDef<Group>[] = [
       };
 
       return (
-        <Badge variant="secondary" className={`px-1.5 ${getTypeColor(type.value)}`}>
+        <Badge
+          variant="secondary"
+          className={`px-1.5 ${getTypeColor(type.value)}`}
+        >
           {type.label}
         </Badge>
       );
@@ -154,7 +163,12 @@ export const columns: ColumnDef<Group>[] = [
       };
 
       return (
-        <Badge variant="secondary" className={`px-1.5 ${getStatusColor(status.value as GroupStatusEnum)}`}>
+        <Badge
+          variant="secondary"
+          className={`px-1.5 ${getStatusColor(
+            status.value as GroupStatusEnum
+          )}`}
+        >
           {status.label}
         </Badge>
       );
@@ -174,7 +188,7 @@ export const columns: ColumnDef<Group>[] = [
       const leader = row.original.leader;
       return (
         <div className="text-muted-foreground">
-          {leader?.user?.fullName || "No leader assigned"}
+          {leader?.fullName || "No leader assigned"}
         </div>
       );
     },
@@ -188,9 +202,21 @@ export const columns: ColumnDef<Group>[] = [
     ),
     cell: ({ row }) => {
       const memberCount = row.original.members.length;
+      const group = row.original;
+
       return (
-        <div className="text-muted-foreground">
-          {memberCount} {memberCount === 1 ? "member" : "members"}
+        <div className="flex items-center gap-2">
+          <div className="text-muted-foreground">
+            {memberCount} {memberCount === 1 ? "member" : "members"}
+          </div>
+          <GroupMembersDialog
+            group={group}
+            trigger={
+              <Button variant="ghost" size="sm" className="h-6 px-2">
+                <Users className="h-3 w-3" />
+              </Button>
+            }
+          />
         </div>
       );
     },
@@ -304,4 +330,4 @@ export const columns: ColumnDef<Group>[] = [
   },
 ];
 
-export default columns; 
+export default columns;

@@ -1,6 +1,7 @@
 import { BaseEntity } from "@/types/globals";
 import { GroupTypeEnum } from "../constants/group-type.constant";
 import { GroupStatusEnum } from "../constants/group-status.constant";
+import { User } from "@/app/(core)/users/types";
 
 export type Group = BaseEntity & {
   name: string;
@@ -9,7 +10,7 @@ export type Group = BaseEntity & {
   status: GroupStatusEnum;
   members: GroupMember[];
   leaderId?: string;
-  leader?: GroupMember;
+  leader?: User;
   email?: string;
   phone?: string;
   location?: string;
@@ -67,4 +68,4 @@ export type GroupFilters = {
   status?: GroupStatusEnum;
   isActive?: boolean;
   leaderId?: string;
-}; 
+};

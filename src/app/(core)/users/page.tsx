@@ -6,6 +6,7 @@ import { columns } from "./components/columns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUsers } from "./hooks/useUsers";
+import { PlusIcon } from "lucide-react";
 
 export default function UsersPage() {
   const {
@@ -35,7 +36,11 @@ export default function UsersPage() {
           </div>
         </div>
         <Button size="sm" asChild>
-          <Link href="/users/create" className="dark:text-foreground">
+          <Link
+            href="/users/create"
+            className="dark:text-foreground flex items-center gap-2"
+          >
+            <PlusIcon className="size-4" />
             Create User
           </Link>
         </Button>

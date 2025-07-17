@@ -6,6 +6,7 @@ import { columns } from "./components/columns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useGroups } from "./hooks/useGroups";
+import { PlusIcon } from "lucide-react";
 
 export default function GroupsPage() {
   const {
@@ -32,7 +33,11 @@ export default function GroupsPage() {
           </div>
         </div>
         <Button size="sm" asChild>
-          <Link href="/groups/create" className="dark:text-foreground">
+          <Link
+            href="/groups/create"
+            className="dark:text-foreground flex items-center gap-2"
+          >
+            <PlusIcon className="size-4" />
             Create Group
           </Link>
         </Button>
@@ -48,8 +53,13 @@ export default function GroupsPage() {
         />
       </div>
       <div className="px-4 lg:px-6">
-        <DataTable data={groups} columns={columns} refetch={refetch} isLoading={isLoading} />
+        <DataTable
+          data={groups}
+          columns={columns}
+          refetch={refetch}
+          isLoading={isLoading}
+        />
       </div>
     </>
   );
-} 
+}

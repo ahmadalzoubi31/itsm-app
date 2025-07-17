@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteGroup } from "../services/group.service";
 import { toast } from "sonner";
+import { GroupMembersDialog } from "./GroupMembersDialog";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -58,11 +59,20 @@ export function DataTableRowActions<TData>({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem onClick={handleEdit}>
           <Edit className="h-4 w-4 mr-2" />
           Edit
         </DropdownMenuItem>
+        <GroupMembersDialog
+          group={group}
+          trigger={
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Users className="h-4 w-4 mr-2" />
+              Manage Members
+            </DropdownMenuItem>
+          }
+        />
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleDelete}
@@ -75,4 +85,4 @@ export function DataTableRowActions<TData>({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-} 
+}

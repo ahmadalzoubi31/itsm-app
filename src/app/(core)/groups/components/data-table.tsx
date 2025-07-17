@@ -45,7 +45,22 @@ export function DataTable<TData, TValue>({
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({
+      name: true,
+      description: false,
+      type: true,
+      status: true,
+      leader: true,
+      email: true,
+      phone: true,
+      location: true,
+      isActive: true,
+      members: true,
+      createdAt: true,
+      createdBy: false,
+      updatedAt: true,
+      updatedBy: false,
+    });
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -144,4 +159,4 @@ export function DataTable<TData, TValue>({
       <DataTablePagination table={table} />
     </div>
   );
-} 
+}
