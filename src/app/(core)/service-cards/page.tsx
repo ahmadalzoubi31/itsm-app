@@ -43,7 +43,7 @@ import {
   createServiceCard,
   deleteServiceCard,
   updateServiceCard,
-} from "./services/template.service";
+} from "./services/service-card.service";
 
 export default function ServiceCards() {
   const { serviceCards } = useServiceCards();
