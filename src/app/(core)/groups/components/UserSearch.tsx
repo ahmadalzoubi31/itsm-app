@@ -60,11 +60,19 @@ export function UserSearch({
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const filteredUsers = dbUsers.filter(
-      (user) =>
-        user.fullName.toLowerCase().includes(term.toLowerCase()) ||
-        user.email.toLowerCase().includes(term.toLowerCase())
-    );
+    let filteredUsers;
+
+    // Global search pattern - show all users when %%% is entered
+    if (term.trim() === "%%%") {
+      filteredUsers = dbUsers;
+    } else {
+      // Normal search - filter by name or email
+      filteredUsers = dbUsers.filter(
+        (user) =>
+          user.fullName.toLowerCase().includes(term.toLowerCase()) ||
+          user.email.toLowerCase().includes(term.toLowerCase())
+      );
+    }
 
     setUsers(filteredUsers);
     setIsSearching(false);
@@ -97,7 +105,7 @@ export function UserSearch({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               id="userSearch"
-              placeholder="Search by name or email..."
+              placeholder="Search by name or email (type %%% to show all users)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -117,6 +125,11 @@ export function UserSearch({
               </Button>
             )}
           </div>
+          <p className="text-xs text-muted-foreground">
+            💡 Pro tip: Type{" "}
+            <code className="bg-muted px-1 rounded text-xs">%%%</code> to show
+            all users
+          </p>
         </div>
         {/* <div className="space-y-2">
           <Label htmlFor="userRole">Default Role</Label>
@@ -136,53 +149,58 @@ export function UserSearch({
             </SelectContent>
           </Select>
         </div> */}
-        {/* <div className="flex items-end">
+        <div className="flex items-end">
           <div className="text-sm text-muted-foreground">
-            {isSearching
-              ? "Searching..."
-              : `${filteredUsers.length} users found`}
+            {isSearching ? (
+              "Searching..."
+            ) : searchTerm.trim() === "%%%" ? (
+              <span className="flex items-center gap-1">
+                <Badge variant="outline" className="text-xs">
+                  Global Search
+                </Badge>
+                {`Showing all ${filteredUsers.length} users`}
+              </span>
+            ) : (
+              `${filteredUsers.length} users found`
+            )}
           </div>
-        </div> */}
+        </div>
       </div>
 
       {filteredUsers.length > 0 && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              {filteredUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                  onClick={() => handleUserSelect(user)}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} />
-                      <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.fullName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{selectedRole}</Badge>
-                    <UserPlus className="h-4 w-4 text-muted-foreground" />
-                  </div>
+        <div className="space-y-2">
+          {filteredUsers.map((user) => (
+            <div
+              key={user.id}
+              className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+              onClick={() => handleUserSelect(user)}
+            >
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar} />
+                  <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{user.fullName}</p>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{selectedRole}</Badge>
+                <UserPlus className="h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       )}
 
       {searchTerm && !isSearching && filteredUsers.length === 0 && (
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-muted-foreground">
-              No users found matching "{searchTerm}"
+              {searchTerm.trim() === "%%%"
+                ? "No users available in the system"
+                : `No users found matching "${searchTerm}"`}
             </p>
           </CardContent>
         </Card>

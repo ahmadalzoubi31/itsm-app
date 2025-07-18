@@ -4,6 +4,7 @@ import { User } from "../types";
 import { ApiResponse } from "@/types/globals";
 import { AssignPermissionDto } from "../../permissions/types";
 import { PermissionNameEnum } from "../../permissions/constants/permission-name.constant";
+import { Permission } from "../../permissions/types";
 
 // Get all users
 export async function fetchUsers(): Promise<ApiResponse<User[]>> {
@@ -20,6 +21,34 @@ export async function fetchUserById(id: string): Promise<ApiResponse<User>> {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch user");
+  return res.json();
+}
+
+// Get user's effective permissions (direct + group inherited)
+export async function fetchUserEffectivePermissions(
+  userId: string
+): Promise<ApiResponse<Permission[]>> {
+  const res = await fetchWithAuth(
+    getBackendUrl(`/api/users/${userId}/effective-permissions`),
+    {
+      credentials: "include",
+    }
+  );
+  if (!res.ok) throw new Error("Failed to fetch user effective permissions");
+  return res.json();
+}
+
+// Get user's group inherited permissions only
+export async function fetchUserGroupPermissions(
+  userId: string
+): Promise<ApiResponse<Permission[]>> {
+  const res = await fetchWithAuth(
+    getBackendUrl(`/api/users/${userId}/group-permissions`),
+    {
+      credentials: "include",
+    }
+  );
+  if (!res.ok) throw new Error("Failed to fetch user group permissions");
   return res.json();
 }
 

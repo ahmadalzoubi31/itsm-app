@@ -56,7 +56,12 @@ export default function UsersPage() {
         />
       </div>
       <div className="px-4 lg:px-6">
-        <DataTable data={users} columns={columns} refetch={refetch} />
+        <DataTable
+          data={users}
+          columns={columns}
+          refetch={refetch}
+          isLoading={isLoading}
+        />
       </div>
     </>
   );

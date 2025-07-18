@@ -88,15 +88,41 @@ export function DataTable<TData, TValue>({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-[250px]" />
-          <Skeleton className="h-8 w-[100px]" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-[100px]" />
+            <Skeleton className="h-8 w-[80px]" />
+          </div>
         </div>
         <div className="rounded-md border">
-          <div className="h-[400px] flex items-center justify-center">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-              <Skeleton className="h-4 w-[150px]" />
-            </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableHead key={i}>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-4 w-[80px]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex items-center justify-between px-2">
+          <Skeleton className="h-4 w-[100px]" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-[80px]" />
+            <Skeleton className="h-8 w-[60px]" />
+            <Skeleton className="h-8 w-[80px]" />
           </div>
         </div>
       </div>

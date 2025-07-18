@@ -28,17 +28,20 @@ import {
 
 import { DataTableToolbar } from "./data-table-toolbar";
 import { DataTablePagination } from "./data-table-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue, TFunc> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   refetch: () => Promise<TFunc>;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue, TFunc>({
   columns,
   data,
   refetch,
+  isLoading = false,
 }: DataTableProps<TData, TValue, TFunc>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -87,12 +90,58 @@ export function DataTable<TData, TValue, TFunc>({
     getExpandedRowModel: getExpandedRowModel(),
   });
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-[250px]" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-[100px]" />
+            <Skeleton className="h-8 w-[80px]" />
+          </div>
+        </div>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableHead key={i}>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-4 w-[80px]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex items-center justify-between px-2">
+          <Skeleton className="h-4 w-[100px]" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-[80px]" />
+            <Skeleton className="h-8 w-[60px]" />
+            <Skeleton className="h-8 w-[80px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <DataTableToolbar table={table} refetch={refetch} />
-      <div className="rounded-md overflow-hidden border">
-        <Table className="w-full text-sm leading-8">
-          <TableHeader className="bg-muted sticky top-0 z-10">
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -110,12 +159,15 @@ export function DataTable<TData, TValue, TFunc>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="**:data-[slot=table-cell]:first:w-8">
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="py-0.5">
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-0.5">
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -130,7 +182,7 @@ export function DataTable<TData, TValue, TFunc>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No users found.
                 </TableCell>
               </TableRow>
             )}

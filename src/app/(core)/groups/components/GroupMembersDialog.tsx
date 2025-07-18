@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Users, UserPlus, UserMinus, Crown, Shield } from "lucide-react";
 import { Group, GroupMember, GroupMemberRoleEnum } from "../types";
 import {
@@ -103,6 +104,14 @@ export function GroupMembersDialog({
     }
   };
 
+  const getEffectiveRole = (member: GroupMember): GroupMemberRoleEnum => {
+    // If this member is the group leader, always show them as LEADER
+    if (group.leaderId && member.userId === group.leaderId) {
+      return GroupMemberRoleEnum.LEADER;
+    }
+    return member.role;
+  };
+
   const getRoleColor = (role: GroupMemberRoleEnum) => {
     switch (role) {
       case GroupMemberRoleEnum.LEADER:
@@ -156,11 +165,25 @@ export function GroupMembersDialog({
         </CardHeader>
         <CardContent className="pt-0 pb-6">
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground font-medium">
-                Loading members...
-              </p>
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-6 border rounded-lg shadow-sm"
+                >
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[140px]" />
+                      <Skeleton className="h-3 w-[180px]" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-6 w-[80px] rounded-full" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : members.length === 0 ? (
             <div className="text-center py-12">
@@ -174,34 +197,48 @@ export function GroupMembersDialog({
             </div>
           ) : (
             <div className="space-y-4">
-              {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-6 border rounded-lg hover:bg-muted/50 transition-colors shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback className="text-base font-semibold">
-                        {member.user?.fullName?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <p className="font-semibold text-base">
-                        {member.user?.fullName || "Unknown User"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.user?.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Badge className={getRoleColor(member.role)}>
-                      <div className="flex items-center gap-1">
-                        {getRoleIcon(member.role)}
-                        {member.role}
+              {members.map((member) => {
+                const isGroupLeader = group.leaderId === member.userId;
+                return (
+                  <div
+                    key={member.id}
+                    className={`flex items-center justify-between p-6 border rounded-lg hover:bg-muted/50 transition-colors shadow-sm ${
+                      isGroupLeader ? "border-yellow-200 bg-yellow-50/50" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="text-base font-semibold">
+                          {member.user?.fullName?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="font-semibold text-base">
+                          {member.user?.fullName || "Unknown User"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {member.user?.email}
+                        </p>
                       </div>
-                    </Badge>
-                    <Select
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {(() => {
+                        const effectiveRole = getEffectiveRole(member);
+                        return (
+                          <Badge className={getRoleColor(effectiveRole)}>
+                            <div className="flex items-center gap-1">
+                              {getRoleIcon(effectiveRole)}
+                              {effectiveRole}
+                              {group.leaderId === member.userId && (
+                                <span className="text-xs ml-1">
+                                  (Group Leader)
+                                </span>
+                              )}
+                            </div>
+                          </Badge>
+                        );
+                      })()}
+                      {/* <Select
                       value={member.role}
                       onValueChange={(value) =>
                         handleUpdateRole(
@@ -225,19 +262,20 @@ export function GroupMembersDialog({
                           Admin
                         </SelectItem>
                       </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRemoveMember(member.userId)}
-                      disabled={isLoading}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <UserMinus className="h-4 w-4" />
-                    </Button>
+                    </Select> */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRemoveMember(member.userId)}
+                        disabled={isLoading}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <UserMinus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
@@ -256,7 +294,7 @@ export function GroupMembersDialog({
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>{triggerElement}</DrawerTrigger>
       <DrawerContent
-        className="h-full overflow-y-hidden"
+        className="h-full overflow-y-auto"
         data-vaul-drawer-direction="right"
       >
         <DrawerHeader className="pb-8 px-6 pt-6">
@@ -265,7 +303,7 @@ export function GroupMembersDialog({
             {group.name}
           </DrawerTitle>
         </DrawerHeader>
-        <div className="px-6 pb-6">{content}</div>
+        <div className="px-6 py-6 overflow-y-auto flex-1">{content}</div>
       </DrawerContent>
     </Drawer>
   );

@@ -176,7 +176,10 @@ const UserForm = () => {
 
               {/* Permissions Tab */}
               <TabsContent value="permissions">
-                <UserPermissions form={form} />
+                <UserPermissions
+                  form={form}
+                  userId={id && id !== "" ? id : undefined}
+                />
               </TabsContent>
 
               {/* Settings Tab */}

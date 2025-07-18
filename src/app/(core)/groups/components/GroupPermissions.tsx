@@ -29,18 +29,21 @@ import {
   Shield,
   X,
   Plus,
-  Check,
   ChevronDown,
   ChevronRight,
   ArrowLeft,
   Users,
-  User,
   Info,
+  Loader2,
 } from "lucide-react";
 import { Permission } from "../../permissions/types";
 import { usePermissions } from "../../permissions/hooks/usePermissions";
-import { UseFormReturn } from "react-hook-form";
-import { fetchUserGroupPermissions } from "../services/user.service";
+import {
+  fetchGroupPermissions,
+  addPermissionToGroup,
+  removePermissionFromGroup,
+  setGroupPermissions,
+} from "../services/group.service";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -50,76 +53,101 @@ import {
 } from "@/components/ui/tooltip";
 
 type Props = {
-  form: UseFormReturn<any>;
-  userId?: string; // For existing users to fetch group permissions
+  groupId: string;
+  onPermissionsChange?: () => void; // Callback when permissions are modified
 };
 
-const UserPermissions = ({ form, userId }: Props) => {
+const GroupPermissions = ({ groupId, onPermissionsChange }: Props) => {
   const { permissions: availablePermissions } = usePermissions();
   const [permissionSearch, setPermissionSearch] = useState("");
   const [permissionPopoverOpen, setPermissionPopoverOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [groupPermissions, setGroupPermissions] = useState<Permission[]>([]);
+  const [groupPermissions, setGroupPermissionsState] = useState<Permission[]>(
+    []
+  );
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Fetch group permissions for existing users
+  // Fetch group permissions on mount and when groupId changes
   useEffect(() => {
-    if (userId) {
-      setLoading(true);
-      fetchUserGroupPermissions(userId)
-        .then((response) => {
-          setGroupPermissions(response.data || []);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch group permissions:", error);
-          toast.error("Failed to load group permissions");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+    if (groupId) {
+      fetchPermissions();
     }
-  }, [userId]);
+  }, [groupId]);
 
-  const addPermission = (permission: Permission) => {
-    // Check if permission is already assigned directly or inherited from group
-    const directPermissions = form.getValues("permissions") || [];
-    const isDirectlyAssigned = directPermissions.find(
-      (p: Permission) => p.id === permission.id
-    );
-    const isInherited = groupPermissions.find((p) => p.id === permission.id);
-
-    if (isInherited) {
-      toast.warning("This permission is already inherited from a group");
-      return;
-    }
-
-    if (!isDirectlyAssigned) {
-      form.setValue("permissions", [...directPermissions, permission]);
+  const fetchPermissions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetchGroupPermissions(groupId);
+      setGroupPermissionsState(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch group permissions:", error);
+      toast.error("Failed to load group permissions");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const removePermission = (permission: Permission) => {
-    // Only allow removal of direct permissions
-    form.setValue(
-      "permissions",
-      form
-        .getValues("permissions")
-        .filter((p: Permission) => p.id !== permission.id)
-    );
+  const handleAddPermission = async (permission: Permission) => {
+    setActionLoading(permission.id);
+    try {
+      await addPermissionToGroup(groupId, permission.id);
+      setGroupPermissionsState((prev) => [...prev, permission]);
+      toast.success(`Permission "${permission.name}" added to group`);
+      setPermissionPopoverOpen(false);
+      setSelectedCategory(null);
+      onPermissionsChange?.();
+    } catch (error: any) {
+      console.error("Failed to add permission to group:", error);
+      toast.error(error.message || "Failed to add permission to group");
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  // Get direct permissions from form
-  const directPermissions = form.getValues("permissions") || [];
+  const handleRemovePermission = async (permission: Permission) => {
+    setActionLoading(permission.id);
+    try {
+      await removePermissionFromGroup(groupId, permission.id);
+      setGroupPermissionsState((prev) =>
+        prev.filter((p) => p.id !== permission.id)
+      );
+      toast.success(`Permission "${permission.name}" removed from group`);
+      onPermissionsChange?.();
+    } catch (error: any) {
+      console.error("Failed to remove permission from group:", error);
+      toast.error(error.message || "Failed to remove permission from group");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
-  // Filter available permissions (exclude already assigned and inherited)
+  const handleClearAllPermissions = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to remove all permissions from this group? This will affect all members who inherit these permissions."
+    );
+
+    if (!confirmed) return;
+
+    setActionLoading("clear-all");
+    try {
+      await setGroupPermissions(groupId, []);
+      setGroupPermissionsState([]);
+      toast.success("All permissions removed from group");
+      onPermissionsChange?.();
+    } catch (error: any) {
+      console.error("Failed to clear group permissions:", error);
+      toast.error(error.message || "Failed to clear group permissions");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Filter available permissions (exclude already assigned)
   const filteredPermissions = availablePermissions.filter((permission) => {
-    const isDirectlyAssigned = directPermissions.find(
-      (p: Permission) => p.id === permission.id
-    );
-    const isInherited = groupPermissions.find((p) => p.id === permission.id);
+    const isAssigned = groupPermissions.find((p) => p.id === permission.id);
     return (
-      !isDirectlyAssigned &&
-      !isInherited &&
+      !isAssigned &&
       (permission.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
         permission.category
           .toLowerCase()
@@ -152,9 +180,7 @@ const UserPermissions = ({ form, userId }: Props) => {
   };
 
   const handlePermissionSelect = (permission: Permission) => {
-    addPermission(permission);
-    setPermissionPopoverOpen(false);
-    setSelectedCategory(null);
+    handleAddPermission(permission);
   };
 
   const handlePopoverOpenChange = (open: boolean) => {
@@ -170,112 +196,97 @@ const UserPermissions = ({ form, userId }: Props) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          Permission Management
+          Group Permission Management
         </CardTitle>
         <CardDescription>
-          Assign specific permissions to control user access levels. Inherited
-          permissions come from group memberships.
+          Manage permissions that will be inherited by all members of this group
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Direct Permissions */}
-        {directPermissions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-blue-600" />
-              <Label className="text-sm font-medium">
-                Direct Permissions ({directPermissions.length})
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Permissions directly assigned to this user</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {directPermissions.map((permission: Permission) => (
-                <Badge
-                  key={permission.id}
-                  variant="default"
-                  className="gap-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
-                >
-                  {permission.name}
-                  <button
-                    type="button"
-                    onClick={() => removePermission(permission)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
+        {/* Current Group Permissions */}
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="ml-2">Loading permissions...</span>
           </div>
-        )}
-
-        {/* Inherited Permissions from Groups */}
-        {groupPermissions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-green-600" />
-              <Label className="text-sm font-medium">
-                Inherited from Groups ({groupPermissions.length})
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      Permissions inherited from group memberships (read-only)
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {groupPermissions.map((permission: Permission) => (
-                <TooltipProvider key={permission.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge
-                        variant="secondary"
-                        className="gap-1 bg-green-100 text-green-800 cursor-help"
+        ) : (
+          <>
+            {groupPermissions.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-600" />
+                    <Label className="text-sm font-medium">
+                      Group Permissions ({groupPermissions.length})
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            These permissions will be inherited by all group
+                            members
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  {groupPermissions.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={actionLoading === "clear-all"}
+                      onClick={handleClearAllPermissions}
+                    >
+                      {actionLoading === "clear-all" ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Clear All"
+                      )}
+                    </Button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {groupPermissions.map((permission: Permission) => (
+                    <Badge
+                      key={permission.id}
+                      variant="default"
+                      className="gap-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                    >
+                      {permission.name}
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePermission(permission)}
+                        className="ml-1 hover:text-destructive"
+                        disabled={actionLoading === permission.id}
                       >
-                        <Users className="h-3 w-3" />
-                        {permission.name}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Inherited from group membership - manage via group
-                        settings
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ))}
-            </div>
-          </div>
-        )}
+                        {actionLoading === permission.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {directPermissions.length === 0 && groupPermissions.length === 0 && (
-          <div className="text-center text-muted-foreground py-4">
-            No permissions assigned to this user
-          </div>
+            {groupPermissions.length === 0 && (
+              <div className="text-center text-muted-foreground py-4">
+                No permissions assigned to this group
+              </div>
+            )}
+          </>
         )}
 
         <Separator />
 
         {/* Add Permissions */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Add Direct Permissions</Label>
+          <Label className="text-sm font-medium">Add Permissions</Label>
           <Popover
             open={permissionPopoverOpen}
             onOpenChange={handlePopoverOpenChange}
@@ -325,6 +336,7 @@ const UserPermissions = ({ form, userId }: Props) => {
                                   handlePermissionSelect(permission)
                                 }
                                 className="flex flex-col items-start py-2"
+                                disabled={actionLoading === permission.id}
                               >
                                 <div className="font-medium">
                                   {permission.name}
@@ -369,9 +381,7 @@ const UserPermissions = ({ form, userId }: Props) => {
                         </CommandGroup>
                       ) : (
                         <CommandEmpty>
-                          {loading
-                            ? "Loading permissions..."
-                            : "No available permissions to assign."}
+                          No available permissions to assign.
                         </CommandEmpty>
                       )}
                     </>
@@ -386,4 +396,4 @@ const UserPermissions = ({ form, userId }: Props) => {
   );
 };
 
-export default UserPermissions;
+export default GroupPermissions;
