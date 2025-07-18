@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchServiceTemplateById } from "../services/template.service";
+import { fetchServiceTemplateById } from "../services/service-card.service";
 import { ServiceTemplate } from "../types";
 import { ApiResponse } from "@/types/globals";
 

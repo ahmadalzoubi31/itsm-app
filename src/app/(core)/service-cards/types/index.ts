@@ -1,6 +1,6 @@
 import { BaseEntity } from "@/types/globals";
 
-export type ServiceCard = BaseEntity & {
+export type ServiceTemplate = BaseEntity & {
   id: string;
   name: string;
   description: string;
