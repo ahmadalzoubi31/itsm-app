@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchServiceTemplates } from "../services/service-card.service";
-import { ServiceTemplate } from "../types";
+import { fetchServiceCards } from "../services/service-card.service";
+import { ServiceCard } from "../types";
 import { ApiResponse } from "@/types/globals";
 
-export function useServiceTemplates() {
-  const { data, error, isLoading, refetch } = useQuery<ApiResponse<ServiceTemplate[]>>({
-    queryKey: ["service-templates"],
-    queryFn: fetchServiceTemplates,
+export function useServiceCards() {
+  const { data, error, isLoading, refetch } = useQuery<ApiResponse<ServiceCard[]>>({
+    queryKey: ["service-cards"],
+    queryFn: fetchServiceCards,
   });
 
-  const serviceTemplates = data?.data ?? [];
+  const serviceCards = data?.data ?? [];
 
   return {
-    serviceTemplates,
+    serviceCards,
     error,
     isLoading,
     refetch,

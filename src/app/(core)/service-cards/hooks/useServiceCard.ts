@@ -1,19 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchServiceTemplateById } from "../services/service-card.service";
-import { ServiceTemplate } from "../types";
+import { fetchServiceCardById } from "../services/service-card.service";
+import { ServiceCard } from "../types";
 import { ApiResponse } from "@/types/globals";
 
-export function useServiceTemplate(id: string) {
+export function useServiceCard(id: string) {
   const { data, error, isLoading, refetch } = useQuery<
-    ApiResponse<ServiceTemplate>
+    ApiResponse<ServiceCard>
   >({
-    queryKey: ["service-template", id],
-    queryFn: () => fetchServiceTemplateById(id),
+    queryKey: ["service-card", id],
+    queryFn: () => fetchServiceCardById(id),
     enabled: !!id, // Only run if id exists
   });
 
   return {
-    serviceTemplate: data?.data ?? null,
+    serviceCard: data?.data ?? null,
     error,
     isLoading,
     refetch,

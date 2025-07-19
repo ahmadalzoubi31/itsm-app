@@ -46,27 +46,6 @@ const CreateIncident = () => {
       );
       const createdAt = new Date();
 
-      const newIncident: IncidentWithDetails = {
-        id: Date.now().toString(),
-        number: generateIncidentNumber(),
-        title: data.title,
-        description: data.description,
-        status: IncidentStatus.NEW,
-        priority,
-        impact: data.impact || Impact.MEDIUM,
-        urgency: data.urgency || Urgency.MEDIUM,
-        category: data.category,
-        subcategory: data.subcategory,
-        reportedBy: mockUser,
-        slaBreachTime: calculateSLABreachTime(priority, createdAt),
-        businessService: data.businessService,
-        location: data.location,
-        createdAt,
-        updatedAt: createdAt,
-        comments: [],
-        history: [],
-        _count: { comments: 0 },
-      };
 
       toast.success("Incident created successfully");
 

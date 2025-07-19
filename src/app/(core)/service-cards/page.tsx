@@ -81,26 +81,7 @@ export default function ServiceCards() {
   ];
 
   const handleCreateService = () => {
-    const newServiceCard: ServiceCard = {
-      id: `service-${Date.now()}`,
-      name: formData.name,
-      description: formData.description,
-      category: formData.category,
-      estimatedTime: formData.estimatedTime,
-      price: formData.price,
-      workflowId: formData.workflowId,
-      icon: iconOptions[0].icon, // Default to first icon
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: "system",
-      updatedBy: "system",
     };
-
-    createServiceCard(newServiceCard);
-    resetForm();
-    setShowCreateDialog(false);
-  };
 
   const handleEditService = (serviceCard: ServiceCard) => {
     setEditingServiceCard(serviceCard);

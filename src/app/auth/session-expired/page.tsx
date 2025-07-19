@@ -2,7 +2,7 @@
 
 import { getBackendUrl } from "@/utils/getBackendUrl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { AlertCircle, RefreshCw, LogIn, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function SessionExpiredPage() {
+function SessionExpiredContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
@@ -117,5 +117,34 @@ export default function SessionExpiredPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-lg border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4 pb-6">
+            <div className="mx-auto w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+              <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400 animate-pulse" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                Loading...
+              </CardTitle>
+            </div>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+export default function SessionExpiredPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SessionExpiredContent />
+    </Suspense>
   );
 }
