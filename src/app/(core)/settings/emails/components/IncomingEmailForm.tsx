@@ -15,9 +15,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Mail, Inbox, Clock, Settings } from "lucide-react";
 
-import { useIncomingEmailSettings } from "../hooks/useEmailSettings";
+
 import {  EMAIL_SECURITY_OPTIONS } from "../constants/email-security.constant";
-import { EmailProtocolEnum, IncomingEmailEngine } from "../types";
+import { EmailProtocolEnum, EmailSecurityEnum, IncomingEmailEngine } from "../types";
 import { incomingEmailEngineSchema } from "../validations/email.schema";
 
 interface IncomingEmailFormProps {
@@ -35,7 +35,7 @@ export function IncomingEmailForm({ onSuccess }: IncomingEmailFormProps) {
       protocol: EmailProtocolEnum.IMAP,
       host: "",
       port: 993,
-      secure: true,
+      secure: EmailSecurityEnum.SSL_TLS,
       username: "",
       password: "",
       pollInterval: 5,
@@ -476,3 +476,7 @@ export function IncomingEmailForm({ onSuccess }: IncomingEmailFormProps) {
     </Card>
   );
 } 
+
+function useIncomingEmailSettings(): { settings: any; loading: any; saving: any; saveSettings: any; } {
+  throw new Error("Function not implemented.");
+}

@@ -132,7 +132,7 @@ export const testEmailSchema = z.object({
   to: emailSchema,
   subject: z.string().min(1, "Subject is required").max(998),
   body: z.string().min(1, "Body is required"),
-  isHtml: z.boolean().default(false)
+  isHtml: z.boolean().default(false) as z.ZodType<boolean>
 });
 
 // Email Statistics Schema

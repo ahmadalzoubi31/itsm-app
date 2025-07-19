@@ -31,7 +31,7 @@ export function EmailTestForm({ onTestResult }: EmailTestFormProps) {
       to: "",
       subject: "Test Email from ITSM System",
       body: "This is a test email to verify your email configuration is working correctly.\n\nIf you receive this message, your email settings are properly configured.",
-      isHtml: false
+      isHtml: false as boolean, // Default to plain text
     }
   });
 

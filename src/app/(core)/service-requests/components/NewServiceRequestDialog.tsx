@@ -41,30 +41,8 @@ export const NewServiceRequestDialog = ({
     const selectedServiceData = services.find((s) => s.id === selectedService);
     if (!selectedServiceData) return;
 
-    const newRequest: ServiceRequest = {
-      id: `REQ-${Date.now()}`,
-      serviceId: selectedService,
-      serviceName: selectedServiceData.name,
-      title: requestTitle,
-      priority,
-      businessJustification,
-      requiredDate,
-      additionalDetails,
-      requestedBy: "Current User", // In real app, get from auth
-      requestedDate: new Date().toISOString(),
-      status: "Submitted",
-      progress: 0,
-      workflowId: selectedServiceData.workflowId,
-      workflowStatus: "Not Started",
-      estimatedCompletion: requiredDate,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: "Current User", // In real app, get from auth
-      updatedBy: "Current User", // In real app, get from auth
-    };
-
-    console.log("Submitting service request:", newRequest);
-    createServiceRequest(newRequest);
+    console.log("Submitting service request:", selectedServiceData);
+    createServiceRequest(selectedServiceData);
 
     toast.success(
       `Your ${selectedServiceData.name} request has been submitted successfully!`

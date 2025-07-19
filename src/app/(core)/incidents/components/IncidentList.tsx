@@ -65,7 +65,7 @@ function IncidentList({ incidents, loading = false, onFiltersChange }: IncidentL
 
   const getAssignedToName = (incident: IncidentWithDetails) => {
     if (incident.assignedTo) {
-      return incident.assignedTo.name;
+      return incident.assignedTo.username;
     }
     const assignedUser = "";
     return assignedUser || "Unassigned";
