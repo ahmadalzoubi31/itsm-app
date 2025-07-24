@@ -12,6 +12,7 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 
 import { User } from "../types";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -73,9 +74,15 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
     cell: ({ row }) => {
+      const router = useRouter();
       return (
         <div className="flex items-center gap-2">
-          <span className="text-primary hover:text-primary/80 font-medium">
+          <span
+            className="text-primary hover:text-primary/80 font-medium cursor-pointer"
+            onClick={() => {
+              router.push(`/users/edit/${row.original.id}`);
+            }}
+          >
             {row.original.fullName}
           </span>
         </div>
@@ -90,9 +97,15 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Username" />
     ),
     cell: ({ row }) => {
+      const router = useRouter();
       return (
         <div className="flex items-center gap-2">
-          <span className="text-primary hover:text-primary/80 font-medium">
+          <span
+            className="text-primary hover:text-primary/80 font-medium cursor-pointer"
+            onClick={() => {
+              router.push(`/users/edit/${row.original.id}`);
+            }}
+          >
             {row.original.username}
           </span>
         </div>

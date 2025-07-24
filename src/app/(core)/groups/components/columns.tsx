@@ -18,6 +18,7 @@ import { GroupMembersDialog } from "./GroupMembersDialog";
 
 import { Group } from "../types";
 import { Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<Group>[] = [
   {
@@ -57,9 +58,15 @@ export const columns: ColumnDef<Group>[] = [
       <DataTableColumnHeader column={column} title="Group Name" />
     ),
     cell: ({ row }) => {
+      const router = useRouter();
       return (
         <div className="flex items-center gap-2">
-          <span className="text-primary hover:text-primary/80 font-medium">
+          <span
+            className="text-primary hover:text-primary/80 font-medium cursor-pointer"
+            onClick={() => {
+              router.push(`/groups/edit/${row.original.id}`);
+            }}
+          >
             {row.original.name}
           </span>
         </div>

@@ -1,84 +1,67 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Shield, Wrench, Clock, Activity } from "lucide-react";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-interface SectionCardsProps {
-  totalGroups: number;
-  totalActiveGroups: number;
-  totalSupportGroups: number;
-  totalTechnicalGroups: number;
-  totalPendingGroups: number;
-}
-
-export default function SectionCards({
+const SectionCards = ({
   totalGroups,
   totalActiveGroups,
   totalSupportGroups,
   totalTechnicalGroups,
   totalPendingGroups,
-}: SectionCardsProps) {
-  const cards = [
-    {
-      title: "Total Groups",
-      value: totalGroups,
-      icon: Users,
-      description: "All support groups",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      title: "Active Groups",
-      value: totalActiveGroups,
-      icon: Activity,
-      description: "Currently active groups",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      title: "Support Groups",
-      value: totalSupportGroups,
-      icon: Shield,
-      description: "General support teams",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      title: "Technical Groups",
-      value: totalTechnicalGroups,
-      icon: Wrench,
-      description: "Technical specialist teams",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-    {
-      title: "Pending Groups",
-      value: totalPendingGroups,
-      icon: Clock,
-      description: "Awaiting activation",
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-  ];
-
+}: {
+  totalGroups: number;
+  totalActiveGroups: number;
+  totalSupportGroups: number;
+  totalTechnicalGroups: number;
+  totalPendingGroups: number;
+}) => {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-6">
-      {cards.map((card, index) => (
-        <Card key={index} className="border-0 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {card.title}
-            </CardTitle>
-            <div className={`p-2 rounded-full ${card.bgColor}`}>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{card.value}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {card.description}
-            </p>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
+      <Card className="@container/card py-3 ">
+        <CardHeader>
+          <CardDescription>Total Groups</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {totalGroups}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card py-3 ">
+        <CardHeader>
+          <CardDescription>Active Groups</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {totalActiveGroups}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card py-3 ">
+        <CardHeader>
+          <CardDescription>Support Groups</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {totalSupportGroups}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card py-3 ">
+        <CardHeader>
+          <CardDescription>Technical Groups</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {totalTechnicalGroups}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card py-3 ">
+        <CardHeader>
+          <CardDescription>Pending Groups</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {totalPendingGroups}
+          </CardTitle>
+        </CardHeader>
+      </Card>
     </div>
   );
-} 
+};
+
+export default SectionCards;
