@@ -36,7 +36,7 @@ const icons: { [key: string]: React.ComponentType<any> } = {
   help: IconHelp,
   search: IconSearch,
   "service-requests": IconFileWord,
-  "service-templates": IconDatabase,
+  "service-cards": IconDatabase,
   design: IconPalette,
   // add other mappings as needed
 };
