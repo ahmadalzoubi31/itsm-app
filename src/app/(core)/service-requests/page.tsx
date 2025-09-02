@@ -2,63 +2,39 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 import { ServiceRequestsFilters } from "./components/ServiceRequestsFilters";
 import { ServiceCatalog } from "./components/ServiceCatalog";
 import { MyRequestsList } from "./components/MyRequestsList";
 import { NewServiceRequestDialog } from "./components/NewServiceRequestDialog";
 import { useServiceRequests } from "./hooks/useServiceRequests";
+import { useServiceCards } from "./hooks/useServiceCards";
 
 export default function ServiceRequests() {
-  const { serviceRequests } = useServiceRequests();
+  const {
+    serviceRequests,
+    isLoading: requestsLoading,
+    refetch: refetchRequests,
+  } = useServiceRequests();
+  const { serviceCards, isLoading: cardsLoading } = useServiceCards();
   const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
+  const [selectedServiceCard, setSelectedServiceCard] = useState<string | null>(
+    null
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Mock active requests
-  const activeRequests = [
-    {
-      id: "REQ-2024-001",
-      serviceName: "Employee Onboarding",
-      status: "In Progress",
-      requestedBy: "Sarah Chen",
-      requestedDate: "2024-01-15",
-      priority: "High",
-      estimatedCompletion: "2024-01-18",
-    },
-    {
-      id: "REQ-2024-002",
-      serviceName: "Expense Reimbursement",
-      status: "Pending Approval",
-      requestedBy: "Mike Johnson",
-      requestedDate: "2024-01-15",
-      priority: "Medium",
-      estimatedCompletion: "2024-01-17",
-    },
-    {
-      id: "REQ-2024-003",
-      serviceName: "System Access Request",
-      status: "Completed",
-      requestedBy: "Alex Rivera",
-      requestedDate: "2024-01-14",
-      priority: "Low",
-      estimatedCompletion: "2024-01-14",
-    },
-  ];
+  // Real service requests from API
 
   const handleRequestService = (serviceId: string) => {
     console.log("Requesting service:", serviceId);
+    setSelectedServiceCard(serviceId);
     setShowNewRequestDialog(true);
   };
 
-  // Filter services to only show active ones
-  const activeServices = serviceRequests.filter(
-    (service: any) => service.isActive
-  );
-
-  const filteredServices = activeServices.filter((service: any) => {
+  // Filter services based on search and category
+  const filteredServices = serviceCards.filter((service) => {
     const matchesSearch =
       service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -67,14 +43,25 @@ export default function ServiceRequests() {
     return matchesSearch && matchesCategory;
   });
 
-  const filteredRequests = activeRequests.filter((request) => {
+  // Ensure serviceRequests is always an array
+  const safeServiceRequests = Array.isArray(serviceRequests)
+    ? serviceRequests
+    : [];
+
+  const filteredRequests = safeServiceRequests.filter((request) => {
     const matchesSearch =
-      request.serviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.id.toLowerCase().includes(searchTerm.toLowerCase());
+      request.serviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || request.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Get unique categories from service cards
+  const availableCategories = Array.from(
+    new Set(serviceCards.map((card) => card.category))
+  );
 
   return (
     <>
@@ -98,6 +85,7 @@ export default function ServiceRequests() {
           onCategoryFilterChange={setCategoryFilter}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
+          availableCategories={availableCategories}
         />
       </div>
 
@@ -108,12 +96,16 @@ export default function ServiceRequests() {
             <ServiceCatalog
               services={filteredServices}
               onRequestService={handleRequestService}
+              isLoading={cardsLoading}
             />
           </div>
 
           {/* My Requests */}
           <div>
-            <MyRequestsList requests={filteredRequests} />
+            <MyRequestsList
+              requests={filteredRequests}
+              isLoading={requestsLoading}
+            />
           </div>
         </div>
       </div>
@@ -122,8 +114,13 @@ export default function ServiceRequests() {
         {/* New Service Request Dialog */}
         <NewServiceRequestDialog
           open={showNewRequestDialog}
-          onOpenChange={setShowNewRequestDialog}
-          services={activeServices}
+          onOpenChange={(open) => {
+            setShowNewRequestDialog(open);
+            if (!open) setSelectedServiceCard(null);
+          }}
+          services={serviceCards}
+          selectedServiceId={selectedServiceCard}
+          onRequestCreated={refetchRequests}
         />
       </div>
     </>

@@ -7,13 +7,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 interface MyRequestsListProps {
   requests: any[];
+  isLoading?: boolean;
 }
 
-export const MyRequestsList = ({ requests }: MyRequestsListProps) => {
+export const MyRequestsList = ({
+  requests,
+  isLoading = false,
+}: MyRequestsListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Completed":
@@ -62,30 +67,55 @@ export const MyRequestsList = ({ requests }: MyRequestsListProps) => {
         <CardDescription>Track your service request status</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {requests.map((request) => (
-          <div key={request.id} className="p-4 border rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {getStatusIcon(request.status)}
-                <span className="font-semibold text-sm">{request.id}</span>
+        {isLoading
+          ? // Loading skeleton
+            [1, 2, 3].map((i) => (
+              <div key={i} className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-16" />
+                </div>
+                <Skeleton className="h-5 w-40 mb-3" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-3 w-28" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <Skeleton className="h-3 w-20" />
+                </div>
               </div>
-              <Badge className={`text-xs ${getStatusColor(request.status)}`}>
-                {request.status}
-              </Badge>
-            </div>
-            <h5 className="font-medium text-gray-900">{request.serviceName}</h5>
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <div className="flex items-center gap-4">
-                <span>Requested: {request.requestedDate}</span>
-                <Badge className={`${getPriorityColor(request.priority)}`}>
-                  {request.priority}
-                </Badge>
+            ))
+          : requests.map((request) => (
+              <div key={request.id} className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(request.status)}
+                    <span className="font-semibold text-sm">{request.id}</span>
+                  </div>
+                  <Badge
+                    className={`text-xs ${getStatusColor(request.status)}`}
+                  >
+                    {request.status}
+                  </Badge>
+                </div>
+                <h5 className="font-medium text-gray-900">
+                  {request.serviceName}
+                </h5>
+                <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+                  <div className="flex items-center gap-4">
+                    <span>Requested: {request.requestedDate}</span>
+                    <Badge className={`${getPriorityColor(request.priority)}`}>
+                      {request.priority}
+                    </Badge>
+                  </div>
+                  <span>ETA: {request.estimatedCompletion}</span>
+                </div>
               </div>
-              <span>ETA: {request.estimatedCompletion}</span>
-            </div>
-          </div>
-        ))}
-        {requests.length === 0 && (
+            ))}
+        {!isLoading && requests.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <AlertCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
             <p>No requests found matching your filters.</p>

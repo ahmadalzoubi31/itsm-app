@@ -1,6 +1,5 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,11 +11,12 @@ import { Search } from "lucide-react";
 
 interface ServiceRequestsFiltersProps {
   searchTerm: string;
-  onSearchChange: (value: string) => void;
+  onSearchChange: (term: string) => void;
   categoryFilter: string;
-  onCategoryFilterChange: (value: string) => void;
+  onCategoryFilterChange: (category: string) => void;
   statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
+  onStatusFilterChange: (status: string) => void;
+  availableCategories?: string[];
 }
 
 export const ServiceRequestsFilters = ({
@@ -26,48 +26,71 @@ export const ServiceRequestsFilters = ({
   onCategoryFilterChange,
   statusFilter,
   onStatusFilterChange,
+  availableCategories = [],
 }: ServiceRequestsFiltersProps) => {
+  const statusOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "Submitted", label: "Submitted" },
+    { value: "In Progress", label: "In Progress" },
+    { value: "Pending Approval", label: "Pending Approval" },
+    { value: "Completed", label: "Completed" },
+    { value: "Rejected", label: "Rejected" },
+  ];
+
   return (
-    <>
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search services or requests..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="HR">HR</SelectItem>
-              <SelectItem value="Finance">Finance</SelectItem>
-              <SelectItem value="IT">IT</SelectItem>
-              <SelectItem value="Legal">Legal</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Pending Approval">Pending</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="flex-1">
+        <Label htmlFor="search" className="text-sm font-medium">
+          Search
+        </Label>
+        <div className="relative mt-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            id="search"
+            placeholder="Search services or requests..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
         </div>
       </div>
-    </>
+
+      <div className="w-full sm:w-48">
+        <Label htmlFor="category" className="text-sm font-medium">
+          Category
+        </Label>
+        <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {availableCategories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="w-full sm:w-48">
+        <Label htmlFor="status" className="text-sm font-medium">
+          Request Status
+        </Label>
+        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 };

@@ -11,7 +11,8 @@ export function useServiceRequests() {
     queryFn: fetchServiceRequests,
   });
 
-  const serviceRequests = data?.data ?? [];
+  // Ensure serviceRequests is always an array
+  const serviceRequests = Array.isArray(data?.data) ? data.data : [];
 
   return {
     serviceRequests,

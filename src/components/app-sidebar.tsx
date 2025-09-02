@@ -49,9 +49,9 @@ const data = {
       permissions: [],
     },
     {
-      title: "Service Templates",
-      url: "/service-templates",
-      icon: "service-templates",
+      title: "Service Cards",
+      url: "/service-cards",
+      icon: "service-cards",
       roles: [RoleEnum.ADMIN],
       permissions: [],
     },
