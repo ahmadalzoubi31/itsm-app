@@ -8,6 +8,7 @@ export type ServiceRequest = BaseEntity & {
   businessJustification: string;
   requiredDate: string;
   additionalDetails: string;
+  customFieldValues?: Record<string, any>;
   requestedBy: string;
   requestedDate: string;
   status:
