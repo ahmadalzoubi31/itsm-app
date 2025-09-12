@@ -1,5 +1,57 @@
 import { BaseEntity } from "@/types/globals";
 
+// Enums matching backend
+export enum ServiceCardStatus {
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  RETIRED = "retired",
+}
+
+export enum ServiceCardVisibility {
+  PUBLIC = "public",
+  INTERNAL = "internal",
+  RESTRICTED = "restricted",
+}
+
+export enum Priority {
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
+}
+
+// Entity types matching backend
+export type ServiceCategory = BaseEntity & {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+};
+
+export type ApprovalWorkflow = BaseEntity & {
+  id: string;
+  name: string;
+  description?: string;
+  steps?: any; // JSON field for workflow steps
+  isActive: boolean;
+};
+
+export type SLA = BaseEntity & {
+  id: string;
+  name: string;
+  targetResponseTime: string; // e.g. "4h"
+  targetResolutionTime: string; // e.g. "2d"
+  priority: Priority;
+};
+
+export type Group = BaseEntity & {
+  id: string;
+  name: string;
+  description?: string;
+  // Add other group properties as needed
+};
+
+// Legacy types for backward compatibility
 export type FormFieldType =
   | "text"
   | "textarea"
@@ -125,26 +177,59 @@ export type ServiceCardConfig = {
 export type ServiceCard = BaseEntity & {
   id: string;
   name: string;
-  description: string;
-  category: string;
-  estimatedTime: string;
-  price: string;
-  workflowId: string;
-  icon: any;
+  description?: string;
+  category: ServiceCategory; // Now a full entity
+  categoryId?: string; // For form handling
+  status: ServiceCardStatus;
+  visibility: ServiceCardVisibility;
+  estimatedTime?: string;
+  price?: string;
+  icon?: string;
   isActive: boolean;
-  version: number;
-  config: ServiceCardConfig;
+  displayOrder?: number;
   tags?: string[];
-  visibility: "public" | "private" | "restricted";
+  requestFormSchema?: any; // Renamed from config
+  approvalWorkflow?: ApprovalWorkflow;
+  approvalWorkflowId?: string;
+  sla?: SLA;
+  slaId?: string;
+  assignedGroup?: Group;
+  assignedGroupId?: string;
+  supportContact?: string;
+
+  // Legacy fields for backward compatibility
+  workflowId?: string;
+  version?: number;
+  config?: ServiceCardConfig;
   restrictedToGroups?: string[];
-  createdBy: string;
-  lastModifiedBy: string;
-  usage: {
+  createdBy?: string;
+  lastModifiedBy?: string;
+  usage?: {
     totalRequests: number;
     avgCompletionTime: number;
     successRate: number;
     lastUsed?: string;
   };
+};
+
+// DTO for creating/updating service cards
+export type CreateServiceCardDto = {
+  name: string;
+  description?: string;
+  categoryId?: string;
+  status?: ServiceCardStatus;
+  visibility?: ServiceCardVisibility;
+  estimatedTime?: string;
+  price?: string;
+  icon?: string;
+  isActive?: boolean;
+  displayOrder?: number;
+  tags?: string[];
+  requestFormSchema?: Record<string, any>;
+  approvalWorkflowId?: string;
+  slaId?: string;
+  assignedGroupId?: string;
+  supportContact?: string;
 };
 
 export type ServiceCardTemplate = {

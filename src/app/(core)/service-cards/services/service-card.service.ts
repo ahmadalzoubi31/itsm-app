@@ -1,19 +1,14 @@
 import { fetchWithAuth } from "@/utils/fetxhWithAuth";
 import { getBackendUrl } from "@/utils/getBackendUrl";
 import { ApiResponse } from "@/types/globals";
-import { ServiceCard } from "../types";
-
-// DTO type that matches the backend CreateServiceCardDto
-type CreateServiceCardDto = {
-  name: string;
-  description?: string;
-  category: string;
-  estimatedTime?: string;
-  price: string;
-  icon?: any;
-  isActive?: boolean;
-  config?: any;
-};
+import {
+  ServiceCard,
+  CreateServiceCardDto,
+  ServiceCategory,
+  ApprovalWorkflow,
+  SLA,
+  Group,
+} from "../types";
 
 // Get all users
 export async function fetchServiceCards(): Promise<ApiResponse<ServiceCard[]>> {
@@ -43,12 +38,32 @@ export async function createServiceCard(
   const filteredPayload: CreateServiceCardDto = {
     name: payload.name!,
     description: payload.description,
-    category: payload.category!,
+    categoryId:
+      payload.categoryId ||
+      (typeof payload.category === "object" ? payload.category?.id : undefined),
+    status: payload.status,
+    visibility: payload.visibility,
     estimatedTime: payload.estimatedTime,
-    price: payload.price!,
+    price: payload.price,
     icon: payload.icon,
     isActive: payload.isActive,
-    config: payload.config,
+    displayOrder: payload.displayOrder,
+    tags: payload.tags,
+    requestFormSchema: payload.requestFormSchema || payload.config,
+    approvalWorkflowId:
+      payload.approvalWorkflowId ||
+      (typeof payload.approvalWorkflow === "object"
+        ? payload.approvalWorkflow?.id
+        : undefined),
+    slaId:
+      payload.slaId ||
+      (typeof payload.sla === "object" ? payload.sla?.id : undefined),
+    assignedGroupId:
+      payload.assignedGroupId ||
+      (typeof payload.assignedGroup === "object"
+        ? payload.assignedGroup?.id
+        : undefined),
+    supportContact: payload.supportContact,
   };
 
   const res = await fetchWithAuth(getBackendUrl("/api/service-cards"), {
@@ -70,12 +85,32 @@ export async function updateServiceCard(
   const filteredPayload: Partial<CreateServiceCardDto> = {
     name: payload.name,
     description: payload.description,
-    category: payload.category,
+    categoryId:
+      payload.categoryId ||
+      (typeof payload.category === "object" ? payload.category?.id : undefined),
+    status: payload.status,
+    visibility: payload.visibility,
     estimatedTime: payload.estimatedTime,
     price: payload.price,
     icon: payload.icon,
     isActive: payload.isActive,
-    config: payload.config,
+    displayOrder: payload.displayOrder,
+    tags: payload.tags,
+    requestFormSchema: payload.requestFormSchema || payload.config,
+    approvalWorkflowId:
+      payload.approvalWorkflowId ||
+      (typeof payload.approvalWorkflow === "object"
+        ? payload.approvalWorkflow?.id
+        : undefined),
+    slaId:
+      payload.slaId ||
+      (typeof payload.sla === "object" ? payload.sla?.id : undefined),
+    assignedGroupId:
+      payload.assignedGroupId ||
+      (typeof payload.assignedGroup === "object"
+        ? payload.assignedGroup?.id
+        : undefined),
+    supportContact: payload.supportContact,
   };
 
   const res = await fetchWithAuth(getBackendUrl(`/api/service-cards/${id}`), {
@@ -97,5 +132,45 @@ export async function deleteServiceCard(
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to delete service card");
+  return res.json();
+}
+
+// Fetch service categories
+export async function fetchServiceCategories(): Promise<
+  ApiResponse<ServiceCategory[]>
+> {
+  const res = await fetchWithAuth(getBackendUrl("/api/service-categories"), {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch service categories");
+  return res.json();
+}
+
+// Fetch approval workflows
+export async function fetchApprovalWorkflows(): Promise<
+  ApiResponse<ApprovalWorkflow[]>
+> {
+  const res = await fetchWithAuth(getBackendUrl("/api/approval-workflows"), {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch approval workflows");
+  return res.json();
+}
+
+// Fetch SLAs
+export async function fetchSLAs(): Promise<ApiResponse<SLA[]>> {
+  const res = await fetchWithAuth(getBackendUrl("/api/slas"), {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch SLAs");
+  return res.json();
+}
+
+// Fetch groups
+export async function fetchGroups(): Promise<ApiResponse<Group[]>> {
+  const res = await fetchWithAuth(getBackendUrl("/api/groups"), {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch groups");
   return res.json();
 }
