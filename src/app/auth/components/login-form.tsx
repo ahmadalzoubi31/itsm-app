@@ -26,8 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
-import { getBackendUrl } from "@/utils/getBackendUrl";
-import { useQuery } from "@tanstack/react-query";
+import { login } from "../services/auth.service";
 
 const formSchema = z.object({
   username: z.string(),
@@ -49,24 +48,10 @@ export function LoginForm() {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const promise = () =>
-      new Promise(
-        async (resolve, reject) =>
-          await fetch(getBackendUrl("/api/auth/sign-in"), {
-            method: "POST",
-            credentials: "include", // Important for cookies!
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: values.username,
-              password: values.password,
-            }),
-          }).then((res) => {
-            if (res.ok) {
-              resolve(res);
-            } else {
-              reject(res);
-            }
-          })
-      );
+      login({
+        username: values.username,
+        password: values.password,
+      });
 
     toast.promise(promise, {
       loading: "Loading...",

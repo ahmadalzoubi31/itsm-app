@@ -1,7 +1,7 @@
 "use client";
 
-import { getBackendUrl } from "@/utils/getBackendUrl";
 import { useRouter, useSearchParams } from "next/navigation";
+import { refreshToken as refreshTokenService } from "../services/auth.service";
 import { useState, Suspense } from "react";
 import { AlertCircle, RefreshCw, LogIn, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,7 @@ function SessionExpiredContent() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(getBackendUrl("/api/auth/refresh-token"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // very important for cookies!
-        body: JSON.stringify({ refreshToken }),
-      });
+      const res = await refreshTokenService({ refreshToken });
 
       if (res.ok) {
         // Success: New cookies set by server, reload to original page.

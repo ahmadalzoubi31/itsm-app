@@ -1,3 +1,4 @@
+"use client";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "./nav-user";
@@ -10,111 +11,138 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { PermissionNameEnum } from "@/app/(core)/permissions/constants/permission-name.constant";
-import { IconInnerShadowTop } from "@tabler/icons-react";
-import { getLoggedUser } from "@/app/(core)/users/services/user.server";
-import { RoleEnum } from "@/app/(core)/users/constants/role.constant";
+import { IconInnerShadowTop, IconLoader2 } from "@tabler/icons-react";
+import { getCurrentUser } from "@/app/auth/services/auth.service";
+import { useEffect, useState, useMemo } from "react";
+import {
+  filterNavigationItems,
+  NavigationItem,
+} from "@/utils/navigation-access.utils";
+import { User } from "@/app/(core)/iam/users/interfaces/user.interface";
 
-const data = {
+const data: {
+  navMain: NavigationItem[];
+  navSecondary: NavigationItem[];
+} = {
   navMain: [
     {
       title: "Dashboard",
       url: "/",
       icon: "dashboard",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [
-        PermissionNameEnum.INCIDENT_MASTER,
-        PermissionNameEnum.INCIDENT_USER,
-        PermissionNameEnum.INCIDENT_SUBMITTER,
-        PermissionNameEnum.INCIDENT_VIEWER,
-      ],
-    },
-    {
-      title: "Incidents",
-      url: "/incidents",
-      icon: "incidents",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [
-        PermissionNameEnum.INCIDENT_MASTER,
-        PermissionNameEnum.INCIDENT_USER,
-        PermissionNameEnum.INCIDENT_SUBMITTER,
-        PermissionNameEnum.INCIDENT_VIEWER,
-      ],
-    },
-    {
-      title: "Service Requests",
-      url: "/service-requests",
-      icon: "service-requests",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      roles: ["admin", "agent"],
       permissions: [],
     },
+    // {
+    //   title: "Cases",
+    //   url: "/cases",
+    //   icon: "cases",
+    //   roles: ["admin", "agent"],
+    //   permissions: [],
+    // },
+    // {
+    //   title: "Service Requests",
+    //   url: "/service-requests",
+    //   icon: "service-requests",
+    //   roles: ["admin", "agent", "end_user"],
+    //   permissions: [],
+    // },
+    // {
+    //   title: "Service Cards",
+    //   url: "/service-cards",
+    //   icon: "service-cards",
+    //   roles: ["admin"],
+    //   permissions: [],
+    // },
+    // {
+    //   title: "Analytics",
+    //   url: "#",
+    //   icon: "analytics",
+    //   roles: ["admin"],
+    //   permissions: [],
+    // },
+    // {
+    //   title: "Groups",
+    //   url: "/groups",
+    //   icon: "groups",
+    //   roles: ["admin", "agent"],
+    //   permissions: [],
+    // },
     {
-      title: "Service Cards",
-      url: "/service-cards",
-      icon: "service-cards",
-      roles: [RoleEnum.ADMIN],
+      title: "Identity & Access Management",
+      url: "/iam",
+      icon: "shield",
+      roles: ["admin", "agent"],
       permissions: [],
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: "analytics",
-      roles: [RoleEnum.ADMIN],
-      permissions: [],
-    },
-    {
-      title: "Groups",
-      url: "/groups",
-      icon: "groups",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [PermissionNameEnum.Foundation_SupportGroups],
     },
     {
       title: "Users",
-      url: "/users",
+      url: "/iam/users",
       icon: "users",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [PermissionNameEnum.Foundation_People],
-    },
-    {
-      title: "Design Demo",
-      url: "/design-demo",
-      icon: "design",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      roles: ["admin", "agent"],
       permissions: [],
     },
+    // {
+    //   title: "Design Demo",
+    //   url: "/design-demo",
+    //   icon: "design",
+    //   roles: ["admin", "agent", "end_user"],
+    //   permissions: [],
+    // },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "/settings",
       icon: "settings",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT],
-      permissions: [PermissionNameEnum.Foundation_People],
+      roles: ["admin", "agent"],
+      permissions: [],
     },
     {
       title: "Get Help",
       url: "#",
       icon: "help",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      roles: ["admin", "agent", "end_user"],
       permissions: [],
     },
     {
       title: "Search",
       url: "#",
       icon: "search",
-      roles: [RoleEnum.ADMIN, RoleEnum.AGENT, RoleEnum.USER],
+      roles: ["admin", "agent", "end_user"],
       permissions: [],
     },
   ],
 };
 
-async function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const user = await getLoggedUser();
+function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = useState<User>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!user) {
-    return null;
-  }
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setIsLoading(true);
+        const user = await getCurrentUser();
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Filter navigation items based on user access
+  const filteredNavMain = useMemo(
+    () => filterNavigationItems(data.navMain, user),
+    [user]
+  );
+
+  const filteredNavSecondary = useMemo(
+    () => filterNavigationItems(data.navSecondary, user),
+    [user]
+  );
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -134,11 +162,19 @@ async function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} user={user!} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <IconLoader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <>
+            <NavMain items={filteredNavMain} />
+            <NavSecondary items={filteredNavSecondary} className="mt-auto" />
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={user || null} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -23,7 +23,10 @@ import {
   IconUser,
   IconUsers,
   IconPalette,
+  IconLock,
+  IconShield,
 } from "@tabler/icons-react";
+import { NavigationItem } from "@/utils/navigation-access.utils";
 
 // Map icon names to components
 const icons: { [key: string]: React.ComponentType<any> } = {
@@ -38,28 +41,12 @@ const icons: { [key: string]: React.ComponentType<any> } = {
   "service-requests": IconFileWord,
   "service-cards": IconDatabase,
   design: IconPalette,
+  lock: IconLock,
+  shield: IconShield,
   // add other mappings as needed
 };
 
-export function NavMain({
-  items,
-  user,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: string;
-    roles: string[];
-    permissions: string[];
-  }[];
-  user: {
-    id: string;
-    fullName: string;
-    email: string;
-    role: string;
-    permissions: Array<string>;
-  };
-}) {
+export function NavMain({ items }: { items: NavigationItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -87,26 +74,19 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => {
-            const IconComponent = icons[item.icon]; // lookup the icon
+            const IconComponent = icons[item.icon];
+            if (!IconComponent) {
+              console.warn(`Icon not found for: ${item.icon}`);
+              return null;
+            }
             return (
               <SidebarMenuItem key={item.title}>
-                {item.roles.includes(user.role) &&
-                  (!item.permissions ||
-                    item.permissions.length === 0 ||
-                    item.permissions.some((perm) =>
-                      user.permissions.includes(perm)
-                    )) && (
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      className="cursor-pointer"
-                      asChild
-                    >
-                      <Link href={item.url}>
-                        {IconComponent && <IconComponent />}
-                        <span className="leading-8">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )}
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <IconComponent />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             );
           })}

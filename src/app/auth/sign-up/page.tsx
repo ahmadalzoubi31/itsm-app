@@ -21,7 +21,12 @@ const Page = () => {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <Image src="/assets/placeholder.svg" alt="Image" fill className="absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale" />
+        <Image
+          src="/assets/placeholder.svg"
+          alt="Image"
+          fill
+          className="absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
     </div>
   );

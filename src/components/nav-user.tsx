@@ -26,48 +26,31 @@ import {
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getBackendUrl } from "@/utils/getBackendUrl";
-import { fetchWithAuth } from "@/utils/fetxhWithAuth";
+import { LoggedUser } from "@/types/globals";
+import { logoutAction } from "@/app/auth/actions/logout.action";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    id: string;
-    fullName: string;
-    email: string;
-    role: string;
-    permissions: Array<string>;
-  };
-}) {
+export function NavUser({ user }: { user: LoggedUser | null }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
   const handleLogout = async () => {
-    const promise = () =>
-      new Promise(
-        async (resolve, reject) =>
-          await fetchWithAuth(getBackendUrl("/api/auth/sign-out"), {
-            method: "DELETE",
-            credentials: "include",
-          }).then((res) => {
-            if (res.ok) {
-              resolve(res);
-            } else {
-              reject(res);
-            }
-          })
-      );
+    const promise = async () => {
+      const result = await logoutAction();
+      if (result.ok) {
+        return result;
+      } else {
+        throw new Error(result.error || "Logout failed");
+      }
+    };
 
-    toast.promise(promise, {
-      loading: "Loading...",
-      success: (data) => {
-        // TODO: Clear cookies
+    toast.promise(promise(), {
+      loading: "Logging out...",
+      success: () => {
         router.push("/auth/sign-in");
-        return `Signed out successfully!`;
+        return "Signed out successfully!";
       },
-      error: (error: Response) => {
-        return `Sign out failed, ${error.statusText}`;
+      error: (error: Error) => {
+        return `Sign out failed: ${error.message}`;
       },
     });
   };
@@ -98,13 +81,15 @@ export function NavUser({
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 {/* <AvatarImage src={user.image} alt={user.name} /> */}
                 <AvatarFallback className="rounded-lg">
-                  {getInitials(user.fullName)}
+                  {getInitials(user?.displayName ?? "")}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.fullName}</span>
+                <span className="truncate font-medium">
+                  {user?.displayName}
+                </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+                  {user?.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -121,13 +106,15 @@ export function NavUser({
                 <Avatar className="h-8 w-8 rounded-lg">
                   {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                   <AvatarFallback className="rounded-lg">
-                    {getInitials(user.fullName)}
+                    {getInitials(user?.displayName ?? "")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.fullName}</span>
+                  <span className="truncate font-medium">
+                    {user?.displayName}
+                  </span>
                   <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
+                    {user?.email}
                   </span>
                 </div>
               </div>

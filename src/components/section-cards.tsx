@@ -9,20 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IncidentWithDetails, IncidentStatus } from "@/types/globals";
+import { Case, CaseStatus } from "@/types/globals";
 
-export function SectionCards({
-  incidents,
-}: {
-  incidents: IncidentWithDetails[];
-}) {
+export function SectionCards({ cases }: { cases: Case[] }) {
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-6">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Incidents</CardDescription>
+          <CardDescription>New Cases</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {incidents.filter((i) => i.status === IncidentStatus.NEW).length}
+            {cases.filter((c) => c.status === CaseStatus.NEW).length}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -44,7 +40,7 @@ export function SectionCards({
         <CardHeader>
           <CardDescription>Open Incidents</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {incidents.filter((i) => i.status !== IncidentStatus.CLOSED).length}
+            {cases.filter((c) => c.status !== CaseStatus.CLOSED).length}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -67,10 +63,10 @@ export function SectionCards({
           <CardDescription>Resolved Incidents</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             {
-              incidents.filter(
-                (i) =>
-                  i.status === IncidentStatus.RESOLVED ||
-                  i.status === IncidentStatus.CLOSED
+              cases.filter(
+                (c) =>
+                  c.status === CaseStatus.RESOLVED ||
+                  c.status === CaseStatus.CLOSED
               ).length
             }
           </CardTitle>
@@ -90,20 +86,20 @@ export function SectionCards({
           </div>
         </CardFooter>
       </Card>
-      <Card className="@container/card">
+      {/* <Card className="@container/card">
         <CardHeader>
           <CardDescription>Incidents Due Today</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             {
-              incidents.filter(
-                (i) =>
-                  i.slaBreachTime! < new Date(Date.now() + 24 * 60 * 60 * 1000)
+              cases.filter(
+                (c) =>
+                  c.slaBreachTime! < new Date(Date.now() + 24 * 60 * 60 * 1000)
               ).length
             }
             {
-              incidents.filter(
-                (i) =>
-                  i.slaBreachTime! < new Date(Date.now() + 24 * 60 * 60 * 1000)
+              cases.filter(
+                (c) =>
+                  c.slaBreachTime! < new Date(Date.now() + 24 * 60 * 60 * 1000)
               ).length
             }
           </CardTitle>
@@ -122,15 +118,12 @@ export function SectionCards({
             Acquisition needs attention
           </div>
         </CardFooter>
-      </Card>
+      </Card> */}
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>First Call Response</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {
-              incidents.filter((i) => i.status === IncidentStatus.IN_PROGRESS)
-                .length
-            }
+            {cases.filter((c) => c.status === CaseStatus.IN_PROGRESS).length}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -150,10 +143,7 @@ export function SectionCards({
         <CardHeader>
           <CardDescription>Average Resolution Time</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {
-              incidents.filter((i) => i.status === IncidentStatus.RESOLVED)
-                .length
-            }
+            {cases.filter((c) => c.status === CaseStatus.RESOLVED).length}
           </CardTitle>
           {/* <CardAction>
             <Badge variant="outline">
