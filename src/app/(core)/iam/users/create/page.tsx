@@ -1,6 +1,6 @@
 "use client";
 
-import CreateUserForm from "./components/CreateUserForm";
+import UserForm from "../components/user-form";
 
 const Page = () => {
   return (
@@ -15,7 +15,7 @@ const Page = () => {
       </div>
 
       <div className="px-4 lg:px-6">
-        <CreateUserForm />
+        <UserForm id="" />
       </div>
     </>
   );

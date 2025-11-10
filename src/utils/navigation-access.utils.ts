@@ -1,4 +1,6 @@
-import { LoggedUser } from "@/types/globals";
+import { Role } from "@/app/(core)/iam/roles/interfaces/role.interface";
+import { User } from "../app/(core)/iam/users/interfaces/user.interface";
+import { Permission } from "@/app/(core)/iam/permissions/interfaces/permission.interface";
 
 export type NavigationItem = {
   title: string;
@@ -23,7 +25,7 @@ export type NavigationItem = {
  */
 export function hasNavigationAccess(
   item: NavigationItem,
-  user: LoggedUser | undefined | null
+  user: User | undefined | null
 ): boolean {
   // No user = no access
   if (!user) {
@@ -39,8 +41,8 @@ export function hasNavigationAccess(
   const hasRoleAccess = item.roles?.length
     ? item.roles.some((requiredRole) =>
         user.roles.some(
-          (userRole) =>
-            userRole === requiredRole ||
+          (userRole: Role) =>
+            userRole.id === requiredRole ||
             String(userRole).toLowerCase() ===
               String(requiredRole).toLowerCase()
         )
@@ -51,10 +53,9 @@ export function hasNavigationAccess(
   const hasPermissionAccess = item.permissions?.length
     ? item.permissions.some((requiredPermission) =>
         user.permissions.some(
-          (userPermission: string) =>
-            userPermission === requiredPermission ||
-            String(userPermission).toLowerCase() ===
-              String(requiredPermission).toLowerCase()
+          (userPermission: Permission) =>
+            userPermission.id === requiredPermission ||
+            userPermission.key === requiredPermission
         )
       )
     : false;
@@ -77,7 +78,7 @@ export function hasNavigationAccess(
  */
 export function filterNavigationItems<T extends NavigationItem>(
   items: T[],
-  user: LoggedUser | undefined | null
+  user: User | undefined | null
 ): T[] {
   return items.filter((item) => hasNavigationAccess(item, user));
 }

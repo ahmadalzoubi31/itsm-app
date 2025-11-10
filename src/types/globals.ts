@@ -15,6 +15,14 @@ export interface BaseEntity {
   updatedByName?: string;
 }
 
+export interface BusinessLine {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  active: boolean;
+}
+
 export enum CaseStatus {
   NEW = "New",
   WAITING_APPROVAL = "WaitingApproval",
@@ -128,36 +136,6 @@ export interface GroupMember {
     phone?: string;
   };
 }
-
-export interface Group extends BaseEntity {
-  name: string;
-  description?: string;
-  interface: string;
-  status: string;
-  members: GroupMember[];
-  leaderId?: string;
-  leader?: User;
-  email?: string;
-  phone?: string;
-  location?: string;
-  isActive: boolean;
-  tags?: string[];
-}
-
-export interface CreateGroupDto {
-  name: string;
-  description?: string;
-  interface: string;
-  status: string;
-  leaderId?: string;
-  email?: string;
-  phone?: string;
-  location?: string;
-  tags?: string[];
-  memberIds?: string[];
-}
-
-export interface UpdateGroupDto extends Partial<CreateGroupDto> {}
 
 export interface GroupFilters {
   search?: string;

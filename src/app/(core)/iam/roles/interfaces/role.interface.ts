@@ -8,6 +8,7 @@ export interface Role extends BaseEntity {
   description?: string;
   permissionCount: number;
   userCount: number;
+  permissions: Permission[];
 }
 
 export interface RolePermission extends BaseEntity {

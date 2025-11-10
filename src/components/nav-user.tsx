@@ -26,10 +26,10 @@ import {
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { LoggedUser } from "@/types/globals";
+import { User } from "@/app/(core)/iam/users/interfaces/user.interface";
 import { logoutAction } from "@/app/auth/actions/logout.action";
 
-export function NavUser({ user }: { user: LoggedUser | null }) {
+export function NavUser({ user }: { user: User | null }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
 

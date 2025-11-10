@@ -1,6 +1,6 @@
 "use client";
 
-import RoleForm from "./components/RoleForm";
+import RoleForm from "../../components/role-form";
 import { useParams } from "next/navigation";
 
 const Page = () => {

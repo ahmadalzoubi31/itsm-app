@@ -190,7 +190,7 @@ export const columns: ColumnDef<Role>[] = [
       <DataTableColumnHeader column={column} title="Updated By" />
     ),
     cell: ({ row }) => {
-      return <div className="flex space-x-2">{row.original.createdById}</div>;
+      return <div className="flex space-x-2">{row.original.updatedByName}</div>;
     },
   },
 

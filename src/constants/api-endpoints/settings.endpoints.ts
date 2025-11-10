@@ -4,8 +4,6 @@
  */
 
 export const SETTINGS_ENDPOINTS = {
-  ldap: "/api/settings/LDAP",
-  sync: "/api/settings/SYNC",
-  email: "/api/settings/EMAIL",
-  emailNotifications: "/api/settings/EMAIL_NOTIFICATIONS",
+  email: "/api/v1/settings/email",
+  emailNotifications: "/api/v1/settings/email-notifications",
 } as const;

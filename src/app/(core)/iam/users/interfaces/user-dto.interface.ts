@@ -7,6 +7,7 @@ export interface CreateUserDto {
   authSource: AuthSource;
   externalId?: string; // For LDAP users
   isActive: boolean;
+  isLicensed: boolean;
   password?: string; // Required for local users
 }
 
@@ -15,6 +16,7 @@ export interface UpdateUserDto {
   displayName?: string;
   isActive?: boolean;
   password?: string; // Optional - only if changing password
+  isLicensed?: boolean;
 }
 
 export interface PasswordStrengthResponseDto {

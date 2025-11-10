@@ -6,11 +6,16 @@
 
 export const PERMISSIONS_ENDPOINTS = {
   base: "/api/v1/iam/permissions",
-  // User Permission endpoints
-  assignPermissionsToUser: (userId: string) =>
-    `/api/v1/iam/permissions/users/${userId}/assign`,
-  revokePermissionFromUser: (userId: string, permissionId: string) =>
-    `/api/v1/iam/permissions/users/${userId}/revoke/${permissionId}`,
-  getUserPermissions: (userId: string) =>
+  rolesGetPermissions: (roleId: string) =>
+    `/api/v1/iam/permissions/roles/${roleId}`,
+  rolesAssignPermissions: (roleId: string) =>
+    `/api/v1/iam/permissions/roles/${roleId}/assign`,
+  rolesRevokePermissions: (roleId: string) =>
+    `/api/v1/iam/permissions/roles/${roleId}/revoke`,
+  usersGetPermissions: (userId: string) =>
     `/api/v1/iam/permissions/users/${userId}`,
+  usersAssignPermissions: (userId: string) =>
+    `/api/v1/iam/permissions/users/${userId}/assign`,
+  usersRevokePermissions: (userId: string) =>
+    `/api/v1/iam/permissions/users/${userId}/revoke`,
 } as const;

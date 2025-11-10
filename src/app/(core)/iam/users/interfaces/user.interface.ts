@@ -14,13 +14,14 @@ export interface User extends BaseEntity {
   displayName: string;
   authSource: AuthSource; // 'local' | 'ldap'
   externalId?: string; // AD GUID
-  passwordHash?: string; // only for 'local' users
+  password?: string; // only for 'local' users
   isActive: boolean;
   lastLoginAt?: Date;
+  isLicensed: boolean;
   // TODO: Add memberships
   // memberships: Membership[];
-  userRoles: Role[];
-  userPermissions: Permission[];
+  roles: Role[];
+  permissions: Permission[];
 }
 
 export interface UserRole extends BaseEntity {
@@ -37,5 +38,4 @@ export interface UserPermission extends BaseEntity {
   permissionId: string;
   user: User;
   permission: Permission;
-  metadata?: Record<string, any>;
 }

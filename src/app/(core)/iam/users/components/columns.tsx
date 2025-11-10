@@ -103,6 +103,34 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: true,
   },
   {
+    accessorKey: "roles",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Roles" />
+    ),
+    cell: ({ row }) => (
+      <div>
+        {row.original.roles.map((role) => {
+          const roleColor = role.name.toLowerCase().includes("admin")
+            ? "text-red-600"
+            : "text-blue-600";
+          return (
+            <Badge
+              key={role.id}
+              variant="outline"
+              className={`px-1.5 mr-1 ${roleColor}`}
+            >
+              <span className={`text-primary font-medium  ${roleColor}`}>
+                {role.name}
+              </span>
+            </Badge>
+          );
+        })}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "authSource",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Auth Source" />

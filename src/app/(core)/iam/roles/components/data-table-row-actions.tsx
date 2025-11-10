@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface RoleRowActionsProps {
   row: Row<Role>;
@@ -35,7 +36,7 @@ export function DataTableRowActions({ row }: RoleRowActionsProps) {
   const role = row.original;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const queryClient = useQueryClient();
   const handleEdit = () => {
     router.push(`/iam/roles/edit/${role.id}`);
   };
@@ -44,11 +45,9 @@ export function DataTableRowActions({ row }: RoleRowActionsProps) {
     setIsDeleting(true);
     try {
       await deleteRole(role.id);
+      queryClient.refetchQueries({ queryKey: ["roles"] });
       toast.success("Role deleted successfully");
       setShowDeleteDialog(false);
-      // // Trigger a refetch by reloading the page or using a refetch function
-      // window.location.reload();
-      router.push("/iam/roles?refetch=true");
     } catch (error: any) {
       toast.error(`Failed to delete role: ${error.message}`);
     } finally {

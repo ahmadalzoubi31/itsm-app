@@ -60,13 +60,7 @@ const data: {
     //   roles: ["admin"],
     //   permissions: [],
     // },
-    // {
-    //   title: "Groups",
-    //   url: "/groups",
-    //   icon: "groups",
-    //   roles: ["admin", "agent"],
-    //   permissions: [],
-    // },
+
     {
       title: "Identity & Access Management",
       url: "/iam",
@@ -78,6 +72,13 @@ const data: {
       title: "Users",
       url: "/iam/users",
       icon: "users",
+      roles: ["admin", "agent"],
+      permissions: [],
+    },
+    {
+      title: "Groups",
+      url: "/iam/groups",
+      icon: "groups",
       roles: ["admin", "agent"],
       permissions: [],
     },

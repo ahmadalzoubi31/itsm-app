@@ -1,6 +1,6 @@
 "use client";
 
-import RoleForm from "./components/RoleForm";
+import RoleForm from "../components/role-form";
 
 const Page = () => {
   return (
@@ -15,7 +15,7 @@ const Page = () => {
       </div>
 
       <div className="px-4 lg:px-6">
-        <RoleForm />
+        <RoleForm id={""} />
       </div>
     </>
   );

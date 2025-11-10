@@ -27,23 +27,21 @@ import {
 import { useState } from "react";
 import { deleteUser } from "../services/user.service";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps<User>) {
-  const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const user = row.original;
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       await deleteUser(user.id);
+      queryClient.refetchQueries({ queryKey: ["users"] });
       toast.success("User deleted successfully");
       setShowDeleteDialog(false);
-      // // Trigger a refetch by reloading the page or using a refetch function
-      // window.location.reload();
-      router.push("/iam/users?refetch=true");
     } catch (error: any) {
       toast.error(`Failed to delete user: ${error.message}`);
     } finally {

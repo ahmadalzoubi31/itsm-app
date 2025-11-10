@@ -5,7 +5,7 @@ import { columns } from "./components/columns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { useUsers } from "./hooks/useUsers";
+import { useUsersHook } from "./hooks/useUsers.hook";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { tableConfig } from "./components/table-config";
@@ -21,7 +21,7 @@ const Page = () => {
     importedUsers,
     agentUsers,
     refetch,
-  } = useUsers();
+  } = useUsersHook();
 
   if (error) return <div className="px-4 lg:px-6">Error: {error.message}</div>;
 

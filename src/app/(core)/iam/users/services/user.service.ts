@@ -17,16 +17,23 @@ export async function createUser(dto: CreateUserDto): Promise<User> {
 
 // Get all users
 export async function listUsers(): Promise<User[]> {
-  return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.base));
+  return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.base), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 // Get user by ID
 export async function getUser(id: string): Promise<User> {
-  return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.byId(id)));
+  return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.byId(id)), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 // Update user
-export async function updateUser(id: string, dto: UpdateUserDto): Promise<User> {
+export async function updateUser(
+  id: string,
+  dto: UpdateUserDto
+): Promise<User> {
   return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.byId(id)), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -34,8 +41,11 @@ export async function updateUser(id: string, dto: UpdateUserDto): Promise<User> 
   });
 }
 // Delete user
-export async function deleteUser(id: string): Promise<{ id: string; deleted: boolean }> {
+export async function deleteUser(
+  id: string
+): Promise<{ id: string; deleted: boolean }> {
   return await fetchWithAuth(getBackendUrl(USERS_ENDPOINTS.byId(id)), {
     method: "DELETE",
+    headers: { "Content-Type": "application/json" },
   });
 }

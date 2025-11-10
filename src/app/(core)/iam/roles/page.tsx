@@ -4,13 +4,13 @@ import { columns } from "./components/columns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { useRoles } from "./hooks/useRoles";
+import { useRolesHook } from "./hooks/useRoles.hook";
 import { PlusIcon, Key } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { tableConfig } from "./components/table-config";
 
 const Page = () => {
-  const { roles, error, isLoading, refetch } = useRoles();
+  const { roles, error, isLoading, refetch } = useRolesHook();
 
   if (error) return <div className="px-4 lg:px-6">Error: {error.message}</div>;
   if (isLoading) {
@@ -104,7 +104,7 @@ const Page = () => {
 
       <div className="px-4 lg:px-6">
         <DataTable
-          data={roles.filter((role) => role.key !== 'end_user')}
+          data={roles.filter((role) => role.key !== "end_user")}
           columns={columns}
           refetch={refetch}
           isLoading={isLoading}

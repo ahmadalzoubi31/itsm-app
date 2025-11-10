@@ -6,11 +6,11 @@ import { Key } from "lucide-react";
 import Link from "next/link";
 import { DataTable } from "@/components/data-table";
 import { tableConfig } from "./components/table-config";
-import { usePermissions } from "./hooks/usePermissions";
+import { usePermissionsHook } from "./hooks/usePermissions.hook";
 import { Button } from "@/components/ui/button";
 
 const Page = () => {
-  const { permissions, error, isLoading, refetch } = usePermissions();
+  const { permissions, error, isLoading, refetch } = usePermissionsHook();
 
   if (error) return <div className="px-4 lg:px-6">Error: {error.message}</div>;
 
