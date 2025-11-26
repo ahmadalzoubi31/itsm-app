@@ -3,13 +3,13 @@
 import {
   RequestCardFormValues,
   requestCardSchema,
-} from "../../../validations/request-card.schema";
+} from  "@/app/(core)/catalog/admin/request-cards/_lib/_schemas";
 import {
   createRequestCard,
   updateRequestCard,
   fetchRequestCardById,
-  fetchServices,
-} from "../../../services/catalog.service";
+} from "@/app/(core)/catalog/admin/request-cards/_lib/_services/request-card.service";
+
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGroupsHook } from "@/app/(core)/iam/groups/_lib/_hooks/useGroups";
@@ -26,6 +26,7 @@ import BasicInfoTab from "./BasicInfoTab";
 import SchemaTab from "./SchemaTab";
 import SettingsTab from "./SettingsTab";
 import ApprovalTab from "./ApprovalTab";
+import { listServices } from "../../services/_lib/_services/service.service";
 
 interface RequestCardFormProps {
   id?: string;
@@ -64,7 +65,7 @@ const RequestCardForm = ({ id }: RequestCardFormProps) => {
   // EFFECTS
   useEffect(() => {
     // Fetch business lines and services
-    fetchServices()
+    listServices()
       .then((svcs) => {
         setServices(svcs);
       })

@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { ReactNode } from "react";
 import Link from "next/link";
-import { cn } from "../../../../utils/cn";
+import { cn } from "@/lib/utils/cn";
 
 type IntegrationCardProps = {
   icon: ReactNode;

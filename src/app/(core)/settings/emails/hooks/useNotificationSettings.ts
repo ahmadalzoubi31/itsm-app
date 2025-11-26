@@ -7,7 +7,7 @@ export function useGetNotificationSettings() {
     return useQuery({
       queryKey: ["notificationSettings"],
       queryFn: fetchNotificationSettings,
-      select: (data) => data.data,
+      select: (data) => data,
       refetchOnWindowFocus: false,
     });
   }

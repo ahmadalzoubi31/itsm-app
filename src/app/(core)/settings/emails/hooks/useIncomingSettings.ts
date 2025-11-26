@@ -7,7 +7,7 @@ export function useGetIncomingSettings() {
     return useQuery({
       queryKey: ["incomingSettings"],
       queryFn: fetchEmailSettings,
-      select: (data) => data.data.incoming,
+      select: (data) => data.incoming,
       refetchOnWindowFocus: false,
     });
   }

@@ -99,8 +99,8 @@ const BasicInfoPage = () => {
         "allowSelfSignedCert",
         settings.allowSelfSignedCert ?? false
       );
-      form.setValue("syncIntervalMinutes", settings.syncIntervalMinutes ?? 300);
-      form.setValue("autoSync", settings.autoSync ?? true);
+      // form.setValue("syncIntervalMinutes", se ?? 300);
+      // form.setValue("autoSync", settings.autoSync ?? true);
       form.setValue(
         "deactivateRemovedUsers",
         settings.deactivateRemovedUsers ?? false
@@ -237,7 +237,6 @@ const BasicInfoPage = () => {
               <Button
                 size="sm"
                 variant="outline"
-                size="sm"
                 onClick={onPreviewSample}
                 disabled={testConnectionMutation.isPending}
               >
@@ -247,7 +246,6 @@ const BasicInfoPage = () => {
               <Button
                 size="sm"
                 onClick={onTest}
-                size="sm"
                 disabled={
                   testConnectionMutation.isPending ||
                   !(

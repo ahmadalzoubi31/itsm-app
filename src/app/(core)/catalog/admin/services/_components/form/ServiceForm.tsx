@@ -60,6 +60,7 @@ import {
   FolderTree,
   Tags,
 } from "lucide-react";
+import { createService, updateService } from "../../_lib/_services/service.service";
 
 interface ServiceFormProps {
   id?: string;
@@ -88,43 +89,43 @@ export function ServiceForm({ id }: ServiceFormProps) {
     },
   });
 
-  // useEffect(() => {
-  //   // Fetch business lines
-  //   fetchBusinessLines()
-  //     .then(setBusinessLines)
-  //     .catch((error) => toast.error("Failed to load business lines"));
+  useEffect(() => {
+    // Fetch business lines
+    fetchBusinessLines()
+      .then(setBusinessLines)
+      .catch((error) => toast.error("Failed to load business lines"));
 
-  //   // Fetch categories
-  //   fetchCaseCategories()
-  //     .then(setCategories)
-  //     .catch((error) => toast.error("Failed to load categories"));
+    // Fetch categories
+    fetchCaseCategories()
+      .then(setCategories)
+      .catch((error) => toast.error("Failed to load categories"));
 
-  //   // Fetch all subcategories
-  //   fetchCaseSubcategories()
-  //     .then(setSubcategories)
-  //     .catch((error) => toast.error("Failed to load subcategories"));
+    // Fetch all subcategories
+    fetchCaseSubcategories()
+      .then(setSubcategories)
+      .catch((error) => toast.error("Failed to load subcategories"));
 
-  //   // Prefill if editing
-  //   if (id) {
-  //     setLoading(true);
-  //     fetchServiceById(id)
-  //       .then((service) => {
-  //         form.reset({
-  //           key: service.key,
-  //           name: service.name,
-  //           description: service.description || "",
-  //           businessLineId: service.businessLineId,
-  //           categoryId: service.categoryId,
-  //           subcategoryId: service.subcategoryId,
-  //         });
-  //       })
-  //       .catch((error) => {
-  //         toast.error(`Failed to fetch service: ${error.message}`);
-  //         router.push("/catalog/admin/services");
-  //       })
-  //       .finally(() => setLoading(false));
-  //   }
-  // }, [id, form, router]);
+    // Prefill if editing
+    // if (id) {
+    //   setLoading(true);
+    //   fetchServiceById(id)
+    //     .then((service) => {
+    //       form.reset({
+    //         key: service.key,
+    //         name: service.name,
+    //         description: service.description || "",
+    //         businessLineId: service.businessLineId,
+    //         categoryId: service.categoryId,
+    //         subcategoryId: service.subcategoryId,
+    //       });
+    //     })
+    //     .catch((error) => {
+    //       toast.error(`Failed to fetch service: ${error.message}`);
+    //       router.push("/catalog/admin/services");
+    //     })
+    //     .finally(() => setLoading(false));
+    // }
+  }, [id, form, router]);
 
   // Watch category changes to filter subcategories
   const selectedCategoryId = form.watch("categoryId");
@@ -153,9 +154,9 @@ export function ServiceForm({ id }: ServiceFormProps) {
   const onSubmit = async (data: ServiceFormValues) => {
     const promise = async () => {
       if (id) {
-        // await updateService(id, data);
+        await updateService(id, data);
       } else {
-        // await createService(data);
+        await createService(data);
       }
     };
 

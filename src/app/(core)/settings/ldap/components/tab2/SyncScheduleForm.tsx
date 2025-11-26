@@ -540,7 +540,6 @@ export function SyncScheduleForm({
             <Button
               size="sm"
               type="submit"
-              size="sm"
               disabled={isSaving}
               className="bg-primary hover:bg-primary/90 text-white"
             >

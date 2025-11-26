@@ -49,9 +49,9 @@ export const columns: ColumnDef<Case>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
-          <span className="text-primary hover:text-primary/80 font-medium">
+          <Link href={`/cases/${row.original.id}`} className="text-primary hover:text-primary/80 font-medium">
             {row.original.number}
-          </span>
+          </Link>
           {row.original.slaTimers?.some(
             (timer) =>
               timer.status === "Breached" ||
@@ -78,23 +78,6 @@ export const columns: ColumnDef<Case>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "category",
-    accessorFn: (row) => row.category?.name || "",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
-    ),
-    cell: ({ row }) => (
-      <div className="flex flex-col text-sm">
-        <p>{row.original.category?.name || "—"}</p>
-        <p className="text-sm text-muted-foreground">
-          {row.original.subcategory?.name || "—"}
-        </p>
-      </div>
-    ),
-    enableSorting: true,
-    enableHiding: false,
-  },
-  {
     accessorKey: "description",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Description" />
@@ -110,6 +93,21 @@ export const columns: ColumnDef<Case>[] = [
     },
     enableSorting: false,
     enableHiding: true,
+  },  {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex flex-col text-sm">
+        <p>{row.original.category?.name || "—"}</p>
+        <p className="text-sm text-muted-foreground">
+          {row.original.subcategory?.name || "—"}
+        </p>
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: false,
   },
   {
     accessorKey: "status",

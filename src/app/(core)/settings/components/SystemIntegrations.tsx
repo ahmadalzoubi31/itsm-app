@@ -1,7 +1,7 @@
 import { Users, Clock, Workflow } from "lucide-react";
 import { IntegrationCard } from "./IntegrationCard";
-import { cn } from "../../../../utils/cn";
-
+import { cn } from "@/lib/utils/cn";
+ 
 type Integration = {
   id: string;
   icon: React.ReactNode;

@@ -145,7 +145,6 @@ const SyncHistoryCard = ({
                 <Button
                   size="sm"
                   variant="outline"
-                  size="sm"
                   onClick={onRefresh}
                   disabled={isRefreshing}
                   className="h-8 gap-2"
@@ -229,7 +228,6 @@ const SyncHistoryCard = ({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                size="sm"
                                 className="h-6 w-6 p-0"
                                 onClick={() => toggleExpand(entry.id)}
                               >

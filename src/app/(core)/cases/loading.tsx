@@ -30,44 +30,10 @@ export default function CasesLoading() {
           </div>
         </div>
 
-        {/* Table */}
-        <Card>
-          <div className="p-4 space-y-3">
-            {/* Table Header */}
-            <div className="flex items-center gap-4 pb-3 border-b">
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-
-            {/* Table Rows */}
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 py-3">
-                <Skeleton className="h-4 w-12" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            ))}
-          </div>
-        </Card>
-
         {/* Pagination */}
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-48" />
           <div className="flex items-center gap-2">
-            <Skeleton className="h-9 w-24" />
-            <Skeleton className="h-9 w-9" />
-            <Skeleton className="h-9 w-9" />
-            <Skeleton className="h-9 w-9" />
-            <Skeleton className="h-9 w-9" />
             <Skeleton className="h-9 w-24" />
           </div>
         </div>

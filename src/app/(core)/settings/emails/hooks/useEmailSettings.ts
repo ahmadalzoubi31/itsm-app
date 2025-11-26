@@ -24,7 +24,7 @@ export function useGetEmailSettings() {
   return useQuery({
     queryKey: ["emailSettings"],
     queryFn: fetchEmailSettings,
-    select: (data) => data.data,
+    select: (data) => data,
     refetchOnWindowFocus: false,
   });
 }
@@ -51,14 +51,14 @@ export function useEmailTest() {
       setTesting(true);
       setError(null);
       const response = await testEmailConnection();
-      if (response.status === "success" && response.data) {
-        setTestResult(response.data);
-        if (response.data.success) {
+      if (response.success && response.details) {
+        setTestResult(response);
+        if (response.success) {
           toast.success("Email connection test successful");
         } else {
-          toast.error(`Connection test failed: ${response.data.message}`);
+          toast.error(`Connection test failed: ${response.message}`);
         }
-        return response.data;
+        return response;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to test email connection";
@@ -75,14 +75,14 @@ export function useEmailTest() {
       setTesting(true);
       setError(null);
       const response = await sendTestEmail(testEmail);
-      if (response.status === "success" && response.data) {
-        setTestResult(response.data);
-        if (response.data.success) {
+      if (response.success && response) {
+        setTestResult(response);
+        if (response.success) {
           toast.success("Test email sent successfully");
         } else {
-          toast.error(`Failed to send test email: ${response.data.message}`);
+          toast.error(`Failed to send test email: ${response.message}`);
         }
-        return response.data;
+        return response;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to send test email";
@@ -114,8 +114,8 @@ export function useEmailStatistics() {
       setLoading(true);
       setError(null);
       const response = await fetchEmailStatistics();
-      if (response.status === "success" && response.data) {
-        setStatistics(response.data);
+      if (response) {
+        setStatistics(response);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to load email statistics";

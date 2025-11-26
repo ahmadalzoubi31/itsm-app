@@ -241,8 +241,7 @@ const SyncStatusCard = ({
         <div className="flex gap-2 pt-2 border-t border-gray-200">
           <Button
             size="sm"
-            onClick={onSync}
-            size="sm"
+            onClick={onSync}          
             disabled={isRunning || syncLdapMutation.isPending || !configId}
             className="flex items-center gap-2"
           >
@@ -257,7 +256,6 @@ const SyncStatusCard = ({
             size="sm"
             variant="outline"
             onClick={handlePauseSync}
-            size="sm"
             disabled={
               !isRunning || !configId || cancelLdapSyncMutation.isPending
             }
