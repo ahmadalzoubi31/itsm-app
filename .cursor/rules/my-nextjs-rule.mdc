@@ -1,0 +1,265 @@
+---
+alwaysApply: true
+---
+# PROJECT RULES — Next.js + TypeScript + shadcn/ui + Data Fetching + Folder Structure
+
+This project uses Next.js (latest), TypeScript, the App Router, shadcn/ui, React Query, and a domain-based architecture.  
+Cursor must follow these rules at all times.
+
+---
+
+# 1. FRAMEWORK RULES
+
+- Always use the latest stable Next.js version.
+- Use the App Router (`app/`).
+- Prefer Server Components by default.
+- Use `"use client"` only when necessary (stateful hooks, React Query, event handlers).
+
+---
+
+# 2. UI RULES — SHADCN/UI + TAILWIND
+
+- Always use shadcn/ui components for UI.
+- Import UI components like:
+
+```tsx
+import { Button } from "@/components/ui/button";
+```
+
+- Use Tailwind CSS for styling.
+- Avoid inline styles unless necessary.
+
+---
+
+# 3. COMPONENT STRUCTURE
+
+Every component MUST strictly follow this structure:
+
+```tsx
+// use interface for the props
+interface ComponentProps {
+  ...
+}
+
+const ComponentName = ({ ... }: ComponentProps) => {
+  // HOOKS
+  // Custom Hooks
+  // React Hooks
+
+  // EFFECTS
+  // useEffect(() => {}, []);
+
+  // HELPERS
+  // const helperFn = () => {};
+
+  // EVENT HANDLERS
+  // const handleClick = () => {};
+
+  // EARLY RETURNS
+  // if (!data) return <div>Loading...</div>;
+
+  // RENDER LOGIC
+  // const title = loading ? "Loading..." : "Ready";
+
+  return <div>...</div>;
+};
+
+export default ComponentName;
+```
+
+Rules:
+- Props must always use TypeScript interfaces.
+- Only one default export per file.
+- Keep empty sections present for consistency.
+
+---
+
+# 4. DATA FETCHING — use() VS useQuery()
+
+Use BOTH — but for different responsibilities.
+
+This is the recommended best practice for modern Next.js (App Router).
+
+---
+
+## ✅ Use `use()` for server-side initial data
+
+Use it for:
+
+- Initial page load
+- Large lists (Users, Tickets, CMDB)
+- SEO-critical pages
+- `<Suspense>` + streaming
+- Data that does **not** depend on client state
+
+Pages that SHOULD use `use()`:
+
+```
+/users
+/tickets/[id]
+/catalog
+/cmdb
+```
+
+Why:
+
+- Faster (server parallel execution)
+- Zero client JS for initial data
+- Cleaner and simpler than client fetching
+- Perfect for `<Suspense>`
+- Replaces initial React Query for SSR
+
+With `use()`, do NOT create a client hook for initial data.
+
+---
+
+## ✅ Use `useQuery()` for client-side interactions
+
+Use React Query for:
+
+- Filtering
+- Searching
+- Pagination
+- Sorting
+- Date selectors
+- Auto-refresh dashboards
+- Optimistic updates
+- Form submissions
+- Create/Update/Delete actions
+- Anything changing based on client state
+
+Screens that SHOULD use React Query:
+
+```
+/users (search + filters)
+<tickets> (live updates)
+<settings/ldap> (test connection)
+<reports> (date range filtering)
+<notifications> (auto refresh)
+```
+
+React Query provides:
+
+- Caching  
+- Refetching  
+- Invalidation  
+- Error handling  
+- Loading states  
+- Full client-side reactivity  
+
+`use()` CANNOT handle dynamic client interactions — use React Query instead.
+
+---
+
+# 5. DOMAIN-BASED FOLDER STRUCTURE
+
+Each domain must follow this structure:
+
+```
+/app/<domain>/
+  page.tsx
+  new/
+    page.tsx
+  [id]/
+    page.tsx
+    edit/
+      page.tsx
+  components/
+  hooks/
+  services/
+  interfaces/
+  validations/
+  constants/
+```
+
+Folder meanings:
+
+- `components/` → UI (forms, tables, dialogs)
+- `hooks/` → Client hooks (useQuery/useMutation/state)
+- `services/` → Data access  
+  - Use `.server.ts` for server functions
+- `interfaces/` → DTOs, Types, Enums
+- `validations/` → Zod/Yup schemas
+- `constants/` → Role lists, permissions, statuses
+
+---
+
+# 6. ROUTE NAMING RULES (REST STYLE)
+
+Correct patterns:
+
+```
+/users
+/users/new
+/users/[id]
+/users/[id]/edit
+```
+
+Do NOT use:
+
+```
+/users/create
+/users/edit
+/users/edit/[id]
+```
+
+REST-style routes scale better and are more predictable.
+
+---
+
+# 7. HOOKS NAMING RULES
+
+Hooks must NOT use `.hook.ts`.
+
+Use:
+
+```
+useUser.ts
+useUsers.ts
+useUserPermissions.ts
+useCreateUser.ts
+useUpdateUser.ts
+```
+
+Correct import:
+
+```
+import { useUsers, useUser } from "@/app/users/hooks";
+```
+
+---
+
+# 8. BARREL EXPORTS
+
+Inside domain folders (`hooks`, `services`, `interfaces`):
+
+`index.ts` should re-export items:
+
+```
+export * from "./useUsers";
+export * from "./useUser";
+export * from "./useUserPermissions";
+```
+
+Usage:
+
+```
+import { useUsers } from "@/app/users/hooks";
+```
+
+---
+
+# 9. SERVER VS CLIENT RESPONSIBILITY
+
+- **Server Components:**  
+  SSR, use(), Suspense, server-side data
+
+- **Client Components:**  
+  React Query, forms, modals, interactivity
+
+- **services/*.server.ts** → server-only logic  
+- **hooks/** → client-only logic
+
+Keep separation strict.
+
+---
