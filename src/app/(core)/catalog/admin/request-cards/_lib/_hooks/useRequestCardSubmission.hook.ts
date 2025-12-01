@@ -19,16 +19,29 @@ export function useRequestCardSubmissionHook() {
     setError(null);
     setIsSuccess(false);
 
-    startTransition(async () => {
+    try {
       const result = await submitRequestCardAction(requestCardId, formData);
 
-      if (result.success) {
-        setSubmittedRequest(result.data ?? null);
-        setIsSuccess(true);
-      } else {
-        setError(result.error || "Failed to submit request");
+      startTransition(() => {
+        if (result.success) {
+          setSubmittedRequest(result.data ?? null);
+          setIsSuccess(true);
+        } else {
+          setError(result.error || "Failed to submit request");
+        }
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to submit request");
       }
-    });
+
+      return result.data;
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An unexpected error occurred";
+      setError(errorMessage);
+      throw e;
+    }
   };
 
   const reset = () => {

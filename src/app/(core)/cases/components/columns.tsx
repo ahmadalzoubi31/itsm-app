@@ -49,7 +49,10 @@ export const columns: ColumnDef<Case>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
-          <Link href={`/cases/${row.original.id}`} className="text-primary hover:text-primary/80 font-medium">
+          <Link
+            href={`/cases/${row.original.id}`}
+            className="text-primary hover:text-primary/80 font-medium"
+          >
             {row.original.number}
           </Link>
           {row.original.slaTimers?.some(
@@ -93,7 +96,8 @@ export const columns: ColumnDef<Case>[] = [
     },
     enableSorting: false,
     enableHiding: true,
-  },  {
+  },
+  {
     accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />

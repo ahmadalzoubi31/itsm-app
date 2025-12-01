@@ -46,12 +46,13 @@ export default function ServiceDetailPage({ params }: ServiceDetailPageProps) {
 
   const handleSubmit = async (formData: Record<string, any>) => {
     if (!selectedRequestCard) return;
-
-    console.log("formData", formData);
-    await submitRequestCard(selectedRequestCard.id, formData);
-    handleCloseDrawer();
-    setIsSuccessModalOpen(true);
-    toast.success("Request submitted successfully!");
+    try {
+      await submitRequestCard(selectedRequestCard.id, formData);
+      handleCloseDrawer();
+      setIsSuccessModalOpen(true);
+    } catch (error) {
+      toast.error("Failed to submit request");
+    }
   };
 
   const handleCloseSuccessModal = () => {

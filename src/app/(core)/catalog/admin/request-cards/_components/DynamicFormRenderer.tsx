@@ -23,7 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { getVisibleFields } from "@/app/(core)/catalog/admin/request-cards/_lib/_utils/conditionEvaluator";
 
 interface DynamicFormRendererProps {
   jsonSchema: any;
@@ -35,7 +36,13 @@ interface DynamicFormRendererProps {
 /**
  * Convert JSON Schema to Zod schema for validation
  */
-function jsonSchemaToZod(jsonSchema: any): z.ZodObject<any> {
+/**
+ * Convert JSON Schema to Zod schema for validation
+ */
+function jsonSchemaToZod(
+  jsonSchema: any,
+  visibleFields?: Set<string>
+): z.ZodObject<any> {
   const shape: Record<string, z.ZodTypeAny> = {};
   const properties = jsonSchema.properties || {};
   const required = jsonSchema.required || [];
@@ -73,8 +80,8 @@ function jsonSchemaToZod(jsonSchema: any): z.ZodObject<any> {
         zodType = z.any();
     }
 
-    // Make optional if not required
-    if (!required.includes(key)) {
+    // Make optional if not required OR if not visible
+    if (!required.includes(key) || (visibleFields && !visibleFields.has(key))) {
       zodType = zodType.optional();
     }
 
@@ -123,15 +130,62 @@ export function DynamicFormRenderer({
     }
   });
 
-  const zodSchema = jsonSchemaToZod(jsonSchema);
+  // Memoize fields array for performance
+  const fields = useMemo(
+    () =>
+      Object.keys(properties).map((key) => ({
+        key,
+        conditionalLogic: properties[key].conditionalLogic,
+      })),
+    [properties]
+  );
+
   const form = useForm({
-    resolver: zodResolver(zodSchema),
+    resolver: async (values, context, options) => {
+      // Calculate visible fields based on current values
+      const currentVisibleFields = getVisibleFields(fields, values);
+      // Generate schema based on visibility
+      const schema = jsonSchemaToZod(jsonSchema, currentVisibleFields);
+      // Validate
+      return zodResolver(schema)(values, context, options);
+    },
     defaultValues,
   });
 
   useEffect(() => {
     form.reset(defaultValues);
   }, [jsonSchema]);
+
+  // Watch all form values to evaluate conditions
+  const formValues = form.watch();
+
+  // Calculate visible fields based on conditions
+  const visibleFields = useMemo(() => {
+    return getVisibleFields(fields, formValues);
+  }, [fields, formValues]);
+
+  // Clear values of hidden fields
+  useEffect(() => {
+    const currentValues = form.getValues();
+    Object.keys(currentValues).forEach((key) => {
+      // If field exists in schema but is not visible, clear it
+      if (properties[key] && !visibleFields.has(key)) {
+        // Only reset if it has a value to avoid unnecessary renders
+        if (
+          currentValues[key] !== undefined &&
+          currentValues[key] !== "" &&
+          currentValues[key] !== null &&
+          currentValues[key] !== false
+        ) {
+          form.setValue(key, undefined, {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+        }
+      }
+    });
+  }, [visibleFields, form, properties]);
 
   /**
    * Clean form data before submission:
@@ -142,10 +196,18 @@ export function DynamicFormRenderer({
   const cleanFormData = (data: Record<string, any>): Record<string, any> => {
     const cleaned: Record<string, any> = {};
 
+    // Recalculate visible fields based on the data being submitted to ensure consistency
+    const currentVisibleFields = getVisibleFields(fields, data);
+
     Object.keys(properties).forEach((key) => {
       const prop = properties[key];
       const value = data[key];
       const isRequired = required.includes(key);
+
+      // Skip if field is not visible
+      if (!currentVisibleFields.has(key)) {
+        return;
+      }
 
       // Skip empty values for optional fields
       if (
@@ -222,33 +284,35 @@ export function DynamicFormRenderer({
         onSubmit={form.handleSubmit(handleFormSubmit)}
         className="space-y-6"
       >
-        {Object.keys(properties).map((key) => {
-          const prop = properties[key];
-          const isRequired = required.includes(key);
+        {Object.keys(properties)
+          .filter((key) => visibleFields.has(key))
+          .map((key) => {
+            const prop = properties[key];
+            const isRequired = required.includes(key);
 
-          return (
-            <FormField
-              key={key}
-              control={form.control}
-              name={key}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {prop.title || key}
-                    {isRequired && (
-                      <span className="text-destructive ml-1">*</span>
+            return (
+              <FormField
+                key={key}
+                control={form.control}
+                name={key}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {prop.title || key}
+                      {isRequired && (
+                        <span className="text-destructive ml-1">*</span>
+                      )}
+                    </FormLabel>
+                    <FormControl>{renderField(prop, field, key)}</FormControl>
+                    {prop.description && (
+                      <FormDescription>{prop.description}</FormDescription>
                     )}
-                  </FormLabel>
-                  <FormControl>{renderField(prop, field, key)}</FormControl>
-                  {prop.description && (
-                    <FormDescription>{prop.description}</FormDescription>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        })}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            );
+          })}
 
         <div className="flex justify-end gap-4 pt-4">
           <Button size="sm" type="submit" disabled={isSubmitting}>

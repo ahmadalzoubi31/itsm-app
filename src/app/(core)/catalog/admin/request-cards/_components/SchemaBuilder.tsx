@@ -27,9 +27,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Trash2, GripVertical, Code2, Wand2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, Code2, Wand2, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import JsonSchemaEditor from "./JsonSchemaEditor";
+import ConditionBuilder from "./ConditionBuilder";
 import { toast } from "sonner";
+import {
+  ConditionalLogic,
+  validateNoDependencyCycles,
+  getFieldDependencies,
+} from "@/app/(core)/catalog/admin/request-cards/_lib/_utils/conditionEvaluator";
 
 interface DatabaseDataSource {
   entity: string; // e.g., "users", "groups", "businessLines"
@@ -61,6 +68,7 @@ interface SchemaField {
   maximum?: number;
   format?: string;
   default?: string | number | boolean;
+  conditionalLogic?: ConditionalLogic;
 }
 
 interface SchemaBuilderProps {
@@ -96,6 +104,7 @@ const SchemaBuilder = ({ value, onChange }: SchemaBuilderProps) => {
           maximum: prop.maximum,
           format: prop.format,
           default: prop.default,
+          conditionalLogic: prop.conditionalLogic,
         })
       );
       setFields(fieldArray);
@@ -158,6 +167,10 @@ const SchemaBuilder = ({ value, onChange }: SchemaBuilderProps) => {
 
       if (field.default !== undefined && field.default !== "") {
         prop.default = field.default;
+      }
+
+      if (field.conditionalLogic) {
+        prop.conditionalLogic = field.conditionalLogic;
       }
 
       properties[field.key] = prop;
@@ -236,6 +249,27 @@ const SchemaBuilder = ({ value, onChange }: SchemaBuilderProps) => {
     const updatedFields = isEdit
       ? fields.map((f) => (f.id === editingField.id ? field : f))
       : [...fields, field];
+
+    // Validate conditional logic
+    if (field.conditionalLogic) {
+      // Check that all referenced fields exist
+      for (const condition of field.conditionalLogic.conditions) {
+        const referencedField = updatedFields.find(
+          (f) => f.key === condition.field
+        );
+        if (!referencedField) {
+          toast.error(`Referenced field "${condition.field}" does not exist`);
+          return;
+        }
+      }
+
+      // Check for circular dependencies
+      const validation = validateNoDependencyCycles(updatedFields);
+      if (!validation.valid) {
+        toast.error(validation.error || "Circular dependency detected");
+        return;
+      }
+    }
 
     setFields(updatedFields);
     updateSchema(updatedFields);
@@ -346,6 +380,12 @@ const SchemaBuilder = ({ value, onChange }: SchemaBuilderProps) => {
                           {field.required && (
                             <span className="text-xs text-destructive">*</span>
                           )}
+                          {field.conditionalLogic && (
+                            <Badge variant="outline" className="text-xs">
+                              <Eye className="h-3 w-3 mr-1" />
+                              Conditional
+                            </Badge>
+                          )}
                         </div>
                         {field.description && (
                           <p className="text-sm text-muted-foreground ml-6">
@@ -362,6 +402,21 @@ const SchemaBuilder = ({ value, onChange }: SchemaBuilderProps) => {
                               </span>
                             )}
                         </p>
+                        {field.conditionalLogic && (
+                          <p className="text-xs text-muted-foreground ml-6">
+                            <span className="text-blue-600 dark:text-blue-400">
+                              Depends on:{" "}
+                              {field.conditionalLogic.conditions
+                                .map((c) => {
+                                  const depField = fields.find(
+                                    (f) => f.key === c.field
+                                  );
+                                  return depField?.title || c.field;
+                                })
+                                .join(", ")}
+                            </span>
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
@@ -880,6 +935,18 @@ const FieldDialog = ({
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, required: checked })
                 }
+              />
+            </div>
+
+            {/* Conditional Logic Section */}
+            <div className="border-t pt-4">
+              <ConditionBuilder
+                value={formData.conditionalLogic}
+                onChange={(conditionalLogic) =>
+                  setFormData({ ...formData, conditionalLogic })
+                }
+                availableFields={existingFields}
+                currentFieldKey={formData.key}
               />
             </div>
           </div>

@@ -15,16 +15,23 @@ import { RequestCard } from "./_lib/_types";
 
 export default function RequestCardsManagementPage() {
   const [requestCards, setRequestCards] = useState<RequestCard[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Call the hook at the top level
+  const {
+    services,
+    isLoading: servicesLoading,
+    error: servicesError,
+  } = useServicesHook();
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
 
   useEffect(() => {
     // Fetch all services and their templates
     const loadTemplates = async () => {
-      try {
-        setIsLoading(true);
-        const { services } = useServicesHook();
+      if (servicesLoading || !services.length) return;
 
+      try {
+        setIsLoadingCards(true);
         // Fetch service cards for each service
         const allRequestCards: RequestCard[] = [];
         for (const service of services) {
@@ -45,18 +52,18 @@ export default function RequestCardsManagementPage() {
         setError(err as Error);
         toast.error("Failed to load templates");
       } finally {
-        setIsLoading(false);
+        setIsLoadingCards(false);
       }
     };
 
     loadTemplates();
-  }, []);
+  }, [services, servicesLoading]);
 
-  if (error) {
+  if (error || servicesError) {
     return (
       <div className="px-4 lg:px-8">
         <div className="text-destructive">
-          Error loading templates: {error.message}
+          Error loading templates: {(error || servicesError)?.message}
         </div>
       </div>
     );
@@ -80,14 +87,14 @@ export default function RequestCardsManagementPage() {
           />
         </div>
         <Button size="sm" asChild>
-          <Link href="/catalog/admin/request-cards/create">
+          <Link href="/catalog/admin/request-cards/new">
             <Plus className="h-4 w-4 mr-2" />
             Create Request Card
           </Link>
         </Button>
       </div>
 
-      {isLoading ? (
+      {servicesLoading || isLoadingCards ? (
         <div className="space-y-4">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-64 w-full" />

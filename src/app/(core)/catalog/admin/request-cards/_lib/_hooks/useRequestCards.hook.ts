@@ -41,7 +41,6 @@ export function useRequestCardsHook() {
  * Hook to fetch request cards by service ID
  */
 export function useRequestCardsByServiceHook(serviceId: string) {
-  console.log("🚀 ~ useRequestCardsByServiceHook ~ serviceId:", serviceId);
   const {
     data: requestCards = [],
     error,

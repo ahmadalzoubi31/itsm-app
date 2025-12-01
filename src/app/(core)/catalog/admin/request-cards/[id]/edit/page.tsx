@@ -1,11 +1,11 @@
 "use client";
 
 import { use } from "react";
-import RequestCardForm from "../../components/RequestCardForm";
+import RequestCardForm from "@/app/(core)/catalog/admin/request-cards/_components/RequestCardForm";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { CatalogHeader } from "@/app/(core)/catalog/components/CatalogHeader";
+import { CatalogHeader } from "@/app/(core)/catalog/_components/CatalogHeader";
 
 interface EditRequestCardPageProps {
   params: Promise<{ id: string }>;
