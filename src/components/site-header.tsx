@@ -17,9 +17,17 @@ import Link from "next/link";
 import React from "react";
 
 function formatSegment(segment: string) {
+  console.log(segment);
+  // if the segmant is uuid
+  const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(segment);
+  if (isUUID) {
+    return segment;
+  }
+
   return segment
     .replace(/-/g, " ") // service-requests → service requests
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize each word
+    .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize each word
+    .replace(/\s+/g, " "); // Remove extra spaces
 }
 
 export function SiteHeader() {

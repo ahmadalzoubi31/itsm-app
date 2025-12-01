@@ -74,67 +74,49 @@ export default function ApprovalsPage() {
 
         {/* Statistics Cards */}
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Pending Approvals
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm text-muted-foreground leading-tight">
+                    Pending
                   </p>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                    {isLoading ? (
-                      <span className="animate-pulse">--</span>
-                    ) : (
-                      stats.total
-                    )}
+                  <p className="text-2xl font-semibold leading-tight mt-0.5">
+                    {isLoading ? "--" : stats.total}
                   </p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-amber-500 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Requires Attention
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm text-muted-foreground leading-tight">
+                    Urgent
                   </p>
-                  <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                    {isLoading ? (
-                      <span className="animate-pulse">--</span>
-                    ) : (
-                      stats.urgent
-                    )}
+                  <p className="text-2xl font-semibold leading-tight mt-0.5">
+                    {isLoading ? "--" : stats.urgent}
                   </p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm text-muted-foreground leading-tight">
                     This Week
                   </p>
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-                    {isLoading ? (
-                      <span className="animate-pulse">--</span>
-                    ) : (
-                      stats.thisWeek
-                    )}
+                  <p className="text-2xl font-semibold leading-tight mt-0.5">
+                    {isLoading ? "--" : stats.thisWeek}
                   </p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>

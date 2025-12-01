@@ -117,7 +117,7 @@ export default function RequestsPage() {
   const { requests, isLoading, error } = useRequests();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [layoutView, setLayoutView] = useState<LayoutView>("card");
+  const [layoutView, setLayoutView] = useState<LayoutView>("table");
   const [activeTab, setActiveTab] = useState<"active" | "past">("active");
 
   const { activeRequests, pastRequests } = useMemo(() => {
@@ -210,7 +210,7 @@ export default function RequestsPage() {
           type="single"
           value={layoutView}
           onValueChange={(value) => value && setLayoutView(value as LayoutView)}
-          className="border rounded-lg p-1"
+          className="border rounded-lg "
         >
           <ToggleGroupItem value="card" aria-label="Card view" size="sm">
             <LayoutGrid className="h-4 w-4" />
