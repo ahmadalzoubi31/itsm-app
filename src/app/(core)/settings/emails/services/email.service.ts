@@ -1,5 +1,6 @@
 import { fetchWithAuth } from "@/lib/api/helper/fetchWithAuth";
 import { getBackendUrl } from "@/lib/api/helper/getBackendUrl";
+import { SETTINGS_ENDPOINTS } from "@/lib/api/endpoints/settings";
 import {
   EmailSettings,
   NotificationSettings,
@@ -12,7 +13,7 @@ import { TestEmailForm } from "../validations/email.schema";
 
 // Fetch all email settings
 export async function fetchEmailSettings(): Promise<EmailSettings> {
-  const res = await fetchWithAuth(getBackendUrl("/api/settings/EMAIL"), {
+  const res = await fetchWithAuth(getBackendUrl(SETTINGS_ENDPOINTS.email), {
     credentials: "include",
   });
 
@@ -29,7 +30,7 @@ export async function saveEmailSettings(
   payload: Partial<EmailSettings>
 ): Promise<EmailSettings> {
   const body = { type: "EMAIL", jsonValue: payload };
-  const res = await fetchWithAuth(getBackendUrl("/api/settings"), {
+  const res = await fetchWithAuth(getBackendUrl(SETTINGS_ENDPOINTS.email), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -46,7 +47,7 @@ export async function saveEmailSettings(
 // Notification Settings API
 export async function fetchNotificationSettings(): Promise<NotificationSettings> {
   const res = await fetchWithAuth(
-    getBackendUrl("/api/settings/EMAIL_NOTIFICATIONS"),
+    getBackendUrl(SETTINGS_ENDPOINTS.emailNotifications),
     {
       credentials: "include",
     }
@@ -64,12 +65,15 @@ export async function saveNotificationSettings(
   payload: Partial<NotificationSettings>
 ): Promise<NotificationSettings> {
   const body = { type: "EMAIL_NOTIFICATIONS", jsonValue: payload };
-  const res = await fetchWithAuth(getBackendUrl("/api/settings"), {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailNotifications),
+    {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -80,9 +84,12 @@ export async function saveNotificationSettings(
 
 // Email Templates API
 export async function fetchEmailTemplates(): Promise<EmailTemplate[]> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/templates"), {
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailTemplates.base),
+    {
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -95,12 +102,15 @@ export async function fetchEmailTemplates(): Promise<EmailTemplate[]> {
 export async function createEmailTemplate(
   payload: Omit<EmailTemplate, "id" | "createdAt" | "updatedAt">
 ): Promise<EmailTemplate> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/templates"), {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailTemplates.base),
+    {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -113,12 +123,15 @@ export async function updateEmailTemplate(
   id: string,
   payload: Partial<EmailTemplate>
 ): Promise<EmailTemplate> {
-  const res = await fetchWithAuth(getBackendUrl(`/api/email/templates/${id}`), {
-    method: "PUT",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailTemplates.byId(id)),
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -128,10 +141,13 @@ export async function updateEmailTemplate(
 }
 
 export async function deleteEmailTemplate(id: string): Promise<void> {
-  const res = await fetchWithAuth(getBackendUrl(`/api/email/templates/${id}`), {
-    method: "DELETE",
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailTemplates.byId(id)),
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -141,11 +157,16 @@ export async function deleteEmailTemplate(id: string): Promise<void> {
 }
 
 // Email Testing API
-export async function testEmailConnection(): Promise<EmailTestResult> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/test-connection"), {
-    method: "POST",
-    credentials: "include",
-  });
+export async function testEmailConnection(
+  id: string
+): Promise<EmailTestResult> {
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.testConnection(id)),
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -157,7 +178,7 @@ export async function testEmailConnection(): Promise<EmailTestResult> {
 export async function sendTestEmail(
   payload: TestEmailForm
 ): Promise<EmailTestResult> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/send-test"), {
+  const res = await fetchWithAuth(getBackendUrl(SETTINGS_ENDPOINTS.email), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -173,9 +194,12 @@ export async function sendTestEmail(
 
 // Email Statistics API
 export async function fetchEmailStatistics(): Promise<EmailStatistics> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/statistics"), {
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    {
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -190,7 +214,7 @@ export async function getOAuthAuthorizationUrl(
   provider: string
 ): Promise<{ authUrl: string }> {
   const res = await fetchWithAuth(
-    getBackendUrl(`/api/email/oauth/${provider}/auth-url`),
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
     {
       credentials: "include",
     }
@@ -210,7 +234,7 @@ export async function exchangeOAuthCode(
   state?: string
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const res = await fetchWithAuth(
-    getBackendUrl(`/api/email/oauth/${provider}/exchange`),
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
     {
       method: "POST",
       credentials: "include",
@@ -229,9 +253,12 @@ export async function exchangeOAuthCode(
 
 // Email Queue Management
 export async function getEmailQueue(): Promise<any[]> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/queue"), {
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    {
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -242,10 +269,13 @@ export async function getEmailQueue(): Promise<any[]> {
 }
 
 export async function clearEmailQueue(): Promise<void> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/queue"), {
-    method: "DELETE",
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -256,10 +286,13 @@ export async function clearEmailQueue(): Promise<void> {
 }
 
 export async function retryFailedEmails(): Promise<{ retried: number }> {
-  const res = await fetchWithAuth(getBackendUrl("/api/email/retry-failed"), {
-    method: "POST",
-    credentials: "include",
-  });
+  const res = await fetchWithAuth(
+    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
