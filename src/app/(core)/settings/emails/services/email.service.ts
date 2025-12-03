@@ -1,6 +1,7 @@
 import { fetchWithAuth } from "@/lib/api/helper/fetchWithAuth";
 import { getBackendUrl } from "@/lib/api/helper/getBackendUrl";
 import { SETTINGS_ENDPOINTS } from "@/lib/api/endpoints/settings";
+import { EMAIL_ENDPOINTS } from "@/lib/api/endpoints/email";
 import {
   EmailSettings,
   NotificationSettings,
@@ -157,16 +158,11 @@ export async function deleteEmailTemplate(id: string): Promise<void> {
 }
 
 // Email Testing API
-export async function testEmailConnection(
-  id: string
-): Promise<EmailTestResult> {
-  const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.testConnection(id)),
-    {
-      method: "POST",
-      credentials: "include",
-    }
-  );
+export async function testEmailConnection(): Promise<EmailTestResult> {
+  const res = await fetchWithAuth(getBackendUrl(EMAIL_ENDPOINTS.testConnection), {
+    method: "POST",
+    credentials: "include",
+  });
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
@@ -178,7 +174,7 @@ export async function testEmailConnection(
 export async function sendTestEmail(
   payload: TestEmailForm
 ): Promise<EmailTestResult> {
-  const res = await fetchWithAuth(getBackendUrl(SETTINGS_ENDPOINTS.email), {
+  const res = await fetchWithAuth(getBackendUrl(EMAIL_ENDPOINTS.sendTest), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -195,7 +191,7 @@ export async function sendTestEmail(
 // Email Statistics API
 export async function fetchEmailStatistics(): Promise<EmailStatistics> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.statistics),
     {
       credentials: "include",
     }
@@ -214,7 +210,7 @@ export async function getOAuthAuthorizationUrl(
   provider: string
 ): Promise<{ authUrl: string }> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.oauth.authUrl(provider)),
     {
       credentials: "include",
     }
@@ -234,7 +230,7 @@ export async function exchangeOAuthCode(
   state?: string
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.oauth.exchange(provider)),
     {
       method: "POST",
       credentials: "include",
@@ -254,7 +250,7 @@ export async function exchangeOAuthCode(
 // Email Queue Management
 export async function getEmailQueue(): Promise<any[]> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.queue.base),
     {
       credentials: "include",
     }
@@ -270,7 +266,7 @@ export async function getEmailQueue(): Promise<any[]> {
 
 export async function clearEmailQueue(): Promise<void> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.queue.base),
     {
       method: "DELETE",
       credentials: "include",
@@ -287,7 +283,7 @@ export async function clearEmailQueue(): Promise<void> {
 
 export async function retryFailedEmails(): Promise<{ retried: number }> {
   const res = await fetchWithAuth(
-    getBackendUrl(SETTINGS_ENDPOINTS.emailChannels.base),
+    getBackendUrl(EMAIL_ENDPOINTS.retryFailed),
     {
       method: "POST",
       credentials: "include",
