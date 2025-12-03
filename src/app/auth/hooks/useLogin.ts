@@ -1,9 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { login } from "../services";
-import type { LoginDto } from "../interfaces";
+import type { LoginDto } from "../types";
 
 interface UseLoginOptions {
   onSuccess?: () => void;
@@ -11,25 +10,21 @@ interface UseLoginOptions {
 }
 
 export function useLogin(options?: UseLoginOptions) {
-  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: (dto: LoginDto) => login(dto),
+    onSuccess: () => {
+      options?.onSuccess?.();
+    },
+    onError: (error: Response) => {
+      options?.onError?.(error);
+    },
+  });
 
-  const handleLogin = async (dto: LoginDto) => {
-    const promise = () => login(dto);
-
-    toast.promise(promise, {
-      loading: "Loading...",
-      success: (data) => {
-        options?.onSuccess?.();
-        router.push("/");
-        return `Signed in successfully!`;
-      },
-      error: (error: Response) => {
-        options?.onError?.(error);
-        return `Sign in failed, ${error.statusText}`;
-      },
-    });
+  return {
+    login: mutation.mutate,
+    isLoading: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
   };
-
-  return { login: handleLogin };
 }
 

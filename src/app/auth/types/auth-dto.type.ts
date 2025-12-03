@@ -1,26 +1,26 @@
-export interface LoginDto {
+export type LoginDto = {
   username: string;
   password: string;
 }
 
-export interface RefreshTokenDto {
+export type RefreshTokenDto = {
   refreshToken: string;
 }
 
-export interface LogoutDto {
+export type LogoutDto = {
   refreshToken: string;
 }
 
-export interface ResetPasswordDto {
+export type ResetPasswordDto = {
   userId: string;
   newPassword: string;
 }
 
-export interface CheckPasswordStrengthDto {
+export type CheckPasswordStrengthDto = {
   password: string;
 }
 
-export interface PasswordStrengthResponseDto {
+export type PasswordStrengthResponseDto = {
   isValid: boolean;
   errors: string[];
   score: number;

@@ -1,6 +1,6 @@
 import { User } from "@/app/(core)/iam/users/_lib/_types";
 
-export interface RefreshToken {
+export type RefreshToken = {
   id: string;
   userId: string;
   token: string; // hashed refresh token
@@ -13,7 +13,7 @@ export interface RefreshToken {
   user: User;
 }
 
-export interface TokenBlacklist {
+export type TokenBlacklist = {
   id: string;
   jti: string; // JWT ID - unique identifier for the token
   userId: string;

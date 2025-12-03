@@ -21,38 +21,38 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { loginSchema, type LoginSchema } from "../schemas/auth.schema";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useLogin } from "../hooks";
-import { loginSchema, type LoginFormValues } from "../validations/auth.schema";
 
-interface LoginFormProps {}
 
-const LoginForm = ({}: LoginFormProps) => {
-  // HOOKS
-  const { login } = useLogin();
+export default function LoginForm() {
+  const router = useRouter();
 
-  // EFFECTS
+  const { login, isLoading } = useLogin({
+    onSuccess: () => {
+      toast.success("User logged in successfully");
+      router.push("/iam/users");
+    },
+    onError: (error) => {
+      console.error("Error logging in:", error);
+      toast.error(`Sign in failed: ${error.statusText}`);
+    },
+  });
 
-  // HELPERS
+  const onSubmit = async (data: LoginSchema) => {
+    login(data);
+  };
 
-  // EVENT HANDLERS
-  const form = useForm<LoginFormValues>({
+  const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
     },
   });
-
-  const onSubmit = async (values: LoginFormValues) => {
-    await login({
-      username: values.username,
-      password: values.password,
-    });
-  };
-
-  // EARLY RETURNS
-
-  // RENDER LOGIC
 
   return (
     <Card>
@@ -73,9 +73,17 @@ const LoginForm = ({}: LoginFormProps) => {
                   <FormItem className="grid gap-2">
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input id="username" type="text" required {...field} />
+                      <Input
+                        id="username"
+                        type="text"
+                        required
+                        {...field}
+                        disabled={isLoading}
+                      />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage className="text-xs">
+                      {form.formState.errors.username?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -91,32 +99,46 @@ const LoginForm = ({}: LoginFormProps) => {
                         type="password"
                         required
                         {...field}
+                        disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage className="text-xs">
+                      {form.formState.errors.password?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
             </div>
-            <Button type="submit" size="lg" className="w-full mt-2">
-              Sign in
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full mt-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4 border-t pt-6">
+      {/* <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         <div className="text-sm text-muted-foreground">
           Create a new account?{" "}
           <Link
-            href="/auth/sign-up"
+            href={ROUTES.auth.signUp}
             className="text-primary underline-offset-4 transition-colors hover:underline"
           >
             Sign up
           </Link>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 };
 
-export default LoginForm;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { refreshToken as refreshTokenService } from "../services";
-import type { RefreshTokenDto } from "../interfaces";
+import type { RefreshTokenDto } from "../types";
 
 export function useRefreshToken() {
   const [loading, setLoading] = useState(false);

@@ -10,7 +10,7 @@ import type {
   LoginDto,
   RefreshTokenDto,
   LogoutDto,
-} from "@/app/auth/interfaces/auth-dto.interface";
+} from "@/app/auth/types/auth-dto.type";
 import { User } from "@/app/(core)/iam/users/_lib/_types/user.type";
 
 /**
