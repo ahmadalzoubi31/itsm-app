@@ -145,7 +145,7 @@ const RoleForm = ({ id, initialData }: RoleFormProps) => {
 
         if (permissionIds.length > 0) {
           await assignPermissionsToRole(id, {
-            permissions: permissionIds,
+            permissionIds: permissionIds,
           });
         }
 

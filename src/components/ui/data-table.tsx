@@ -157,7 +157,6 @@ export function DataTable<TData, TValue>({
         <Button
           size="sm"
           variant="outline"
-          size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -166,7 +165,6 @@ export function DataTable<TData, TValue>({
         <Button
           size="sm"
           variant="outline"
-          size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

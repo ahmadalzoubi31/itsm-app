@@ -1,4 +1,4 @@
-import { User } from "@/lib/types/globals";
+import { User } from "@/app/(core)/iam/users/_lib/_types";
 
 export interface RefreshToken {
   id: string;

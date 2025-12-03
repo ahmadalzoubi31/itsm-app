@@ -1,6 +1,5 @@
-import { Role } from "@/app/(core)/iam/roles/_types/role.interface";
-
 import { Permission } from "@/app/(core)/iam/permissions/interfaces/permission.interface";
+import { Role } from "@/app/(core)/iam/roles/_lib/_types";
 import { User } from "@/app/(core)/iam/users/_lib/_types/user.type";
 
 export type NavigationItem = {

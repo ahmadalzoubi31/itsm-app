@@ -620,14 +620,12 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                 size="sm"
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={importCommonAttributes}
               >
                 <Download className="w-4 h-4 mr-1" />
                 Import Common
               </Button>
               <Button
-                size="sm"
                 type="button"
                 variant="outline"
                 size="sm"
@@ -688,7 +686,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                     size="sm"
                     type="button"
                     variant="ghost"
-                    size="sm"
                     onClick={() => removeAttribute(key)}
                     className="mt-5"
                   >
@@ -718,7 +715,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
               size="sm"
               type="button"
               variant="outline"
-              size="sm"
               onClick={addGroupMapping}
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -752,7 +748,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                       size="sm"
                       type="button"
                       variant="ghost"
-                      size="sm"
                       onClick={() => removeGroupMapping(groupName)}
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
@@ -776,7 +771,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                           size="sm"
                           type="button"
                           variant="ghost"
-                          size="sm"
                           onClick={() => removeDNFromGroup(groupName, dnIdx)}
                           disabled={(dns as string[]).length === 1}
                         >
@@ -788,7 +782,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                       size="sm"
                       type="button"
                       variant="outline"
-                      size="sm"
                       onClick={() => addDNToGroup(groupName)}
                       className="w-full"
                     >
@@ -815,7 +808,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
               size="sm"
               type="button"
               variant="outline"
-              size="sm"
               onClick={addRoleMapping}
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -849,7 +841,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                       size="sm"
                       type="button"
                       variant="ghost"
-                      size="sm"
                       onClick={() => removeRoleMapping(roleName)}
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
@@ -873,7 +864,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                           size="sm"
                           type="button"
                           variant="ghost"
-                          size="sm"
                           onClick={() => removeDNFromRole(roleName, dnIdx)}
                           disabled={(dns as string[]).length === 1}
                         >
@@ -885,7 +875,6 @@ export const BasicInfoForm = ({ form, configId }: Props) => {
                       size="sm"
                       type="button"
                       variant="outline"
-                      size="sm"
                       onClick={() => addDNToRole(roleName)}
                       className="w-full"
                     >

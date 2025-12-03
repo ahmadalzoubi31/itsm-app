@@ -1,9 +1,16 @@
-import { FilterOperator, type FilterCondition, type FilterGroup } from "./types";
+import {
+  FilterOperator,
+  type FilterCondition,
+  type FilterGroup,
+} from "./types";
 
 /**
  * Apply a filter condition to a single row
  */
-function applyCondition<TData>(row: TData, condition: FilterCondition<TData>): boolean {
+function applyCondition<TData>(
+  row: TData,
+  condition: FilterCondition<TData>
+): boolean {
   const fieldValue = (row as any)[condition.field];
   const { operator, value, value2 } = condition;
 
@@ -56,18 +63,28 @@ function applyCondition<TData>(row: TData, condition: FilterCondition<TData>): b
       return num >= min && num <= max;
 
     case FilterOperator.IS_EMPTY:
-      return fieldValue === null || fieldValue === undefined || fieldValue === "";
+      return (
+        fieldValue === null || fieldValue === undefined || fieldValue === ""
+      );
 
     case FilterOperator.IS_NOT_EMPTY:
-      return fieldValue !== null && fieldValue !== undefined && fieldValue !== "";
+      return (
+        fieldValue !== null && fieldValue !== undefined && fieldValue !== ""
+      );
 
     case FilterOperator.IN:
       if (!Array.isArray(value)) return false;
-      return value.includes(fieldValue) || value.map(String).includes(String(fieldValue));
+      return (
+        value.includes(fieldValue) ||
+        value.map(String).includes(String(fieldValue))
+      );
 
     case FilterOperator.NOT_IN:
       if (!Array.isArray(value)) return true;
-      return !value.includes(fieldValue) && !value.map(String).includes(String(fieldValue));
+      return (
+        !value.includes(fieldValue) &&
+        !value.map(String).includes(String(fieldValue))
+      );
 
     default:
       return true;
@@ -77,7 +94,10 @@ function applyCondition<TData>(row: TData, condition: FilterCondition<TData>): b
 /**
  * Apply a filter group to a single row
  */
-function applyFilterGroup<TData>(row: TData, group: FilterGroup<TData>): boolean {
+function applyFilterGroup<TData>(
+  row: TData,
+  group: FilterGroup<TData>
+): boolean {
   if (group.conditions.length === 0) return true;
 
   const conditionResults = group.conditions.map((condition) =>
@@ -139,12 +159,11 @@ export function filterGroupToString<TData>(group: FilterGroup<TData>): string {
 
     let valueStr = String(value);
     if (value2 !== undefined) {
-      valueStr += ` and ${value2}`;
+      valueStr += ` and ${String(value2)}`;
     }
 
-    return `${field} ${operatorLabels[operator]} ${valueStr}`;
+    return `${String(field)} ${operatorLabels[operator]} ${valueStr}`;
   });
 
   return conditionStrings.join(` ${group.logic} `);
 }
-

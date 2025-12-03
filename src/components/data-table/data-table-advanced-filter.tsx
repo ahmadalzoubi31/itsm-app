@@ -38,13 +38,17 @@ interface DataTableAdvancedFilterProps<TData> {
   activeFilter?: FilterGroup<TData>;
   onFilterChange: (filter: FilterGroup<TData> | undefined) => void;
   bookmarks?: FilterBookmark<TData>[];
-  onBookmarkSave?: (bookmark: Omit<FilterBookmark<TData>, "id" | "createdAt" | "updatedAt">) => void;
+  onBookmarkSave?: (
+    bookmark: Omit<FilterBookmark<TData>, "id" | "createdAt" | "updatedAt">
+  ) => void;
   onBookmarkDelete?: (bookmarkId: string) => void;
   onBookmarkLoad?: (bookmark: FilterBookmark<TData>) => void;
 }
 
 // Operator options based on field type
-const getOperatorsForField = (fieldType: "text" | "number" | "date" | "boolean" | "array") => {
+const getOperatorsForField = (
+  fieldType: "text" | "number" | "date" | "boolean" | "array"
+) => {
   const textOperators = [
     { value: FilterOperator.EQUALS, label: "is" },
     { value: FilterOperator.NOT_EQUALS, label: "is not" },
@@ -61,7 +65,10 @@ const getOperatorsForField = (fieldType: "text" | "number" | "date" | "boolean" 
     { value: FilterOperator.NOT_EQUALS, label: "not equals" },
     { value: FilterOperator.GREATER_THAN, label: "greater than" },
     { value: FilterOperator.LESS_THAN, label: "less than" },
-    { value: FilterOperator.GREATER_THAN_OR_EQUAL, label: "greater than or equal" },
+    {
+      value: FilterOperator.GREATER_THAN_OR_EQUAL,
+      label: "greater than or equal",
+    },
     { value: FilterOperator.LESS_THAN_OR_EQUAL, label: "less than or equal" },
     { value: FilterOperator.BETWEEN, label: "between" },
   ];
@@ -99,17 +106,24 @@ const getOperatorsForField = (fieldType: "text" | "number" | "date" | "boolean" 
 };
 
 // Detect field type from data
-const detectFieldType = (data: any[], field: string): "text" | "number" | "date" | "boolean" | "array" => {
+const detectFieldType = (
+  data: any[],
+  field: string
+): "text" | "number" | "date" | "boolean" | "array" => {
   if (data.length === 0) return "text";
-  
+
   const sample = data[0];
   const value = (sample as any)[field];
-  
+
   if (value === null || value === undefined) return "text";
   if (typeof value === "boolean") return "boolean";
   if (typeof value === "number") return "number";
   if (Array.isArray(value)) return "array";
-  if (value instanceof Date || (typeof value === "string" && !isNaN(Date.parse(value)))) return "date";
+  if (
+    value instanceof Date ||
+    (typeof value === "string" && !isNaN(Date.parse(value)))
+  )
+    return "date";
   return "text";
 };
 
@@ -138,7 +152,7 @@ export function DataTableAdvancedFilter<TData>({
   // Helper to get column title
   const getColumnTitle = (col: ColumnDef<TData>): string => {
     if (typeof col.header === "string") return col.header;
-    const key = (col.accessorKey as string) || col.id || "";
+    const key = (col.id as string) || "";
     return key
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
@@ -147,7 +161,7 @@ export function DataTableAdvancedFilter<TData>({
 
   // Get filterable columns
   const filterableColumns = columns.filter((col) => {
-    const key = (col.accessorKey as string) || col.id;
+    const key = (col.id as string) || "";
     return key && key !== "select" && key !== "actions";
   });
 
@@ -155,7 +169,7 @@ export function DataTableAdvancedFilter<TData>({
   const addCondition = () => {
     const newCondition: FilterCondition<TData> = {
       id: `condition-${Date.now()}`,
-      field: (filterableColumns[0]?.accessorKey as string) || filterableColumns[0]?.id || "",
+      field: (filterableColumns[0]?.id as string) || "",
       operator: FilterOperator.EQUALS,
       value: "",
     };
@@ -166,7 +180,10 @@ export function DataTableAdvancedFilter<TData>({
   };
 
   // Update condition
-  const updateCondition = (id: string, updates: Partial<FilterCondition<TData>>) => {
+  const updateCondition = (
+    id: string,
+    updates: Partial<FilterCondition<TData>>
+  ) => {
     setFilterGroup({
       ...filterGroup,
       conditions: filterGroup.conditions.map((cond) =>
@@ -206,14 +223,14 @@ export function DataTableAdvancedFilter<TData>({
   // Save bookmark
   const saveBookmark = () => {
     if (!bookmarkName.trim() || !onBookmarkSave) return;
-    
+
     onBookmarkSave({
       name: bookmarkName,
       description: bookmarkDescription,
       filter: filterGroup,
       isDefault: false,
     });
-    
+
     setBookmarkName("");
     setBookmarkDescription("");
     setBookmarkDialogOpen(false);
@@ -234,10 +251,9 @@ export function DataTableAdvancedFilter<TData>({
 
   // Check if operator needs value input
   const needsValue = (operator: FilterOperator) => {
-    return ![
-      FilterOperator.IS_EMPTY,
-      FilterOperator.IS_NOT_EMPTY,
-    ].includes(operator);
+    return ![FilterOperator.IS_EMPTY, FilterOperator.IS_NOT_EMPTY].includes(
+      operator
+    );
   };
 
   // Check if operator needs second value (BETWEEN)
@@ -268,7 +284,7 @@ export function DataTableAdvancedFilter<TData>({
               Build complex filters with multiple conditions
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             {/* Logic Selector */}
             <div className="flex items-center gap-2">
@@ -299,7 +315,7 @@ export function DataTableAdvancedFilter<TData>({
                 filterGroup.conditions.map((condition, index) => {
                   const fieldType = getFieldType(condition.field as string);
                   const operators = getOperatorsForField(fieldType);
-                  
+
                   return (
                     <div
                       key={condition.id}
@@ -312,7 +328,7 @@ export function DataTableAdvancedFilter<TData>({
                           </Badge>
                         </div>
                       )}
-                      
+
                       <div className="flex-1 grid grid-cols-12 gap-2">
                         {/* Field */}
                         <Select
@@ -330,7 +346,7 @@ export function DataTableAdvancedFilter<TData>({
                           </SelectTrigger>
                           <SelectContent>
                             {filterableColumns.map((col) => {
-                              const key = (col.accessorKey as string) || col.id;
+                              const key = (col.id as string) || "";
                               return (
                                 <SelectItem key={key} value={key}>
                                   {getColumnTitle(col)}
@@ -363,7 +379,13 @@ export function DataTableAdvancedFilter<TData>({
                         {needsValue(condition.operator) && (
                           <>
                             <Input
-                              type={fieldType === "number" ? "number" : fieldType === "date" ? "date" : "text"}
+                              type={
+                                fieldType === "number"
+                                  ? "number"
+                                  : fieldType === "date"
+                                  ? "date"
+                                  : "text"
+                              }
                               className="col-span-3"
                               placeholder="Value"
                               value={condition.value || ""}
@@ -375,7 +397,13 @@ export function DataTableAdvancedFilter<TData>({
                             />
                             {needsSecondValue(condition.operator) && (
                               <Input
-                                type={fieldType === "number" ? "number" : fieldType === "date" ? "date" : "text"}
+                                type={
+                                  fieldType === "number"
+                                    ? "number"
+                                    : fieldType === "date"
+                                    ? "date"
+                                    : "text"
+                                }
                                 className="col-span-3"
                                 placeholder="Value 2"
                                 value={condition.value2 || ""}
@@ -442,7 +470,10 @@ export function DataTableAdvancedFilter<TData>({
             <div className="flex items-center justify-between w-full">
               <div className="flex gap-2">
                 {onBookmarkSave && (
-                  <Dialog open={bookmarkDialogOpen} onOpenChange={setBookmarkDialogOpen}>
+                  <Dialog
+                    open={bookmarkDialogOpen}
+                    onOpenChange={setBookmarkDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Bookmark className="mr-2 h-4 w-4" />
@@ -467,20 +498,30 @@ export function DataTableAdvancedFilter<TData>({
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="bookmark-desc">Description (optional)</Label>
+                          <Label htmlFor="bookmark-desc">
+                            Description (optional)
+                          </Label>
                           <Textarea
                             id="bookmark-desc"
                             value={bookmarkDescription}
-                            onChange={(e) => setBookmarkDescription(e.target.value)}
+                            onChange={(e) =>
+                              setBookmarkDescription(e.target.value)
+                            }
                             placeholder="Description of this filter"
                           />
                         </div>
                       </div>
                       <DialogFooter>
-                        <Button variant="outline" onClick={() => setBookmarkDialogOpen(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setBookmarkDialogOpen(false)}
+                        >
                           Cancel
                         </Button>
-                        <Button onClick={saveBookmark} disabled={!bookmarkName.trim()}>
+                        <Button
+                          onClick={saveBookmark}
+                          disabled={!bookmarkName.trim()}
+                        >
                           Save
                         </Button>
                       </DialogFooter>
@@ -504,4 +545,3 @@ export function DataTableAdvancedFilter<TData>({
     </>
   );
 }
-

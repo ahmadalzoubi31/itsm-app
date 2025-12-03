@@ -20,7 +20,7 @@ import {
   IconUsers,
   IconPalette,
 } from "@tabler/icons-react";
-import { NavigationItem } from "@/utils/navigation-access.utils";
+import { NavigationItem } from "@/lib/utils/navigation-access.utils";
 
 // Map icon names to components
 const icons: { [key: string]: React.ComponentType<any> } = {

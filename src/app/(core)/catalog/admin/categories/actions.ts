@@ -39,7 +39,10 @@ export async function upsertCategoryAction(input: CategoryFormValues) {
     const { id, ...dto } = valid;
     await updateCategory(id, dto);
   } else {
-    await createCategory(valid);
+    await createCategory({
+      ...valid,
+      businessLineId: "",
+    });
   }
 
   revalidatePath(CATEGORIES_PATH);

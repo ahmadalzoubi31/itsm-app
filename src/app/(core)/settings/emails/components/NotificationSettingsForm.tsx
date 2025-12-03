@@ -212,14 +212,12 @@ export function NotificationSettingsForm({
                         variant={
                           selectedCategory === "all" ? "default" : "outline"
                         }
-                        size="sm"
                         onClick={() => setSelectedCategory("all")}
                       >
                         All
                       </Button>
                       {NOTIFICATION_CATEGORIES.map((category) => (
                         <Button
-                          size="sm"
                           key={category}
                           type="button"
                           variant={

@@ -4,6 +4,10 @@ import AppSidebar from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { IconLoader2 } from "@tabler/icons-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 export default function Layout({
   children,
 }: Readonly<{

@@ -126,7 +126,6 @@ export const UserStaging = () => {
             <Button
               size="sm"
               onClick={importSelectedUsers}
-              size="sm"
               disabled={selectedIds.length === 0}
               className="flex items-center gap-2"
             >
@@ -137,7 +136,6 @@ export const UserStaging = () => {
               size="sm"
               variant="destructive"
               onClick={rejectSelectedUsers}
-              size="sm"
               disabled={selectedIds.length === 0}
               className="flex items-center gap-2"
             >
@@ -147,7 +145,6 @@ export const UserStaging = () => {
             <Button
               size="sm"
               variant="outline"
-              size="sm"
               onClick={exportUserList}
               className="flex items-center gap-2"
             >

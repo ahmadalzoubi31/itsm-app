@@ -44,7 +44,7 @@ export function DataTableFilterBuilder<TData>({
 
   // Get filterable columns (columns with accessorKey or id, excluding select column)
   const filterableColumns = columns.filter((col) => {
-    const key = (col.accessorKey as string) || col.id;
+    const key = (col.id as string) || "";
     return key && key !== "select" && key !== "actions";
   });
 
@@ -53,24 +53,32 @@ export function DataTableFilterBuilder<TData>({
     activeFilters.map((f) => f.columnKey as string)
   );
   const availableColumns = filterableColumns.filter((col) => {
-    const key = (col.accessorKey as string) || col.id;
+    const key = (col.id as string) || "";
     return !activeFilterKeys.has(key);
   });
 
   // Get unique values for a column
-  const getUniqueValues = (columnKey: string): Array<{ label: string; value: string }> => {
+  const getUniqueValues = (
+    columnKey: string
+  ): Array<{ label: string; value: string }> => {
     const values = new Map<string, string>(); // Map value -> display label
-    
+
     data.forEach((row: any) => {
       const value = row[columnKey];
       if (value !== null && value !== undefined && value !== "") {
         let displayValue: string;
         let filterValue: string;
-        
+
         // Handle nested objects (e.g., requester.displayName)
         if (typeof value === "object" && !Array.isArray(value)) {
-          displayValue = value.displayName || value.name || value.email || value.title || String(value.id || "");
-          filterValue = value.id || value.key || displayValue || JSON.stringify(value);
+          displayValue =
+            value.displayName ||
+            value.name ||
+            value.email ||
+            value.title ||
+            String(value.id || "");
+          filterValue =
+            value.id || value.key || displayValue || JSON.stringify(value);
         } else if (Array.isArray(value)) {
           // For arrays, use the first item or join
           displayValue = value.length > 0 ? String(value[0]) : "";
@@ -79,7 +87,7 @@ export function DataTableFilterBuilder<TData>({
           displayValue = String(value);
           filterValue = displayValue;
         }
-        
+
         if (displayValue && filterValue) {
           values.set(filterValue, displayValue);
         }
@@ -104,13 +112,15 @@ export function DataTableFilterBuilder<TData>({
     const options = predefined || getUniqueValues(selectedColumn);
 
     if (options.length === 0) {
-      alert("No values found for this column. Please select a different column.");
+      alert(
+        "No values found for this column. Please select a different column."
+      );
       return;
     }
 
     // Get column title from column definition
     const column = filterableColumns.find(
-      (col) => ((col.accessorKey as string) || col.id) === selectedColumn
+      (col) => ((col.id as string) || "") === selectedColumn
     );
     const title =
       (column?.header as string) ||
@@ -182,12 +192,13 @@ export function DataTableFilterBuilder<TData>({
                 </SelectTrigger>
                 <SelectContent>
                   {availableColumns.map((col) => {
-                    const key = (col.accessorKey as string) || col.id;
+                    const key = (col.id as string) || "";
                     const title =
                       (col.header as string) ||
-                      key.charAt(0).toUpperCase() + key.slice(1);
+                      key.charAt(0).toUpperCase() + key.slice(1) ||
+                      "";
                     return (
-                      <SelectItem key={key} value={key}>
+                      <SelectItem key={key} value={key || ""}>
                         {title}
                       </SelectItem>
                     );
@@ -198,7 +209,9 @@ export function DataTableFilterBuilder<TData>({
 
             {selectedColumn && currentOptions.length > 0 && (
               <div className="space-y-2">
-                <Label>Filter Options ({currentOptions.length} available)</Label>
+                <Label>
+                  Filter Options ({currentOptions.length} available)
+                </Label>
                 <div className="max-h-60 overflow-y-auto rounded-md border p-2">
                   <div className="text-sm text-muted-foreground mb-2">
                     All values will be available in the filter. You can select
@@ -246,4 +259,3 @@ export function DataTableFilterBuilder<TData>({
     </div>
   );
 }
-

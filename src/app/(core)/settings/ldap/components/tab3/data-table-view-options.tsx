@@ -27,7 +27,6 @@ export function DataTableViewOptions<TData, TFunc>({
       <Button
         size="sm"
         variant="outline"
-        size="sm"
         className="ml-auto mr-2 hidden h-8 lg:flex"
         onClick={() => refetch()}
       >
@@ -38,7 +37,6 @@ export function DataTableViewOptions<TData, TFunc>({
           <Button
             size="sm"
             variant="outline"
-            size="sm"
             className="ml-auto hidden h-8 lg:flex"
           >
             <Settings2 />

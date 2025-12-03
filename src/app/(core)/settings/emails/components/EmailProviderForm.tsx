@@ -397,7 +397,7 @@ export function EmailProviderForm({ onSuccess }: EmailProviderFormProps) {
       console.log("🚀 ~ onSubmit ~ savedSettings:", savedSettings);
 
       if (savedSettings && onSuccess) {
-        onSuccess(savedSettings.data);
+        onSuccess(savedSettings);
       }
       toast.success("Email settings saved successfully!");
     } catch (error) {
@@ -726,7 +726,6 @@ export function EmailProviderForm({ onSuccess }: EmailProviderFormProps) {
                                       size="sm"
                                       type="button"
                                       variant="ghost"
-                                      size="sm"
                                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                       onClick={() =>
                                         setShowOutgoingPassword(
@@ -1273,7 +1272,6 @@ export function EmailProviderForm({ onSuccess }: EmailProviderFormProps) {
                                       size="sm"
                                       type="button"
                                       variant="ghost"
-                                      size="sm"
                                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                       onClick={() =>
                                         setShowIncomingPassword(
@@ -1474,7 +1472,6 @@ export function EmailProviderForm({ onSuccess }: EmailProviderFormProps) {
                 size="sm"
                 type="button"
                 variant="ghost"
-                size="sm"
                 onClick={() => {
                   console.log("🚀 ~ Form Debug Info:");
                   console.log("- Form values:", form.getValues());
@@ -1501,7 +1498,6 @@ export function EmailProviderForm({ onSuccess }: EmailProviderFormProps) {
                 size="sm"
                 type="button"
                 variant="ghost"
-                size="sm"
                 onClick={() => {
                   const values = form.getValues();
                   let diagnostics = "📧 Email Configuration Diagnostics:\n\n";

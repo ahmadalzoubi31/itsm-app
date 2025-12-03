@@ -1,15 +1,15 @@
 import { fetchWithAuth } from "@/lib/api/helper/fetchWithAuth";
 import { getBackendUrl } from "@/lib/api/helper/getBackendUrl";
-import { PERMISSIONS_ENDPOINTS } from "@/lib/api/endpoints/permissions";
 import { AssignPermissionsToUserDto } from "../interfaces/permission-dto.interface";
 import { Permission } from "../interfaces/permission.interface";
+
+import { RevokePermissionsFromUserDto } from "../../permissions/interfaces/permission-dto.interface";
+import { PERMISSIONS_ENDPOINTS } from "@/lib/api/endpoints";
 import {
   AssignPermissionsToRoleDto,
   RevokePermissionsFromRoleDto,
-} from "../../roles/_types/role-dto.interface";
-import { RevokePermissionsFromUserDto } from "../../permissions/interfaces/permission-dto.interface";
-import { Role } from "../../roles/_types/role.interface";
-import { User } from "../../users/_lib/_types/user.type";
+  Role,
+} from "../../roles/_lib/_types";
 
 // -------- Permissions --------
 export async function listPermissions(): Promise<Permission[]> {

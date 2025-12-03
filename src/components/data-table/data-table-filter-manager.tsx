@@ -48,17 +48,17 @@ export function DataTableFilterManager<TData>({
     if (typeof col.header === "string") {
       return col.header;
     }
-    
+
     // Check meta property for title
     if (col.meta && typeof col.meta === "object" && "title" in col.meta) {
       return String(col.meta.title);
     }
-    
+
     // For function headers, try to extract from common patterns
     // Most columns use DataTableColumnHeader with a title prop
     // We'll use the accessorKey/id as fallback
-    const key = (col.accessorKey as string) || col.id || "";
-    
+    const key = (col.id as string) || "";
+
     // Format the key nicely (e.g., "createdAt" -> "Created At")
     return key
       .replace(/([A-Z])/g, " $1") // Add space before capital letters
@@ -68,7 +68,7 @@ export function DataTableFilterManager<TData>({
 
   // Get filterable columns (columns with accessorKey or id, excluding select column)
   const filterableColumns = columns.filter((col) => {
-    const key = (col.accessorKey as string) || col.id;
+    const key = (col.id as string) || "";
     return key && key !== "select" && key !== "actions";
   });
 
@@ -77,7 +77,7 @@ export function DataTableFilterManager<TData>({
     activeFilters.map((f) => f.columnKey as string)
   );
   const availableColumns = filterableColumns.filter((col) => {
-    const key = (col.accessorKey as string) || col.id;
+    const key = (col.id as string) || "";
     return !activeFilterKeys.has(key);
   });
 
@@ -136,15 +136,19 @@ export function DataTableFilterManager<TData>({
     const options = predefined || getUniqueValues(selectedColumn);
 
     if (options.length === 0) {
-      alert("No values found for this column. Please select a different column.");
+      alert(
+        "No values found for this column. Please select a different column."
+      );
       return;
     }
 
     // Get column title from column definition
     const column = filterableColumns.find(
-      (col) => ((col.accessorKey as string) || col.id) === selectedColumn
+      (col) => ((col.id as string) || "") === selectedColumn
     );
-    const title = column ? getColumnTitle(column) : selectedColumn.charAt(0).toUpperCase() + selectedColumn.slice(1);
+    const title = column
+      ? getColumnTitle(column)
+      : selectedColumn.charAt(0).toUpperCase() + selectedColumn.slice(1);
 
     const newFilter: FacetedFilterConfig<TData> = {
       columnKey: selectedColumn,
@@ -216,7 +220,9 @@ export function DataTableFilterManager<TData>({
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0"
-                        onClick={() => handleRemoveFilter(filter.columnKey as string)}
+                        onClick={() =>
+                          handleRemoveFilter(filter.columnKey as string)
+                        }
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -247,7 +253,7 @@ export function DataTableFilterManager<TData>({
                   <SelectContent>
                     {availableColumns.length > 0 ? (
                       availableColumns.map((col) => {
-                        const key = (col.accessorKey as string) || col.id;
+                        const key = (col.id as string) || "";
                         const title = getColumnTitle(col);
                         return (
                           <SelectItem key={key} value={key}>
@@ -318,4 +324,3 @@ export function DataTableFilterManager<TData>({
     </Dialog>
   );
 }
-

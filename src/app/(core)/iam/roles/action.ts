@@ -48,7 +48,9 @@ export async function upsertRoleAction(input: RoleSchema) {
 
   // Assign new permissions
   if (permissions.length > 0) {
-    await assignPermissionsToRole(roleId, { permissions });
+    await assignPermissionsToRole(roleId, {
+      permissionIds: permissions.map((p) => p.id),
+    });
   }
 
   revalidatePath(ROLES_PATH);
@@ -64,11 +66,15 @@ export async function updateRolePermissionsAction(
   const toRemove = oldPermissions.filter((p) => !newPermissions.includes(p));
 
   if (toAdd.length > 0) {
-    await assignPermissionsToRole(id, { permissionIds: toAdd });
+    await assignPermissionsToRole(id, {
+      permissionIds: toAdd.map((p) => p.id),
+    });
   }
 
   if (toRemove.length > 0) {
-    await revokePermissionsFromRole(id, { permissionIds: toRemove });
+    await revokePermissionsFromRole(id, {
+      permissionIds: toRemove.map((p) => p.id),
+    });
   }
 
   revalidatePath(ROLES_PATH);
