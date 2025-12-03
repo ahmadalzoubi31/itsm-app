@@ -75,28 +75,35 @@ export function CreateCaseDialog({
       return;
     }
 
-    createCase(formData, {
-      onSuccess: (newCase) => {
-        toast.success("Case created successfully");
-        setOpen(false);
-        router.push(`/cases/${newCase.id}`);
-        // Reset form
-        setFormData({
-          title: "",
-          description: "",
-          priority: CasePriority.MEDIUM,
-          businessLineId: defaultBusinessLineId || "",
-          requesterId: defaultRequesterId || "",
-          assignmentGroupId: "",
-          assigneeId: "",
-        });
+    createCase(
+      {
+        ...formData,
+        categoryId: "",
+        subcategoryId: "",
       },
-      onError: (error) => {
-        toast.error("Failed to create case", {
-          description: error.message,
-        });
-      },
-    });
+      {
+        onSuccess: (newCase) => {
+          toast.success("Case created successfully");
+          setOpen(false);
+          router.push(`/cases/${newCase.id}`);
+          // Reset form
+          setFormData({
+            title: "",
+            description: "",
+            priority: CasePriority.MEDIUM,
+            businessLineId: defaultBusinessLineId || "",
+            requesterId: defaultRequesterId || "",
+            assignmentGroupId: "",
+            assigneeId: "",
+          });
+        },
+        onError: (error) => {
+          toast.error("Failed to create case", {
+            description: error.message,
+          });
+        },
+      }
+    );
   };
 
   return (

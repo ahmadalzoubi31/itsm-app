@@ -1,5 +1,6 @@
 import { BusinessLine } from "@/app/(core)/settings/services/business-line.service";
-import { RequestCard, Service } from "@/app/(core)/catalog/types";
+import { Service } from "../../catalog/admin/services/_lib/_types";
+import { RequestCard } from "../../catalog/admin/request-cards/_lib/_types";
 
 /**
  * Case status enum
