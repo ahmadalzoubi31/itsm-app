@@ -50,6 +50,8 @@ export function CreateCaseDialog({
     requesterId: defaultRequesterId || "",
     assignmentGroupId: "",
     assigneeId: "",
+    categoryId: "",
+    subcategoryId: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -75,11 +77,19 @@ export function CreateCaseDialog({
       return;
     }
 
+    if (!formData.categoryId) {
+      toast.error("Category is required");
+      return;
+    }
+
+    if (!formData.subcategoryId) {
+      toast.error("Subcategory is required");
+      return;
+    }
+
     createCase(
       {
         ...formData,
-        categoryId: "",
-        subcategoryId: "",
       },
       {
         onSuccess: (newCase) => {
@@ -95,6 +105,8 @@ export function CreateCaseDialog({
             requesterId: defaultRequesterId || "",
             assignmentGroupId: "",
             assigneeId: "",
+            categoryId: "",
+            subcategoryId: "",
           });
         },
         onError: (error) => {
@@ -228,6 +240,40 @@ export function CreateCaseDialog({
                   })
                 }
                 placeholder="Assignment group ID"
+                required
+                disabled={isPending}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="categoryId">
+                Category ID <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="categoryId"
+                value={formData.categoryId}
+                onChange={(e) =>
+                  setFormData({ ...formData, categoryId: e.target.value })
+                }
+                placeholder="Category ID"
+                required
+                disabled={isPending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="subcategoryId">
+                Subcategory ID <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="subcategoryId"
+                value={formData.subcategoryId}
+                onChange={(e) =>
+                  setFormData({ ...formData, subcategoryId: e.target.value })
+                }
+                placeholder="Subcategory ID"
                 required
                 disabled={isPending}
               />
