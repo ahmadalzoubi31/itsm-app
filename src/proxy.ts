@@ -1,30 +1,26 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtDecode } from "jwt-decode";
+import { COOKIE_NAMES } from "@/lib/api/helper/server-cookies";
 
 export function proxy(req: NextRequest) {
-  const token = req.cookies.get("accessToken")?.value;
-
+  const token = req.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
   if (!token) {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
-
   try {
     const payload = jwtDecode<{ exp: number }>(token);
-
     if (payload.exp && payload.exp < Date.now() / 1000) {
       // If expired, redirect to session-expired with redirect param
-      const refreshToken = req.cookies.get("refreshToken")?.value || "";
+      const refreshToken = req.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value || "";
       const sessionExpiredUrl = new URL("/auth/session-expired", req.url);
       sessionExpiredUrl.searchParams.set("redirect", req.nextUrl.pathname);
       sessionExpiredUrl.searchParams.set("refreshToken", refreshToken);
-
       return NextResponse.redirect(sessionExpiredUrl);
     }
   } catch {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
-
   return NextResponse.next();
 }
 
